@@ -1,7 +1,7 @@
 name: stager
 description: "A Flutter library for precisely managing and staging data in cross-platform applications."
 version: 0.0.1
-homepage:
+homepage: https://gitlab.com/bandgap/stager
 
 environment:
   sdk: ^3.8.1
