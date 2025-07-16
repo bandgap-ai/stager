@@ -1,7 +1,7 @@
 // test/stager/site_state_test.dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager/tree/concrete_tree.dart';
-import '../lib/site_state.dart';
+import 'package:stager/site_state.dart';
 import 'package:stager/site_state_observer.dart';
 import 'package:stager/tree/tree.dart';
 

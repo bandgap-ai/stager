@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/site_state.dart';
+import 'package:stager/site_state.dart';
 import 'package:stager/tree/concrete_tree.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/add_site_dialog.dart';
