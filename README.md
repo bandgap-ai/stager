@@ -1,4 +1,7 @@
 # stager
+[![pipeline status](https://gitlab.com/bandgap/stager/badges/main/pipeline.svg)](https://gitlab.com/bandgap/stager/-/commits/main)
+[![coverage report](https://gitlab.com/bandgap/stager/badges/main/coverage.svg)](https://gitlab.com/bandgap/stager/-/commits/main)
+
 
 
 
