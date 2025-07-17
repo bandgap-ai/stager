@@ -2,12 +2,13 @@
 library;
 import 'package:flutter/material.dart';
 import 'package:stager/tree/tree.dart';
+import 'package:stager/editors/stager_editor.dart';
 
 /// A dialog widget for editing the name of a [LeafNode].
 ///
 /// This dialog displays a [TextField] pre-filled with the current node's name.
 /// Users can modify the name and save the changes, which returns the updated name.
-class EditNodeDialog extends StatefulWidget {
+class EditNodeDialog extends StagerEditor {
   /// The [NodeProperties] to be edited.
   final NodeProperties properties;
 
