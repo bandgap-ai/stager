@@ -1,3 +1,6 @@
+# GitLab CI/CD configuration for Band Gap's Stager project
+# Runs tests, static analysis, and builds for the Flutter tree tracking application
+
 # You can override the included template(s) by including variable overrides
 # SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
 # Secret Detection customization: https://docs.gitlab.com/user/application_security/secret_detection/pipeline/configure
@@ -5,15 +8,104 @@
 # Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
-stages:
-- test
-- secret-detection
+
 sast:
   stage: test
 include:
 - template: Security/SAST.gitlab-ci.yml
 - template: Security/Secret-Detection.gitlab-ci.yml
-variables:
-  SECRET_DETECTION_ENABLED: 'true'
 secret_detection:
   stage: secret-detection
+
+# Use the official Flutter Docker image with a stable version
+image: ghcr.io/cirruslabs/flutter:latest
+
+# Cache dependencies between pipeline runs to speed up builds
+cache:
+  key: "${CI_COMMIT_REF_SLUG}"
+  paths:
+    - .pub-cache/
+    - .dart_tool/
+
+# Define pipeline stages
+stages:
+  - setup
+  - test
+  - secret-detection
+  - analyze
+  - build
+
+# Global variables for consistent configuration
+variables:
+  PUB_CACHE: "$CI_PROJECT_DIR/.pub-cache"
+  FLUTTER_ANALYTICS: "false"
+  SECRET_DETECTION_ENABLED: 'true'
+
+# Setup dependencies stage
+setup_dependencies:
+  stage: setup
+  script:
+    - flutter --version
+    - flutter doctor -v
+    - flutter pub get
+  artifacts:
+    paths:
+      - pubspec.lock
+      - .pub-cache/
+      - .dart_tool/
+    expire_in: 2 hours
+
+# Run all tests with coverage
+test_all:
+  stage: test
+  needs: ["setup_dependencies"]
+  before_script:
+    # Install lcov for genhtml command and lcov_cobertura for format conversion
+    - apt-get update -qq && apt-get install -y -qq lcov python3-pip
+    - pip install --break-system-packages lcov_cobertura
+  script:
+    - flutter pub get
+    - echo "Running all Flutter tests..."
+    # Run Flutter tests and generate coverage data
+    - flutter test --coverage
+    # Generate HTML coverage report
+    - genhtml coverage/lcov.info -o $CI_PROJECT_DIR/coverage/html
+    # Convert lcov.info to Cobertura format for GitLab
+    - python3 -m lcov_cobertura coverage/lcov.info -o $CI_PROJECT_DIR/coverage/cobertura-coverage.xml
+  # Regex to parse the coverage percentage from genhtml output
+  coverage: '/lines\.*: \d+\.\d+%/'
+  artifacts:
+    name: "Coverage Report - $CI_COMMIT_REF_NAME"
+    paths:
+      # The path to the generated coverage reports, relative to the project root.
+      - coverage/
+    reports:
+      # Define the coverage report for GitLab's built-in visualization.
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+
+# Static analysis and code quality
+analyze:
+  stage: analyze
+  needs: ["setup_dependencies"]
+  script:
+    - flutter pub get
+    - echo "Running Flutter analyzer..."
+    - flutter analyze --no-fatal-infos --no-fatal-warnings
+
+# Build for Web - for web deployment
+build_web:
+  stage: build
+  needs: ["test_all", "analyze"]
+  script:
+    - flutter pub get
+    - echo "Building web version..."
+    - flutter build web --release
+  artifacts:
+    paths:
+      - build/web/
+    expire_in: 1 month
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG
