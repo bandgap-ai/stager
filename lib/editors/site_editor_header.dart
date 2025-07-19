@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:stager/editors/node_editor_factory.dart';
+import 'package:stager/editors/standard_widgets.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/add_site_dialog.dart';
-import 'package:stager/editors/confirm_dialog.dart';
 import 'package:stager/editors/concrete_node_properties_editor.dart';
 import 'package:stager/editors/file_handler.dart';
 import 'package:stager/editors/import_export_menu.dart';
@@ -87,10 +87,9 @@ class SiteEditorHeader extends StatelessWidget {
                   onPressed: () async {
                     final confirm = await showDialog<bool>(
                       context: context,
-                      builder: (context) => const ConfirmDialog(
-                        title: 'Delete Node',
-                        content: 'Are you sure you want to delete this node?',
-                      ),
+                      builder: (context) => buildConfirmDialog(context,
+                          'Delete Node',
+                          'Are you sure you want to delete this node?'),
                     );
                     if (confirm == true) {
                       siteState.deleteNode(selectedNode);

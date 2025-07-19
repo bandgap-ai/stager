@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/editors/file_handler.dart';
+import 'package:stager/editors/standard_widgets.dart';
 
 /// A popup menu button that provides "Import" and "Export" options.
 ///
@@ -25,6 +26,9 @@ class ImportExportMenu extends StatelessWidget {
     return PopupMenuButton<String>(
       icon: Icon(Icons.more_horiz, color: Theme.of(context).colorScheme.onPrimary),
       onSelected: (value) async {
+        Function() errorDialogCallback = buildErrorDialogCallback(context,
+            "Error", "Directory selection and exporting not available on this platform.");
+        Function(String) notificationCallback = buildNotificationCallback(context);
         final selectedNode = siteState.selectedNode;
         if (value == 'export') {
           final nodesToExport = selectedNode != null ? [selectedNode] : siteState.treeData;
@@ -34,10 +38,11 @@ class ImportExportMenu extends StatelessWidget {
           await fileHandler.export(
             nodes: nodesToExport,
             suggestedFileName: fileName,
-            context: context,
+            errorDialogCallback: errorDialogCallback,
+              notificationCallback: notificationCallback,
           );
         } else if (value == 'import') {
-          final importedNodes = await fileHandler.import(context: context);
+          final importedNodes = await fileHandler.import(notificationCallback: notificationCallback);
           if (importedNodes != null) {
             siteState.addNodes(importedNodes);
           }

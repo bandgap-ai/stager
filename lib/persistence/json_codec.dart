@@ -2,9 +2,14 @@ import 'dart:convert';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/tree/concrete_tree.dart';
 import 'package:stager/tree/iterators.dart';
+import 'package:logger/logger.dart';
 
 /// A codec for serializing and deserializing a tree of [TreeNode]s to and from JSON.
 class JsonCodec {
+
+  /// Logger for this class.
+  final logger = Logger();
+
   /// Serializes a list of [LeafNode]s to a JSON string.
   String serialize(List<LeafNode> nodes) {
     final nodeMap = <LeafNode, Map<String, dynamic>>{};
@@ -48,35 +53,43 @@ class JsonCodec {
 
   /// Deserializes a JSON string into a list of [LeafNode]s.
   List<LeafNode> deserialize(String jsonString) {
-    final List<dynamic> topLevelData = jsonDecode(jsonString) as List<dynamic>;
+
     final List<LeafNode> rootNodes = [];
     final List<Map<String, dynamic>> stack = [];
 
-    for (final data in topLevelData.reversed) {
-      stack.add({'data': data, 'parent': null});
-    }
+    try {
+      final List<dynamic> topLevelData = jsonDecode(jsonString) as List<
+          dynamic>;
 
-    while (stack.isNotEmpty) {
-      final current = stack.removeLast();
-      final data = current['data'] as Map<String, dynamic>;
-      final parent = current['parent'] as CompositeNode?;
-
-      final LeafNode node = _createNodeFromJson(data);
-
-      if (parent != null) {
-        parent.addChild(node);
-      } else {
-        rootNodes.add(node);
+      for (final data in topLevelData.reversed) {
+        stack.add({'data': data, 'parent': null});
       }
 
-      if (data.containsKey('children')) {
-        final childrenData = data['children'] as List<dynamic>;
-        for (final childData in childrenData.reversed) {
-          stack.add({'data': childData, 'parent': node});
+      while (stack.isNotEmpty) {
+        final current = stack.removeLast();
+        final data = current['data'] as Map<String, dynamic>;
+        final parent = current['parent'] as CompositeNode?;
+
+        final LeafNode node = _createNodeFromJson(data);
+
+        if (parent != null) {
+          parent.addChild(node);
+        } else {
+          rootNodes.add(node);
+        }
+
+        if (data.containsKey('children')) {
+          final childrenData = data['children'] as List<dynamic>;
+          for (final childData in childrenData.reversed) {
+            stack.add({'data': childData, 'parent': node});
+          }
         }
       }
+    } catch (e){
+      logger.e('Error deserializing JSON: $e');
+      throw FormatException('Invalid JSON format: '
+          'Expected a list but received ${jsonString.runtimeType}');
     }
-
     return rootNodes;
   }
 

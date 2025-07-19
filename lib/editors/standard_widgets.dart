@@ -3,6 +3,90 @@ import 'package:latlong2/latlong.dart';
 import 'package:stager/editors/single_point_map_editor.dart';
 import 'package:flutter_map/flutter_map.dart';
 
+/// Builds a function that can be used as a callback to post a notification.
+///
+/// [context] is the context for the notification.
+Function(String) buildNotificationCallback(BuildContext context) {
+  return (String message) {
+    showNotification(context, message);
+  };
+}
+
+/// Shows a notification to the user with the given [message] in the
+/// snack bar.
+///
+/// [context] is the context for the notification.
+/// [message] is the message to show.
+void showNotification(BuildContext context, String message) {
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      //const SnackBar(content: Text('Export complete!')),
+      SnackBar(content: Text(message)),
+    );
+  }
+}
+
+/// Builds a Stager-standard Message Dialog.
+///
+/// [context] is the context for the dialog.
+/// [title] is the title of the dialog.
+/// [content] is the content of the dialog.
+Widget buildMessageDialog(BuildContext context, String title, String content) {
+  return AlertDialog(
+    title: Text(title),
+    content: Text(content),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(false),
+        child: const Text('OK'),
+      ),
+    ],
+  );
+}
+
+/// Builds a function that can be used to build an error dialog as a callback.
+///
+/// [context] is the context for the dialog.
+/// [title] is the title of the dialog.
+/// [content] is the content of the dialog.
+Function() buildErrorDialogCallback(BuildContext context, String title, String content) {
+  return () async {
+    //  final String msgTitle = "Error";
+    //   final String errMsg = "Directory selection and exporting not available on "
+    //       "this platform.";
+    if (context.mounted) {
+      await showDialog<void>(
+        context: context,
+        builder: (context) {
+          Widget dialog = buildMessageDialog(context, title, content);
+          return dialog;
+        },
+      );
+    }
+  };
+}
+
+/// Builds a Stager-standard confirm dialog.
+///
+/// [context] is the context for the dialog.
+/// [title] is the title of the dialog.
+/// [content] is the content of the dialog.
+Widget buildConfirmDialog(BuildContext context, String title, String content) {
+  return AlertDialog(
+    title: Text(title),
+    content: Text(content),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(false),
+        child: const Text('Cancel'),
+      ),
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(true),
+        child: const Text('Confirm'),
+      ),
+    ],
+  );
+}
 
 /// Builds a Stager-standard text field editor with all the bells and whistles.
 ///

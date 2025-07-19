@@ -1,11 +1,9 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:stager/persistence/json_codec.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
-import 'package:stager/editors/message_dialog.dart';
 import 'dart:convert';
 
 /// An abstract interface for handling file import and export operations.
@@ -23,7 +21,8 @@ abstract class FileHandler {
   Future<void> export({
     required List<LeafNode> nodes,
     String? filePath,
-    required BuildContext context,
+    required Function() errorDialogCallback,
+    required Function(String) notificationCallback,
     String? suggestedFileName,
   });
 
@@ -35,11 +34,13 @@ abstract class FileHandler {
   /// The [context] is required to show `SnackBar` notifications.
   Future<List<LeafNode>?> import({
     String? filePath,
-    required BuildContext context,
+    required Function(String) notificationCallback,
   });
 
+  /// Direct-write utility function.
   Future<void> writeToFile(String path, List<LeafNode> nodes);
 
+  /// Direct-read utility function.
   Future<List<LeafNode>?> readFromFile(String path);
 }
 
@@ -61,22 +62,11 @@ class BasicFileHandler implements FileHandler {
   /// [nodes] is the list of nodes to save.
   /// [suggestedFileName] is the suggested name for the file.
   void _saveOnMobile(List<LeafNode> nodes, String? suggestedFileName,
-      BuildContext context) async {
+      void Function() onErrFunc,
+      Function(String) notificationCallback,) async {
     // Make sure directory picking is supported.
     if (!await FlutterFileDialog.isPickDirectorySupported()) {
-      final String msgTitle = "Error";
-      final String errMsg = "Directory selection and exporting not available on "
-          "this platform.";
-      if (context.mounted) {
-        await showDialog<void>(
-          context: context,
-          builder: (context) {
-            Widget dialog = MessageDialog(title: msgTitle, content: errMsg,);
-            return dialog;
-          },
-        );
-      }
-      return;
+      onErrFunc();
     }
     // Get the directory and save and mobile.
     final pickedDirectory = await FlutterFileDialog.pickDirectory();
@@ -90,11 +80,7 @@ class BasicFileHandler implements FileHandler {
         replace: true,
       );
       String msg = "File saved to $filePath";
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg)),
-        );
-      }
+      notificationCallback(msg);
     }
     return;
   }
@@ -126,7 +112,8 @@ class BasicFileHandler implements FileHandler {
   Future<void> export({
     required List<LeafNode> nodes,
     String? filePath,
-    required BuildContext context,
+    required Function() errorDialogCallback,
+    required Function(String) notificationCallback,
     String? suggestedFileName,
   }) async {
     try {
@@ -135,7 +122,8 @@ class BasicFileHandler implements FileHandler {
       // difference file picker if so.
       bool platformIsMobile = Platform.isAndroid || Platform.isIOS;
       if (platformIsMobile) {
-        _saveOnMobile(nodes, suggestedFileName, context);
+        _saveOnMobile(nodes, suggestedFileName, errorDialogCallback,
+            notificationCallback);
       } else {
         final String? outputFile = await _getExportFilePath(
           filePath,
@@ -144,45 +132,29 @@ class BasicFileHandler implements FileHandler {
 
         if (outputFile != null) {
           await writeToFile(outputFile, nodes);
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Export complete!')),
-            );
-          }
+          notificationCallback('Export complete!');
         }
       }
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Export failed: $e')),
-        );
-      }
+        notificationCallback('Export failed: $e');
     }
   }
 
   @override
   Future<List<LeafNode>?> import({
     String? filePath,
-    required BuildContext context,
+    required Function(String) notificationCallback,
   }) async {
     try {
       final String? path = await _getImportFilePath(filePath);
 
       if (path != null) {
         final importedNodes = await readFromFile(path);
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${importedNodes?.length ?? 0} nodes imported!')),
-          );
-        }
+        notificationCallback('${importedNodes?.length ?? 0} nodes imported!');
         return importedNodes;
       }
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Import failed: $e')),
-        );
-      }
+      notificationCallback('Import failed: $e');
     }
     return null;
   }

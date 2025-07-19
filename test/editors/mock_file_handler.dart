@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/file_handler.dart';
 
@@ -11,7 +10,8 @@ class MockFileHandler implements FileHandler {
   Future<void> export({
     required List<LeafNode> nodes,
     String? filePath,
-    required BuildContext context,
+    required Function() errorDialogCallback,
+    required Function(String) notificationCallback,
     String? suggestedFileName,
   }) async {
     exportCalled = true;
@@ -20,7 +20,7 @@ class MockFileHandler implements FileHandler {
   @override
   Future<List<LeafNode>?> import({
     String? filePath,
-    required BuildContext context,
+    required Function(String) notificationCallback,
   }) async {
     importCalled = true;
     return nodesToImport;
