@@ -3,7 +3,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/stager_editor.dart';
-import 'package:stager/editors/standard_widgets.dart';
 
 /// A dialog widget for editing the name of a [LeafNode].
 ///
