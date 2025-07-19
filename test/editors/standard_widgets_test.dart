@@ -374,7 +374,6 @@ void main() {
               (WidgetTester tester) async {
             const String dialogTitle = 'Test Title';
             const String dialogContent = 'This is test content.';
-            late BuildContext dialogContext; // To capture dialog's context for popping
 
             await pumpBaseWidget(tester, child: Builder(
               builder: (context) {
@@ -383,7 +382,6 @@ void main() {
                     showDialog<void>(
                       context: context,
                       builder: (BuildContext buildContext) {
-                        dialogContext = buildContext; // Capture the dialog's own context
                         return buildMessageDialog(
                             buildContext, dialogTitle, dialogContent);
                       },
