@@ -66,6 +66,41 @@ Function() buildErrorDialogCallback(BuildContext context, String title, String c
   };
 }
 
+/// Builds a Stager-standard edit and submit dialog, which is a Stager Editor.
+///
+/// [context] is the context for the dialog.
+/// [title] is the title of the dialog.
+/// [inputLabel] is the label for the text field.
+/// [inputController] is the controller for the text field.
+/// [save] is the callback for when the user clicks the save button.
+/// [cancel] is the callback for when the user clicks the cancel button.
+Widget buildEditAndSubmitDialog(BuildContext context,
+    String title,
+    String inputLabel,
+    TextEditingController inputController,
+    void Function() save,
+    void Function() cancel) {
+  return AlertDialog(
+    title: Text(title),
+    content: TextField(
+      controller: inputController,
+      decoration: InputDecoration(labelText: inputLabel),
+    ),
+    actions: [
+      // Cancel button: dismisses the dialog without saving changes.
+      TextButton(
+        onPressed: cancel,
+        child: const Text('Cancel'),
+      ),
+      // Save button: returns the updated name through the dialog's pop method.
+      TextButton(
+        onPressed: save,
+        child: const Text('Save'),
+      ),
+    ],
+  );
+}
+
 /// Builds a Stager-standard confirm dialog.
 ///
 /// [context] is the context for the dialog.

@@ -460,6 +460,134 @@ void main() {
           });
     });
 
+    group('buildEditAndSubmitDialog', () {
+      const String dialogTitle = 'Edit Value';
+      const String inputLabel = 'Enter value:'; // Using your parameter name
+      late TextEditingController testController;
+      bool saveCalled = false;
+      bool cancelCalled = false;
+
+      // Helper to show the dialog
+      Future<void> showTestDialog(WidgetTester tester) async {
+        // Reset state for each test run using this helper
+        testController = TextEditingController(text: 'Initial text');
+        saveCalled = false;
+        cancelCalled = false;
+
+        await pumpBaseWidget(tester, child: Builder(
+          builder: (context) {
+            return ElevatedButton(
+              onPressed: () {
+                showDialog<void>( // Dialog doesn't need to return a value now
+                  context: context,
+                  barrierDismissible: false, // Usually good for edit dialogs
+                  builder: (BuildContext dialogContext) {
+                    return buildEditAndSubmitDialog(
+                      dialogContext,
+                      dialogTitle,
+                      inputLabel,
+                      testController, // Pass the controller
+                          () { // Save callback
+                        saveCalled = true;
+                        Navigator.of(dialogContext).pop(); // Dialog must be popped by callback
+                      },
+                          () { // Cancel callback
+                        cancelCalled = true;
+                        Navigator.of(dialogContext).pop(); // Dialog must be popped by callback
+                      },
+                    );
+                  },
+                );
+              },
+              child: const Text('Show Edit Dialog'),
+            );
+          },
+        ));
+        await tester.tap(find.text('Show Edit Dialog'));
+        await tester.pumpAndSettle(); // Allow dialog to appear
+      }
+
+      // Clean up the controller after each test
+      tearDown(() {
+        testController.dispose();
+      });
+
+      testWidgets('renders dialog with correct title, input label, and initial controller value',
+              (WidgetTester tester) async {
+            await showTestDialog(tester);
+
+            expect(find.byType(AlertDialog), findsOneWidget);
+            expect(find.text(dialogTitle), findsOneWidget); // Checks title in dialog
+
+            // Check for the input label
+            final textFieldFinder = find.byType(TextField);
+            expect(textFieldFinder, findsOneWidget);
+            final TextField textField = tester.widget<TextField>(textFieldFinder);
+            expect(textField.decoration?.labelText, equals(inputLabel));
+
+            // Check TextField's initial value via controller
+            expect(textField.controller, equals(testController));
+            expect(testController.text, equals('Initial text'));
+
+
+            // Check for buttons (assuming standard text for them based on typical usage)
+            expect(find.widgetWithText(TextButton, 'Cancel'), findsOneWidget);
+            expect(find.widgetWithText(TextButton, 'Save'), findsOneWidget); // Changed from "Submit" to "Save"
+          });
+
+      testWidgets('typing in TextField updates the provided controller',
+              (WidgetTester tester) async {
+            await showTestDialog(tester);
+            const String typedText = 'New controller value';
+
+            await tester.enterText(find.byType(TextField), typedText);
+            await tester.pump(); // Allow controller and text field to update
+
+            expect(testController.text, equals(typedText));
+          });
+
+      testWidgets('"Cancel" button calls cancel callback and dialog is dismissed',
+              (WidgetTester tester) async {
+            await showTestDialog(tester);
+            expect(find.byType(AlertDialog), findsOneWidget);
+
+            await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+            await tester.pumpAndSettle(); // Allow dialog to dismiss
+
+            expect(cancelCalled, isTrue, reason: "Cancel callback should have been called");
+            expect(saveCalled, isFalse, reason: "Save callback should NOT have been called");
+            expect(find.byType(AlertDialog), findsNothing);
+          });
+
+      testWidgets('"Save" button calls save callback and dialog is dismissed',
+              (WidgetTester tester) async {
+            await showTestDialog(tester);
+            expect(find.byType(AlertDialog), findsOneWidget);
+            const String finalValue = "Value to save";
+
+            // Update controller before saving
+            testController.text = finalValue;
+            await tester.pump();
+
+
+            await tester.tap(find.widgetWithText(TextButton, 'Save'));
+            await tester.pumpAndSettle(); // Allow dialog to dismiss
+
+            expect(saveCalled, isTrue, reason: "Save callback should have been called");
+            expect(cancelCalled, isFalse, reason: "Cancel callback should NOT have been called");
+            expect(find.byType(AlertDialog), findsNothing);
+            // The actual saving of testController.text would happen within the save callback,
+            // which is external to the dialog's direct responsibility in this design.
+            // We've verified the callback is called and the controller has the correct value.
+          });
+
+      // Optional: Test if save/cancel callbacks are NOT called if dialog is dismissed externally
+      // (e.g., if barrierDismissible were true and user tapped outside)
+      // This depends on whether you want to allow barrier dismissal and what should happen.
+      // If barrierDismissible is false (as in the helper now), this test isn't relevant.
+
+    });
+
   });
 }
 

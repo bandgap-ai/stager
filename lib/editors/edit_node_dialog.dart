@@ -3,6 +3,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/standard_widgets.dart';
 
 /// A dialog widget for editing the name of a [LeafNode].
 ///
@@ -32,28 +33,17 @@ class _EditNodeDialogState extends State<EditNodeDialog> {
     _nameController = TextEditingController(text: widget.properties.getProperty('name') as String);
   }
 
+  void _cancelEdit() {
+    Navigator.of(context).pop();
+  }
+
+  void _saveEdit() {
+    Navigator.of(context).pop(_nameController.text);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Edit Node'),
-      content: TextField(
-        controller: _nameController,
-        decoration: const InputDecoration(labelText: 'Name'),
-      ),
-      actions: [
-        // Cancel button: dismisses the dialog without saving changes.
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        // Save button: returns the updated name through the dialog's pop method.
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop(_nameController.text);
-          },
-          child: const Text('Save'),
-        ),
-      ],
-    );
+    return buildEditAndSubmitDialog(context, 'Edit Node',
+        'Name',_nameController, _cancelEdit, _saveEdit);
   }
 }
