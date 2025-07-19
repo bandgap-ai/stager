@@ -94,18 +94,11 @@ analyze:
     - echo "Running Flutter analyzer..."
     - flutter analyze --no-fatal-infos --no-fatal-warnings
 
-# Build for Web - for web deployment
-build_web:
+# Dry run of dart publish.
+dart-publish-dry-run:
   stage: build
   needs: ["test_all", "analyze"]
   script:
     - flutter pub get
-    - echo "Building web version..."
-    - flutter build web --release
-  artifacts:
-    paths:
-      - build/web/
-    expire_in: 1 month
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_TAG
+    - echo "Running 'dart pub publish --dry-run'."
+    - dart pub publish --dry-run
