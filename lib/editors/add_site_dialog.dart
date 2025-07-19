@@ -60,12 +60,13 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
   ///
   /// [context] is the context for the dialog.
   Widget _buildAddSiteDialog(BuildContext context) {
+    String info = 'Please configure the site information.';
     // Be a content creator!
     Widget content = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildInfoLabel(context),
+        buildInfoLabel(context,info),
         buildTextFieldEditor(context, _nameFieldController,
             'Site Name:', 'Enter site name...'),
         const SizedBox(height: 8),

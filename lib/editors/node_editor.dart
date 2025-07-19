@@ -64,6 +64,8 @@ class _NodeEditorState extends State<NodeEditor> {
 
   @override
   Widget build(BuildContext context) {
+    String info = 'Please configure the site information.';
+
     return AlertDialog(
       title: const Text('Edit Node Properties'),
       content: SingleChildScrollView(
@@ -71,7 +73,7 @@ class _NodeEditorState extends State<NodeEditor> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Display an informational label at the top of the dialog.
-            buildInfoLabel(context),
+            buildInfoLabel(context,info),
             // Dynamically build text field editors for all properties
             // except 'id', 'name', 'latitude', and 'longitude'.
             ...widget.properties.map.entries.where((entry) => entry.key != 'id' && entry.key != 'name' && entry.key != 'latitude' && entry.key != 'longitude').map((entry) {

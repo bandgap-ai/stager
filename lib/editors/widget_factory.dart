@@ -19,7 +19,8 @@ abstract class WidgetFactory {
   /// See [standard_widgets.dart] for reference.
   ///
   /// [context] is the context for the dialog.
-  Widget infoLabel(BuildContext context);
+  /// [info] is the information to be displayed.
+  Widget infoLabel(BuildContext context, String info);
 
   /// Builds the position method widget for the dialog. The selectedOption
   /// parameter is updated in place.
@@ -33,5 +34,22 @@ abstract class WidgetFactory {
   Widget positionMethodWidget(BuildContext context,
       bool initialSelection,
       void Function(bool) onChanged);
+
+  /// Builds a modal dialog that can be used to edit a single text field.
+  ///
+  /// See [standard_widgets.dart] for reference.
+  ///
+  /// [context] is the context for the dialog.
+  /// [title] is the title of the dialog.
+  /// [inputLabel] is the label for the text field.
+  /// [inputController] is the controller for the text field.
+  /// [save] is the callback for when the user clicks the save button.
+  /// [cancel] is the callback for when the user clicks the cancel button.
+  Widget editDialog(BuildContext context,
+      String title,
+      String inputLabel,
+      TextEditingController inputController,
+      void Function() save,
+      void Function() cancel);
 
 }

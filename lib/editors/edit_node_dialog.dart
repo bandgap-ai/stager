@@ -43,7 +43,10 @@ class _EditNodeDialogState extends State<EditNodeDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return buildEditAndSubmitDialog(context, 'Edit Node',
+
+    /// EXAMPLE for calling factory: Widget label = widget.widgetFactory.infoLabel(context,'text');
+
+    return widget.widgetFactory.editDialog(context, 'Edit Node',
         'Name',_nameController, _cancelEdit, _saveEdit);
   }
 }

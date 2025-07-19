@@ -149,10 +149,11 @@ Widget buildTextFieldEditor(BuildContext context, TextEditingController controll
 /// Builds the info label for the dialog.
 ///
 /// [context] is the context for the dialog.
-Widget buildInfoLabel(BuildContext context) {
+/// [info] is the information to be displayed.
+Widget buildInfoLabel(BuildContext context, String info) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
-    child: const Text('Please configure the site information.'),
+    child: Text(info),
   );
 }
 

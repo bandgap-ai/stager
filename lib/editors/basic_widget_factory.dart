@@ -14,8 +14,8 @@ class BasicWidgetFactory implements WidgetFactory {
   const BasicWidgetFactory();
 
   @override
-  Widget infoLabel(BuildContext context) {
-    return buildInfoLabel(context);
+  Widget infoLabel(BuildContext context, String info) {
+    return buildInfoLabel(context,info);
   }
 
   @override
@@ -26,5 +26,10 @@ class BasicWidgetFactory implements WidgetFactory {
   @override
   Widget textFieldEditor(BuildContext context, TextEditingController controller, labelText, hintText) {
       return buildTextFieldEditor(context, controller, labelText, hintText);
+  }
+
+  @override
+  Widget editDialog(BuildContext context, String title, String inputLabel, TextEditingController inputController, void Function() save, void Function() cancel) {
+    return buildEditAndSubmitDialog(context, title, inputLabel, inputController, save, cancel);
   }
 }

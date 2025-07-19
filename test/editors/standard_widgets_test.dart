@@ -36,13 +36,14 @@ void main() {
     });
 
     testWidgets('buildInfoLabel builds a text widget', (WidgetTester tester) async {
+      String info = 'Please configure the site information.';
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: Builder(builder: (context) => buildInfoLabel(context)),
+          body: Builder(builder: (context) => buildInfoLabel(context,info)),
         ),
       ));
 
-      expect(find.text('Please configure the site information.'), findsOneWidget);
+      expect(find.text(info), findsOneWidget);
     });
 
     testWidgets('buildPositionMethodWidget builds a segmented button', (WidgetTester tester) async {
