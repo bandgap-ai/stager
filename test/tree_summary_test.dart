@@ -256,5 +256,144 @@ void main() {
       expect(summary.centerPoint, isNotNull); // Should compute from valid coordinates only
       expect(summary.centerPoint!.latitude, 40.0);
     });
+
+    test('toString() should produce a meaningful string representation', () {
+      final summaryWithAllFields = NodeSummary(
+        totalNodes: 15,
+        nodeCountsByLevel: {1: 1, 2: 5, 3: 9},
+        boundingPolygon: [
+          const LatLng(40.0, -74.0),
+          const LatLng(40.1, -74.0),
+          const LatLng(40.1, -74.1),
+        ],
+        centerPoint: const LatLng(40.05, -74.05),
+        totalOutlineArea: 1234.56,
+        additionalStats: {'averageHeight': 25.5, 'speciesCount': 3},
+      );
+
+      final summaryString = summaryWithAllFields.toString();
+
+      // Basic checks: ensure key information is present.
+      // Avoid checking for exact formatting unless it's critical.
+      expect(summaryString, startsWith('NodeSummary('));
+      expect(summaryString, endsWith(')'));
+      expect(summaryString, contains('totalNodes: 15'));
+      expect(summaryString, contains('center: LatLng(latitude:40.05, longitude:-74.05)'));
+    });
+
+    // Helper to create a fully populated NodeSummary instance for tests
+    NodeSummary createPopulatedSummary({
+      int totalNodes = 10,
+      Map<int, int> nodeCountsByLevel = const {1: 1, 2: 3, 3: 6},
+      List<LatLng> boundingPolygon = const [
+        LatLng(10.0, 20.0),
+        LatLng(10.1, 20.1)
+      ],
+      LatLng? centerPoint = const LatLng(10.05, 20.05),
+      double? totalOutlineArea = 100.5,
+      Map<String, dynamic> additionalStats = const {'avg_height': 15.5},
+    }) {
+      return NodeSummary(
+        totalNodes: totalNodes,
+        nodeCountsByLevel: nodeCountsByLevel,
+        boundingPolygon: boundingPolygon,
+        centerPoint: centerPoint,
+        totalOutlineArea: totalOutlineArea,
+        additionalStats: additionalStats,
+      );
+    }
+
+    // ... existing tests for empty, toJson/fromJson, toString ...
+
+    group('Equality (==) and HashCode', () {
+      test('instances with identical fields should be equal and have same hashCode', () {
+        final summary1 = createPopulatedSummary();
+        final summary2 = createPopulatedSummary(); // Identical data, different instance
+
+        expect(summary1, equals(summary2));
+        expect(summary1.hashCode, equals(summary2.hashCode));
+      });
+
+      test('instances with different totalNodes should not be equal', () {
+        final summary1 = createPopulatedSummary(totalNodes: 10);
+        final summary2 = createPopulatedSummary(totalNodes: 11);
+
+        expect(summary1, isNot(equals(summary2)));
+        // Not strictly required for hashCodes to be different, but good if they are.
+        // The main test is that if they WERE equal, hashCodes would BE equal.
+      });
+
+      test('instances with different nodeCountsByLevel should not be equal', () {
+        final summary1 = createPopulatedSummary(nodeCountsByLevel: {1: 1, 2: 2});
+        final summary2 = createPopulatedSummary(nodeCountsByLevel: {1: 1, 2: 3});
+
+        expect(summary1, isNot(equals(summary2)));
+      });
+
+      test('instances with different boundingPolygon should not be equal', () {
+        final summary1 = createPopulatedSummary(boundingPolygon: [const LatLng(0,0)]);
+        final summary2 = createPopulatedSummary(boundingPolygon: [const LatLng(1,1)]);
+
+        expect(summary1, isNot(equals(summary2)));
+      });
+
+      test('instances with different centerPoint should not be equal', () {
+        final summary1 = createPopulatedSummary(centerPoint: const LatLng(0,0));
+        final summary2 = createPopulatedSummary(centerPoint: const LatLng(1,1));
+        final summary3 = createPopulatedSummary(centerPoint: null);
+
+
+        expect(summary1, isNot(equals(summary2)));
+        expect(summary1, isNot(equals(summary3)));
+        expect(summary3, isNot(equals(summary1)));
+      });
+
+      test('instances with different totalOutlineArea should not be equal', () {
+        final summary1 = createPopulatedSummary(totalOutlineArea: 100.0);
+        final summary2 = createPopulatedSummary(totalOutlineArea: 101.0);
+        final summary3 = createPopulatedSummary(totalOutlineArea: null);
+
+        expect(summary1, isNot(equals(summary2)));
+        expect(summary1, isNot(equals(summary3)));
+        expect(summary3, isNot(equals(summary1)));
+      });
+
+      test('instances with different additionalStats should not be equal', () {
+        final summary1 = createPopulatedSummary(additionalStats: {'a': 1});
+        final summary2 = createPopulatedSummary(additionalStats: {'a': 2});
+        final summary3 = createPopulatedSummary(additionalStats: {'b': 1});
+
+        expect(summary1, isNot(equals(summary2)));
+        expect(summary1, isNot(equals(summary3)));
+      });
+
+      test('equality holds for NodeSummary.empty()', () {
+        const summary1 = NodeSummary.empty();
+        const summary2 = NodeSummary.empty();
+        final summary3 = createPopulatedSummary(
+            totalNodes: 0,
+            nodeCountsByLevel: const {},
+            boundingPolygon: const [],
+            centerPoint: null,
+            totalOutlineArea: null,
+            additionalStats: const {});
+
+        expect(summary1, equals(summary2));
+        expect(summary1.hashCode, equals(summary2.hashCode));
+        expect(summary1, equals(summary3)); // summary3 is effectively empty
+        expect(summary1.hashCode, equals(summary3.hashCode));
+      });
+
+      test('reflexivity: an instance is equal to itself', () {
+        final summary = createPopulatedSummary();
+        expect(summary, equals(summary));
+        expect(summary.hashCode, equals(summary.hashCode));
+      });
+
+      // Symmetry is implicitly tested by `equals()` matcher.
+      // Transitivity is also generally covered if individual field comparisons are correct.
+
+    });
+
   });
 }
