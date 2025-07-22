@@ -5,11 +5,15 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:stager/tree/tree.dart';
+import 'package:stager/editors/stager_editor.dart';
 
 /// Abstract class for editing [NodeProperties].
 ///
 /// Implementations will provide UI for modifying a node's properties.
-abstract class AbstractNodePropertiesEditor {
+abstract class AbstractNodePropertiesEditor extends StagerEditor {
+
+  const AbstractNodePropertiesEditor({super.key});
+
   /// Builds a widget that allows editing the properties of a [NodeProperties] instance.
   ///
   /// [properties]: The [NodeProperties] instance to edit.
@@ -20,7 +24,10 @@ abstract class AbstractNodePropertiesEditor {
 /// Abstract class for editing a [LeafNode].
 ///
 /// Implementations will provide UI for modifying a leaf node's basic attributes.
-abstract class AbstractLeafNodeEditor {
+abstract class AbstractLeafNodeEditor extends StagerEditor {
+
+  const AbstractLeafNodeEditor({super.key});
+
   /// Builds a widget that allows editing a [LeafNode].
   ///
   /// [node]: The [LeafNode] instance to edit.
@@ -32,7 +39,10 @@ abstract class AbstractLeafNodeEditor {
 ///
 /// Implementations will provide UI for managing a composite node's children
 /// (add, remove, reorder) in addition to its own attributes.
-abstract class AbstractCompositeNodeEditor {
+abstract class AbstractCompositeNodeEditor extends StagerEditor {
+
+  const AbstractCompositeNodeEditor({super.key});
+
   /// Builds a widget that allows editing a [CompositeNode].
   ///
   /// [node]: The [CompositeNode] instance to edit.
@@ -44,7 +54,10 @@ abstract class AbstractCompositeNodeEditor {
 ///
 /// Implementations will provide UI for managing the overall tree structure,
 /// including adding/removing top-level nodes.
-abstract class AbstractTreeEditor {
+abstract class AbstractTreeEditor extends StagerEditor {
+
+  const AbstractTreeEditor({super.key});
+
   /// Builds a widget that allows editing the entire tree structure.
   ///
   /// [rootNodes]: A list of top-level [TreeNode]s to edit.

@@ -73,6 +73,11 @@ class NodeEditorFactory extends BasicEditorFactory {
         .onPrimary),
         onPressed: () async {
           // Show the dialog.
+          //
+          // This should be inside an editor widget to eliminate the assumption
+          // that pressing the button will open a dialog. What if we wanted to
+          // open something else?
+          //
           final results = await showDialog(
             context: context,
             builder: (context) => _showCreateNodeMenu(context,state),

@@ -19,6 +19,7 @@ class EditNodeDialog extends StagerEditor {
 
   @override
   State<EditNodeDialog> createState() => _EditNodeDialogState();
+
 }
 
 /// The state for the [EditNodeDialog] widget.
@@ -48,4 +49,5 @@ class _EditNodeDialogState extends State<EditNodeDialog> {
     return widget.widgetFactory.editDialog(context, 'Edit Node',
         'Name',_nameController, _cancelEdit, _saveEdit);
   }
+
 }

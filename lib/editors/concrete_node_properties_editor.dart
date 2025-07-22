@@ -9,13 +9,25 @@ import 'package:stager/editors/enhanced_edit_node_dialog.dart';
 /// This class provides the UI for editing the properties of a [NodeProperties] object.
 /// It renders an "Edit" button that, when pressed, opens an [EditNodeDialog]
 /// to modify the node's name.
-class ConcreteNodePropertiesEditor implements AbstractNodePropertiesEditor {
+class ConcreteNodePropertiesEditor extends AbstractNodePropertiesEditor {
   /// The build context to show dialogs.
   final BuildContext context;
 
   /// Creates a properties editor.
-  ConcreteNodePropertiesEditor(this.context);
+  const ConcreteNodePropertiesEditor(this.context, {super.key});
 
+  @override
+  State<ConcreteNodePropertiesEditor> createState() => _ConcreteNodePropertiesEditorState();
+
+  @override
+  Widget buildPropertiesEditor(NodeProperties properties) {
+    // TODO: implement buildPropertiesEditor
+    throw UnimplementedError();
+  }
+
+}
+
+class _ConcreteNodePropertiesEditorState extends State<ConcreteNodePropertiesEditor> {
   @override
   Widget buildPropertiesEditor(NodeProperties properties) {
     // This widget builds the UI element that triggers the edit action.
@@ -79,4 +91,11 @@ class ConcreteNodePropertiesEditor implements AbstractNodePropertiesEditor {
     }
     return level;
   }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+
 }

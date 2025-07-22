@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stager/editors/message_dialog.dart';
 import 'package:stager/editors/node_editor_factory.dart';
 import 'package:stager/editors/standard_widgets.dart';
 import 'package:stager/site_state.dart';
@@ -53,6 +54,9 @@ class SiteEditorHeader extends StatelessWidget {
 
     final nodePropertiesEditor = ConcreteNodePropertiesEditor(context);
 
+    // Create the editors.
+
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
       width: double.infinity,
@@ -76,10 +80,10 @@ class SiteEditorHeader extends StatelessWidget {
           Row(
             children: [
               // Add the node creation button.
-              nodeEditorFactory.create(context, siteState),
+     //         nodeEditorFactory.create(context, siteState),
               // Edit the properties of the selected node.
-              if (selectedNode != null)
-                nodePropertiesEditor.buildEnhancedPropertiesEditor(selectedNode),
+              if (selectedNode != null) MessageDialog(content: 'This function is disabled.', title: 'Error'),
+    //            nodePropertiesEditor.buildEnhancedPropertiesEditor(selectedNode),
               // Delete the selected node.
               if (selectedNode != null)
                 IconButton(
