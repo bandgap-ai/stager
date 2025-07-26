@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager/editors/dialog_control_button.dart';
+import 'package:stager/site_state.dart';
+import 'package:stager/tree/tree_node.dart';
+import 'mock_controller.dart';
+import 'mock_dialog_control_button.dart';
+import 'mock_editor_factory.dart';
+import 'mock_site_state_observer.dart';
 import 'mock_stager_editor.dart';
 
 void main() {
-  group('StagerControlWidget', () {
-    late MockStagerEditor mockEditor;
-    const IconData expectedIconButtonIcon = Icons
-        .add_home_work; // Icon hardcoded in StagerControlWidget
+
+  group('DialogControlButton', () {
+    late SiteState state;
+    late MockObserver observer;
+    late MockController mockController;
+    late MockEditorFactory mockEditorFactory;
 
     setUp(() {
-      mockEditor = MockStagerEditor();
-      // mockEditor.reset(); // Reset before each test if 'built' status is critical between tests
+      state = SiteState();
+      TreeNode root = state.addSite('Test Site');
+      state.selectedNode = root;
+      state.attach(observer = MockObserver());
+      mockEditorFactory = MockEditorFactory();
+      mockController = MockController(state, mockEditorFactory);
     });
 
     Future<void> pumpStagerControlWidget(WidgetTester tester,
@@ -26,11 +38,7 @@ void main() {
     }
 
     testWidgets('should render an IconButton', (WidgetTester tester) async {
-      final controlWidget = DialogControlButton(
-        icon: Icons.settings,
-        // This icon is passed but not used by IconButton's display
-        editor: mockEditor,
-      );
+      final controlWidget = MockDialogControlButton(controller: mockController, state: state,);
 
       await pumpStagerControlWidget(tester, controlWidget);
 
@@ -40,15 +48,22 @@ void main() {
     testWidgets(
         'tapping IconButton should show dialog with the provided editor',
             (WidgetTester tester) async {
+
+          // Ensure the mock controller's wasProcessed flag is false before the interaction
+          mockController.reset();
+          expect(mockController.wasProcessed, isFalse,
+              reason: "MockController should not have been processed yet");
+
           // Ensure the mock editor's built flag is false before the interaction
+          MockStagerEditor mockEditor = mockController.editorRef as MockStagerEditor;
           mockEditor
               .reset(); // Or create a new instance: mockEditor = MockStagerEditor();
           expect(mockEditor.built, isFalse,
               reason: "MockEditor should not be built yet");
 
-          final controlWidget = DialogControlButton(
-            icon: Icons.play_arrow,
-            editor: mockEditor,
+          final MockDialogControlButton controlWidget = MockDialogControlButton(
+            controller: mockController,
+            state: state,
           );
 
           await pumpStagerControlWidget(tester, controlWidget);
@@ -69,16 +84,28 @@ void main() {
           // Verify that the mock editor's build method was called
           expect(mockEditor.built, isTrue,
               reason: "MockEditor's build method should have been called");
+
+          // Find and tap the 'OK' button.
+          final okButton = find.widgetWithText(TextButton, 'OK');
+          expect(okButton, findsOneWidget,
+              reason: "MockStagerEditor should have an 'OK' button.");
+          await tester.tap(okButton);
+          await tester.pumpAndSettle();
+
+          // Verify that the editor was created with the button and that
+          // _processResults was called.
+          expect(controlWidget.built, isTrue,
+              reason: "Override of DialogControlButton's processResults "
+                  "method should have been called");
+          expect(mockController.wasProcessed, isTrue,);
         });
 
     testWidgets('IconButton should use the IconData passed to the constructor',
             (WidgetTester tester) async {
-          // Define the IconData to be passed and expected
-          const IconData expectedIconData = Icons.settings;
 
-          final controlWidget = DialogControlButton(
-            icon: expectedIconData, // Pass IconData directly
-            editor: mockEditor,
+          final controlWidget = MockDialogControlButton(
+            controller: mockController,
+            state: state,
           );
 
           await pumpStagerControlWidget(tester, controlWidget);
@@ -99,7 +126,7 @@ void main() {
           final actualIconWidget = iconButtonWidget.icon as Icon;
 
           // Assert that the IconData of this Icon widget matches our expectedIconData
-          expect(actualIconWidget.icon, equals(expectedIconData),
+          expect(actualIconWidget.icon, equals(mockController.iconData()),
               reason: "The IconData of the IconButton's Icon should match the IconData passed to StagerControlWidget's constructor");
 
           // Optionally, you can also check other properties like the color if it's consistently applied
@@ -107,30 +134,6 @@ void main() {
           final ThemeData theme = Theme.of(tester.element(find.byType(MaterialApp))); // Get the theme used
           expect(actualIconWidget.color, equals(theme.colorScheme.onPrimary),
               reason: "Icon's color should match theme.colorScheme.onPrimary");
-        });
-
-    testWidgets('tapping IconButton should show dialog with the provided editor',
-            (WidgetTester tester) async {
-          mockEditor.reset();
-          const testIconData = Icons.play_arrow; // Use any valid IconData for this test
-
-          final controlWidget = DialogControlButton(
-            icon: testIconData,
-            editor: mockEditor,
-          );
-
-          await pumpStagerControlWidget(tester, controlWidget);
-
-          expect(find.byType(Dialog), findsNothing);
-          expect(find.byKey(MockStagerEditor.mockStagerEditorKey), findsNothing);
-
-          await tester.tap(find.byType(IconButton));
-          await tester.pumpAndSettle();
-
-          expect(find.byType(Dialog), findsOneWidget);
-          expect(mockEditor.built, isTrue);
-          expect(find.byKey(MockStagerEditor.mockStagerEditorKey), findsOneWidget);
-
         });
 
   });

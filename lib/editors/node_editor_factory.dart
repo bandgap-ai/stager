@@ -3,7 +3,9 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:stager/editors/basic_editor_factory.dart';
+import 'package:stager/editors/editor_factory.dart';
+import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/widget_factory.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/editors/add_node_dialog.dart';
 import 'package:stager/tree/concrete_composite_node.dart';
@@ -12,8 +14,10 @@ import 'package:stager/tree/concrete_leaf_node.dart';
 import 'package:stager/tree/leaf_node.dart';
 import 'package:stager/editors/message_dialog.dart';
 
+import 'basic_widget_factory.dart';
+
 /// This is a factory that creates a NodeEditor.
-class NodeEditorFactory extends BasicEditorFactory {
+class NodeEditorFactory extends EditorFactory {
 
   /// Creates a new NodeEditor dialog.
   ///
@@ -100,6 +104,42 @@ class NodeEditorFactory extends BasicEditorFactory {
   @override
   Widget update(BuildContext context, SiteState state) {
     // TODO: implement update
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor addSiteEditor(BuildContext context, SiteState state, [WidgetFactory widgetFactory = const BasicWidgetFactory()]) {
+    // TODO: implement addSiteEditor
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor createNodeEditor(BuildContext context, SiteState state, [WidgetFactory widgetFactory = const BasicWidgetFactory()]) {
+    // TODO: implement createNodeEditor
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor deleteNodeEditor(BuildContext context, SiteState state, [WidgetFactory widgetFactory = const BasicWidgetFactory()]) {
+    // TODO: implement deleteNodeEditor
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor deleteSiteEditor(BuildContext context, SiteState state, [WidgetFactory widgetFactory = const BasicWidgetFactory()]) {
+    // TODO: implement deleteSiteEditor
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor editNodeEditor(BuildContext context, SiteState state, [WidgetFactory widgetFactory = const BasicWidgetFactory()]) {
+    // TODO: implement editNodeEditor
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor editSiteEditor(BuildContext context, SiteState state, [WidgetFactory widgetFactory = const BasicWidgetFactory()]) {
+    // TODO: implement editSiteEditor
     throw UnimplementedError();
   }
 

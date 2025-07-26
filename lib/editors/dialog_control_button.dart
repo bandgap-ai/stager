@@ -1,39 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/site_state.dart';
+import 'package:stager/editors/controller.dart';
 
 /// The StagerControlWidget is a simple button to control when to open an
 /// editor or launch an independent function on behalf of a user.
 ///
-/// Subclasses must override _processResults to handle the results from the
-/// editor.
-abstract class DialogControlButton extends StatelessWidget {
+/// It delegates work to subclasses of Controller.
+class DialogControlButton extends StatelessWidget {
 
-  /// The icon to display for this control.
-  final IconData icon;
+  /// The site state.
+  final SiteState state;
 
-  /// The editor launched by this control to edit the data.
-  final StagerEditor editor;
+  /// The controller for this control button.
+  final Controller controller;
 
-  const DialogControlButton({super.key, required this.icon, required this.editor});
+  const DialogControlButton({super.key,
+    required this.controller,
+    required this.state});
 
   /// Handles the results from the editor and must be implemented by subclasses.
   ///
   /// [results] is the results from the editor.
-  void _processResults(dynamic results);
+  void processResults(dynamic results) {
+    controller.process(results);
+  }
+
+  /// Utility function to keep build() clean.
+  ///
+  /// [context] is the build context.
+  void _handleButtonPressed(BuildContext context) async {
+
+    final results = await showDialog(
+      context: context,
+      builder: (context) => controller.editor(context),
+    );
+    processResults(results);
+  }
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(icon, color: Theme.of(context).colorScheme.onPrimary),
-      onPressed: () async {
-        final results = await showDialog(
-          context: context,
-          builder: (context) {
-            return editor;
-          }
-        );
-        _processResults(results);
-      },
+      icon: Icon(controller.iconData(), color: Theme.of(context).colorScheme.onPrimary),
+      onPressed: () => _handleButtonPressed(context),
     );
   }
 

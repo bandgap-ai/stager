@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stager/editors/message_dialog.dart';
 import 'package:stager/editors/node_editor_factory.dart';
+import 'package:stager/editors/site_controls.dart';
 import 'package:stager/editors/standard_widgets.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/tree/tree.dart';
@@ -8,6 +9,7 @@ import 'package:stager/editors/add_site_dialog.dart';
 import 'package:stager/editors/concrete_node_properties_editor.dart';
 import 'package:stager/editors/file_handler.dart';
 import 'package:stager/editors/import_export_menu.dart';
+import 'package:stager/editors/basic_site_controls.dart';
 
 /// The header for the [SiteEditor].
 ///
@@ -29,11 +31,15 @@ class SiteEditorHeader extends StatelessWidget {
   /// The handler for file import/export operations.
   final FileHandler fileHandler;
 
+  /// The SiteControls for building the editor buttons.
+  final SiteControls siteControls;
+
   /// Creates a site editor header.
   const SiteEditorHeader({
     super.key,
     required this.siteState,
     required this.fileHandler,
+    this.siteControls = const BasicSiteControls(),
   });
 
   /// Adds a new node to the site.
@@ -79,6 +85,8 @@ class SiteEditorHeader extends StatelessWidget {
           ),
           Row(
             children: [
+              /// TODO Replace this with SiteControls.
+              siteControls.buildAddNodeControl(context, siteState),
               // Add the node creation button.
      //         nodeEditorFactory.create(context, siteState),
               // Edit the properties of the selected node.

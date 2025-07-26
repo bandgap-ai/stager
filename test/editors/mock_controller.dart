@@ -1,0 +1,40 @@
+import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/controller.dart';
+import 'package:flutter/material.dart';
+import 'mock_stager_editor.dart';
+
+class MockController extends Controller {
+
+  final MockStagerEditor _editor = MockStagerEditor();
+
+  /// Observer bool to track if the widget has been built.
+  bool _processed = false;
+
+  /// Returns the observer bool.
+  bool get wasProcessed => _processed;
+
+  /// Mark the observer bool as false to reset the mock.
+  void reset() {
+    _processed = false;
+  }
+
+  MockController(super.state, super.editorFactory);
+
+  StagerEditor get editorRef => _editor;
+
+  @override
+  StagerEditor editor(BuildContext context) {
+    return _editor;
+  }
+
+  @override
+  IconData iconData() {
+    return Icons.add_home_work;
+  }
+
+  @override
+  void process(Object input) {
+    _processed = true;
+  }
+
+}

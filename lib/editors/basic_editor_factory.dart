@@ -1,29 +1,77 @@
-/// This file defines abstract classes for editing different types of nodes
-/// within the Stager tree structure.
-library;
-
 import 'package:flutter/material.dart';
+import 'package:stager/editors/editor_factory.dart';
+import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/widget_factory.dart';
 import 'package:stager/site_state.dart';
+import 'package:stager/editors/basic_widget_factory.dart';
 
-/// This is an abstract factory class definition for creating editors.
-abstract class BasicEditorFactory {
+class BasicEditorFactory extends EditorFactory {
 
-  /// Build a widget that can create a Stager entity.
+  final WidgetFactory widgetFactory;
+
+  /// Constructor for the BasicEditorFactory class.
   ///
-  /// [context]: The build context for the widget.
-  /// [state]: The state manager for the Stager entity.
-  Widget create(BuildContext context, SiteState state);
+  /// [widgetFactory]: An optional widget factory for the editor to use. The
+  /// default is a [BasicWidgetFactory].
+  const BasicEditorFactory([this.widgetFactory = const BasicWidgetFactory()]);
 
-  /// Build a widget that allows a Stager entity to be edited.
-  ///
-  /// [context]: The build context for the widget.
-  /// [state]: The state manager for the Stager entity.
-  Widget update(BuildContext context, SiteState state);
+  @override
+  StagerEditor addSiteEditor(
+    BuildContext context,
+    SiteState state, [
+    WidgetFactory widgetFactory = const BasicWidgetFactory(),
+  ]) {
+    // TODO: implement addSiteEditor
+    throw UnimplementedError();
+  }
 
-  /// Build a widget that can delete a Stager entity.
-  ///
-  /// [context]: The build context for the widget.
-  /// [state]: The state manager for the Stager entity.
-  Widget delete(BuildContext context, SiteState state);
+  @override
+  StagerEditor createNodeEditor(
+    BuildContext context,
+    SiteState state, [
+    WidgetFactory widgetFactory = const BasicWidgetFactory(),
+  ]) {
+    // TODO: implement createNodeEditor
+    throw UnimplementedError();
+  }
 
+  @override
+  StagerEditor deleteNodeEditor(
+    BuildContext context,
+    SiteState state, [
+    WidgetFactory widgetFactory = const BasicWidgetFactory(),
+  ]) {
+    // TODO: implement deleteNodeEditor
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor deleteSiteEditor(
+    BuildContext context,
+    SiteState state, [
+    WidgetFactory widgetFactory = const BasicWidgetFactory(),
+  ]) {
+    // TODO: implement deleteSiteEditor
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor editNodeEditor(
+    BuildContext context,
+    SiteState state, [
+    WidgetFactory widgetFactory = const BasicWidgetFactory(),
+  ]) {
+    // TODO: implement editNodeEditor
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor editSiteEditor(
+    BuildContext context,
+    SiteState state, [
+    WidgetFactory widgetFactory = const BasicWidgetFactory(),
+  ]) {
+    // TODO: implement editSiteEditor
+    throw UnimplementedError();
+  }
 }
