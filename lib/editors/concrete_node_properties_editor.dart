@@ -19,12 +19,6 @@ class ConcreteNodePropertiesEditor extends AbstractNodePropertiesEditor {
   @override
   State<ConcreteNodePropertiesEditor> createState() => _ConcreteNodePropertiesEditorState();
 
-  @override
-  Widget buildPropertiesEditor(NodeProperties properties) {
-    // TODO: implement buildPropertiesEditor
-    throw UnimplementedError();
-  }
-
 }
 
 class _ConcreteNodePropertiesEditorState extends State<ConcreteNodePropertiesEditor> {

@@ -22,7 +22,7 @@ void main() {
       TreeNode root = state.addSite('Test Site');
       state.selectedNode = root;
       state.attach(observer = MockObserver());
-      mockEditorFactory = MockEditorFactory();
+      mockEditorFactory = MockEditorFactory(state);
       mockController = MockController(state, mockEditorFactory);
     });
 

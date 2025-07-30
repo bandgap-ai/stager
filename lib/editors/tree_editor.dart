@@ -5,12 +5,11 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/stager_editor.dart';
 
 /// Abstract class for editing [NodeProperties].
 ///
 /// Implementations will provide UI for modifying a node's properties.
-abstract class AbstractNodePropertiesEditor extends StagerEditor {
+abstract class AbstractNodePropertiesEditor extends StatefulWidget {
 
   const AbstractNodePropertiesEditor({super.key});
 
@@ -24,7 +23,7 @@ abstract class AbstractNodePropertiesEditor extends StagerEditor {
 /// Abstract class for editing a [LeafNode].
 ///
 /// Implementations will provide UI for modifying a leaf node's basic attributes.
-abstract class AbstractLeafNodeEditor extends StagerEditor {
+abstract class AbstractLeafNodeEditor extends StatefulWidget {
 
   const AbstractLeafNodeEditor({super.key});
 
@@ -39,7 +38,7 @@ abstract class AbstractLeafNodeEditor extends StagerEditor {
 ///
 /// Implementations will provide UI for managing a composite node's children
 /// (add, remove, reorder) in addition to its own attributes.
-abstract class AbstractCompositeNodeEditor extends StagerEditor {
+abstract class AbstractCompositeNodeEditor extends StatefulWidget {
 
   const AbstractCompositeNodeEditor({super.key});
 
@@ -54,7 +53,7 @@ abstract class AbstractCompositeNodeEditor extends StagerEditor {
 ///
 /// Implementations will provide UI for managing the overall tree structure,
 /// including adding/removing top-level nodes.
-abstract class AbstractTreeEditor extends StagerEditor {
+abstract class AbstractTreeEditor extends StatefulWidget {
 
   const AbstractTreeEditor({super.key});
 

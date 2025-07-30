@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/standard_widgets.dart';
-import 'package:stager/editors/stager_editor.dart';
 
 /// A dialog for editing node properties.
 ///
@@ -10,7 +9,7 @@ import 'package:stager/editors/stager_editor.dart';
 /// to edit the properties of a tree node. It dynamically generates input fields
 /// for each property, allowing for editing of string, latitude, and longitude
 /// values.
-class NodeEditor extends StagerEditor {
+class NodeEditor extends StatefulWidget {
   /// The properties of the node to be edited.
   final NodeProperties properties;
 

@@ -2,14 +2,20 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/message_dialog.dart';
+import 'package:stager/editors/basic_widget_factory.dart';
+import 'package:stager/site_state.dart';
 
 /// A dialog widget for adding a new [TreeNode].
 ///
 /// This dialog provides a [TextField] for the user to enter the name of the new node.
 /// When the 'Add' button is pressed, the entered name is returned.
-class AddNodeDialog extends StatefulWidget {
+class AddNodeDialog extends StagerEditor {
   /// Creates an [AddNodeDialog].
-  const AddNodeDialog({super.key});
+  const AddNodeDialog({super.key,
+    required super.state,
+    super.widgetFactory = const BasicWidgetFactory()});
 
   @override
   State<AddNodeDialog> createState() => _AddNodeDialogState();
@@ -123,6 +129,27 @@ class _AddNodeDialogState extends State<AddNodeDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return _createAlertDialog(context);
+
+    // Figure out wha tto show and build it.
+    Widget addWidget;
+    SiteState state = widget.state;
+    if (state.selectedNode == null) {
+      // Tell the user to select a widget to edit and try again.g
+      String title = "Error";
+      String msg = "No node selected. "
+          "Please select a site or node and try again.";
+      addWidget = MessageDialog(title: title, content: msg,);
+    } else if (state.selectedNode!.isComposite) {
+      // Open the add node dialog
+      addWidget = _createAlertDialog(context);
+    } else {
+      // Create a leaf node.
+      String title = "Error";
+      String msg = "Only groups can contain other objects. "
+          "Please select a group and try again.";
+      addWidget = MessageDialog(title: title, content: msg,);
+    }
+
+    return addWidget;
   }
 }

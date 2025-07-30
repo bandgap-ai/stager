@@ -15,7 +15,7 @@ class EditNodeDialog extends StagerEditor {
   /// Creates an [EditNodeDialog].
   ///
   /// Requires the [properties] to be edited.
-  const EditNodeDialog({super.key, required this.properties});
+  const EditNodeDialog({super.key, required super.state, required this.properties});
 
   @override
   State<EditNodeDialog> createState() => _EditNodeDialogState();

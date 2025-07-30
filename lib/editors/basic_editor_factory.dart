@@ -4,6 +4,8 @@ import 'package:stager/editors/stager_editor.dart';
 import 'package:stager/editors/widget_factory.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/editors/basic_widget_factory.dart';
+import 'package:stager/editors/message_dialog.dart';
+import 'package:stager/editors/add_node_dialog.dart';
 
 class BasicEditorFactory extends EditorFactory {
 
@@ -21,8 +23,7 @@ class BasicEditorFactory extends EditorFactory {
     SiteState state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
   ]) {
-    // TODO: implement addSiteEditor
-    throw UnimplementedError();
+   throw UnimplementedError();
   }
 
   @override
@@ -31,8 +32,7 @@ class BasicEditorFactory extends EditorFactory {
     SiteState state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
   ]) {
-    // TODO: implement createNodeEditor
-    throw UnimplementedError();
+     return AddNodeDialog(state: state);
   }
 
   @override

@@ -35,7 +35,7 @@ class NodeEditorFactory extends EditorFactory {
       addWidget = MessageDialog(title: title, content: msg,);
     } else if (state.selectedNode!.isComposite) {
       // Open the add node dialog
-      addWidget = AddNodeDialog();
+      addWidget = AddNodeDialog(state:state);
     } else {
       // Create a leaf node.
       String title = "Error";

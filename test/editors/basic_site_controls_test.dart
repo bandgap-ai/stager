@@ -13,13 +13,13 @@ void main() {
 
   setUp(() {
     state = SiteState();
-    editorFactory = MockEditorFactory();
+    editorFactory = MockEditorFactory(state);
     siteControls = BasicSiteControls(editorFactory);
   });
 
   group('BasicSiteControls', ()
   {
-    testWidgets('Should open the Add Node dialog', (WidgetTester tester) async {
+    testWidgets('Should build the Add Node Control', (WidgetTester tester) async {
 
       // Reset the editor factory just in case
       editorFactory.reset();

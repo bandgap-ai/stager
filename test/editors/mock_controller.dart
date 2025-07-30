@@ -5,7 +5,7 @@ import 'mock_stager_editor.dart';
 
 class MockController extends Controller {
 
-  final MockStagerEditor _editor = MockStagerEditor();
+  late MockStagerEditor _editor;
 
   /// Observer bool to track if the widget has been built.
   bool _processed = false;
@@ -18,7 +18,9 @@ class MockController extends Controller {
     _processed = false;
   }
 
-  MockController(super.state, super.editorFactory);
+  MockController(super.state, super.editorFactory) {
+    _editor = MockStagerEditor(state:state);
+  }
 
   StagerEditor get editorRef => _editor;
 

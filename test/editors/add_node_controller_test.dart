@@ -23,7 +23,7 @@ void main() {
     TreeNode root = state.addSite('Test Site');
     state.selectedNode = root;
     state.attach(observer = MockObserver());
-    editorFactory = MockEditorFactory();
+    editorFactory = MockEditorFactory(state);
     controller = AddNodeController(state, editorFactory);
   });
 
@@ -58,7 +58,7 @@ void main() {
 
     test('Should return Icons.add', () {
       final SiteState state = SiteState();
-      final EditorFactory editorFactory = MockEditorFactory();
+      final EditorFactory editorFactory = MockEditorFactory(state);
       final Controller controller = AddNodeController(state, editorFactory);
       expect(controller.iconData(), equals(Icons.add),);
     });

@@ -9,7 +9,11 @@ import 'mock_stager_editor.dart';
 
 class MockEditorFactory extends EditorFactory {
 
-  MockStagerEditor mockEditor = MockStagerEditor();
+  late MockStagerEditor mockEditor;
+
+  MockEditorFactory(SiteState state) {
+    mockEditor = MockStagerEditor(state: state);
+  }
 
   // Bools for tracking if the editor was called
   bool _addSiteCalled = false;

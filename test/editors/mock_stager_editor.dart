@@ -18,7 +18,7 @@ class MockStagerEditor extends StagerEditor {
   /// Useful if you need the mock to display a specific minimal UI for testing.
   MockStagerEditor({
     super.key,
-    super.widgetFactory = const BasicWidgetFactory(), // Use the default from StagerEditor or allow override
+    super.widgetFactory = const BasicWidgetFactory(), required super.state, // Use the default from StagerEditor or allow override
   });
 
   /// Mark the observer bool as false to reset the mock.
