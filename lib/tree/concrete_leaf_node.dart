@@ -5,6 +5,7 @@ library;
 import 'package:stager/tree/node_visitor.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/tree/concrete_node_properties.dart';
+import 'package:stager/tree/node_observer.dart';
 
 class ConcreteLeafNode implements LeafNode {
   /// The properties of this node.
@@ -22,7 +23,7 @@ class ConcreteLeafNode implements LeafNode {
   LeafNode? previous;
 
   /// Internal list of observers attached to this leaf node.
-  final List<LeafNodeObserver> _leafNodeObservers = [];
+  final List<NodeObserver> _leafNodeObservers = [];
 
   /// Creates a [ConcreteLeafNode] instance.
   ///
@@ -59,15 +60,15 @@ class ConcreteLeafNode implements LeafNode {
     notify(); // Notify observers about the change in previous sibling
   }
 
-  /// Attaches a [LeafNodeObserver] to this leaf node.
+  /// Attaches a [NodeObserver] to this leaf node.
   @override
-  void attach(LeafNodeObserver observer) {
+  void attach(NodeObserver observer) {
     _leafNodeObservers.add(observer);
   }
 
   /// Detaches a [LeafNodeObserver] from this leaf node.
   @override
-  void detach(LeafNodeObserver observer) {
+  void detach(NodeObserver observer) {
     _leafNodeObservers.remove(observer);
   }
 

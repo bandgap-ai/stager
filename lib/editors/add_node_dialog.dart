@@ -5,20 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:stager/editors/site_editor.dart';
 import 'package:stager/editors/message_dialog.dart';
 import 'package:stager/editors/basic_widget_factory.dart';
+import 'package:stager/editors/stager_editor.dart';
 import 'package:stager/site_state.dart';
+import 'package:stager/tree/composite_node.dart';
 
 /// A dialog widget for adding a new [TreeNode].
 ///
 /// This dialog provides a [TextField] for the user to enter the name of the new node.
 /// When the 'Add' button is pressed, the entered name is returned.
-class AddNodeDialog extends SiteEditor {
+class AddNodeDialog extends StagerEditor<CompositeNode> {
   /// Creates an [AddNodeDialog].
   const AddNodeDialog({super.key,
     required super.state,
     super.widgetFactory = const BasicWidgetFactory()});
 
   @override
-  State<AddNodeDialog> createState() => _AddNodeDialogState();
+  State<AddNodeDialog> createState() => _AddNodeDialogState(super.state);
 }
 
 /// The state for the [AddNodeDialog] widget.
@@ -29,6 +31,10 @@ class _AddNodeDialogState extends State<AddNodeDialog> {
   /// ValueNotifier for the checkbox state to easily update it and ensure the
   /// dialog UI reflects changes if it rebuilds.
   final ValueNotifier<bool> _isGroupNotifier = ValueNotifier<bool>(false);
+
+  final CompositeNode parent;
+
+  _AddNodeDialogState(this.parent);
 
   @override
   void initState() {
@@ -129,27 +135,6 @@ class _AddNodeDialogState extends State<AddNodeDialog> {
 
   @override
   Widget build(BuildContext context) {
-
-    // Figure out wha tto show and build it.
-    Widget addWidget;
-    SiteState state = widget.state;
-    if (state.selectedNode == null) {
-      // Tell the user to select a widget to edit and try again.g
-      String title = "Error";
-      String msg = "No node selected. "
-          "Please select a site or node and try again.";
-      addWidget = MessageDialog(title: title, content: msg,);
-    } else if (state.selectedNode!.isComposite) {
-      // Open the add node dialog
-      addWidget = _createAlertDialog(context);
-    } else {
-      // Create a leaf node.
-      String title = "Error";
-      String msg = "Only groups can contain other objects. "
-          "Please select a group and try again.";
-      addWidget = MessageDialog(title: title, content: msg,);
-    }
-
-    return addWidget;
+    return _createAlertDialog(context);
   }
 }

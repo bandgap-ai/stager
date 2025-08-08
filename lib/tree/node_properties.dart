@@ -5,7 +5,7 @@ import 'package:stager/tree/observable_subject.dart';
 ///
 /// This class serves as a base for concrete implementations that will store
 /// and manage key-value pairs representing node-specific data.
-abstract class NodeProperties implements ObservableSubject<NodePropertiesObserver> {
+abstract class NodeProperties implements ObservableSubject {
   /// Retrieves the value of a property given its [key].
   ///
   /// [key]: The string identifier for the property.

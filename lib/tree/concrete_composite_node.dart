@@ -6,6 +6,7 @@
 library;
 import 'package:stager/tree/tree.dart';
 import 'package:stager/tree/concrete_leaf_node.dart';
+import 'package:stager/tree/node_observer.dart';
 
 class ConcreteCompositeNode extends ConcreteLeafNode implements CompositeNode {
   /// The list of child nodes.
@@ -42,7 +43,7 @@ class ConcreteCompositeNode extends ConcreteLeafNode implements CompositeNode {
   }
 
   @override
-  void attach(LeafNodeObserver observer) {
+  void attach(NodeObserver observer) {
     super.attach(observer);
     for (final child in children) {
       child.attach(observer);
@@ -50,7 +51,7 @@ class ConcreteCompositeNode extends ConcreteLeafNode implements CompositeNode {
   }
 
   @override
-  void detach(LeafNodeObserver observer) {
+  void detach(NodeObserver observer) {
     super.detach(observer);
     for (final child in children) {
       child.detach(observer);

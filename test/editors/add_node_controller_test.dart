@@ -6,25 +6,29 @@ import 'package:stager/editors/editor_factory.dart';
 import 'package:stager/editors/site_editor.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/tree/composite_node.dart';
+import 'package:stager/tree/concrete_composite_node.dart';
 import 'package:stager/tree/tree_node.dart';
 import 'package:uuid/uuid.dart';
+import 'mock_composite_node_observer.dart';
 import 'mock_editor_factory.dart';
 import 'mock_site_state_observer.dart';
 
 void main() {
 
-  late SiteState state;
+  late CompositeNode parent;
   late MockEditorFactory editorFactory;
   late Controller controller;
-  late MockObserver observer;
+  late MockSiteStateObserver observer;
 
   setUp(() {
     state = SiteState();
     TreeNode root = state.addSite('Test Site');
     state.selectedNode = root;
-    state.attach(observer = MockObserver());
+    state.attach(observer = MockSiteStateObserver());
+    parent = ConcreteCompositeNode(id: "1", name: "Parent");
+    parent.attach(observer = MockCompositeNodeObserver());
     editorFactory = MockEditorFactory(state);
-    controller = AddNodeController(state, editorFactory);
+    controller = AddNodeController(root, editorFactory);
   });
 
   group('AddNodeController', () {

@@ -10,7 +10,7 @@ import 'package:stager/tree/node_visitor.dart';
 /// and pointers to its parent, next sibling, and previous sibling.
 ///
 /// All nodes accept visitors per the visitor pattern with accept().
-abstract class LeafNode implements ObservableSubject<LeafNodeObserver> {
+abstract class LeafNode implements ObservableSubject {
   /// Retrieves the [NodeProperties] associated with this leaf node.
   ///
   /// This getter provides access to the data payload of the node.

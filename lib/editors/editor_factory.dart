@@ -7,6 +7,7 @@ import 'package:stager/editors/site_editor.dart';
 import 'package:stager/editors/widget_factory.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/editors/basic_widget_factory.dart';
+import 'package:stager/tree/composite_node.dart';
 
 /// This is an abstract factory class definition for creating editors.
 abstract class EditorFactory {
@@ -16,8 +17,8 @@ abstract class EditorFactory {
   /// Creates a new StagerEditor that can create new nodes in the site state.
   ///
   /// [context]: The build context for the widget.
-  /// [state]: The Stager SiteState that defines the data to be edited.
-  SiteEditor createNodeEditor(BuildContext context, SiteState state);
+  /// [parent]: The parent node for the new node.
+  SiteEditor createNodeEditor(BuildContext context, CompositeNode parent);
 
   /// Creates a new StagerEditor that can edit an existing node in the site
   /// state.

@@ -3,13 +3,14 @@
 /// This class stores properties in a simple [Map<String, Object?>].
 library;
 import 'package:stager/tree/tree.dart';
+import 'package:stager/tree/node_observer.dart';
 
 class ConcreteNodeProperties implements NodeProperties {
   /// The internal map holding the node's properties.
   final Map<String, Object?> _properties;
 
   /// Internal list of observers attached to this node properties instance.
-  final List<NodePropertiesObserver> _nodePropertiesObservers = [];
+  final List<NodeObserver> _nodePropertiesObservers = [];
 
   /// Creates a [ConcreteNodeProperties] instance.
   ///
@@ -33,13 +34,13 @@ class ConcreteNodeProperties implements NodeProperties {
 
   /// Attaches a [NodePropertiesObserver] to this node properties instance.
   @override
-  void attach(NodePropertiesObserver observer) {
+  void attach(NodeObserver observer) {
     _nodePropertiesObservers.add(observer);
   }
 
   /// Detaches a [NodePropertiesObserver] from this node properties instance.
   @override
-  void detach(NodePropertiesObserver observer) {
+  void detach(NodeObserver observer) {
     _nodePropertiesObservers.remove(observer);
   }
 

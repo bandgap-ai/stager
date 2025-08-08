@@ -4,8 +4,9 @@ import 'package:stager/editors/site_editor.dart';
 import 'package:stager/editors/widget_factory.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/editors/basic_widget_factory.dart';
-import 'package:stager/editors/message_dialog.dart';
 import 'package:stager/editors/add_node_dialog.dart';
+
+import '/tree/composite_node.dart';
 
 class BasicEditorFactory extends EditorFactory {
 
@@ -29,7 +30,7 @@ class BasicEditorFactory extends EditorFactory {
   @override
   SiteEditor createNodeEditor(
     BuildContext context,
-    SiteState state, [
+    CompositeNode state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
   ]) {
      return AddNodeDialog(state: state);

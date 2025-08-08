@@ -8,7 +8,7 @@ import 'package:stager/tree/concrete_composite_node.dart';
 import 'package:uuid/uuid.dart';
 
 /// This is a controller that creates a new node in the site state.
-class AddNodeController extends Controller {
+class AddNodeController extends Controller<CompositeNode> {
   AddNodeController(super.state, super.editorFactory);
 
   @override
@@ -36,7 +36,7 @@ class AddNodeController extends Controller {
       newNode = ConcreteLeafNode(id: id, name: name);
     }
     // Add the new node to the tree
-    (state.selectedNode! as CompositeNode).addChild(newNode);
+    state.addChild(newNode);
     // FIXME - I think the state should register as a listener of all nodes
     // and, thus, notify whenever the tree changes without explicitly calling it
     // like this.

@@ -3,7 +3,7 @@ import 'package:stager/site_state_observer.dart';
 
 
 /// This is a Mock [SiteStateObserver] for testing.
-class MockObserver implements SiteStateObserver {
+class MockSiteStateObserver implements SiteStateObserver {
 
   bool _updated = false;
 

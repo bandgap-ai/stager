@@ -7,19 +7,19 @@ import 'package:stager/editors/editor_factory.dart';
 /// state updates gathered from editors. It is implemented for each type of
 /// edit control/function.
 ///
-/// EditorFactories are injected for customization and testing. It's a "choose
-/// your own adventure" kind of interface...
-abstract class Controller {
+/// EditorFactories are injected for customization and testing, and state types
+/// are templated. It's a "choose your own adventure" kind of interface...
+abstract class Controller<T> {
 
   /// The editor factory used to create the editor.
   final EditorFactory editorFactory;
 
-  /// The site state.
-  final SiteState state;
+  /// The controller state.
+  final T state;
 
   /// Creates a new controller.
   ///
-  /// [state]: The site state.
+  /// [state]: The controller state.
   /// [editorFactory]: The editor factory used to create the editor.
   Controller(this.state, this.editorFactory);
 

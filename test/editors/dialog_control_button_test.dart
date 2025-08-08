@@ -13,7 +13,7 @@ void main() {
 
   group('DialogControlButton', () {
     late SiteState state;
-    late MockObserver observer;
+    late MockSiteStateObserver observer;
     late MockController mockController;
     late MockEditorFactory mockEditorFactory;
 
@@ -21,7 +21,7 @@ void main() {
       state = SiteState();
       TreeNode root = state.addSite('Test Site');
       state.selectedNode = root;
-      state.attach(observer = MockObserver());
+      state.attach(observer = MockSiteStateObserver());
       mockEditorFactory = MockEditorFactory(state);
       mockController = MockController(state, mockEditorFactory);
     });

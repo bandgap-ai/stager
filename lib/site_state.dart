@@ -2,6 +2,7 @@
 import 'package:stager/tree/concrete_tree.dart';
 import 'package:stager/data/basic_sample_data.dart';
 import 'package:stager/site_state_observer.dart';
+import 'package:stager/tree/node_observer.dart';
 import 'package:stager/tree/tree.dart';
 
 /// Manages the application's state for a collection of sites, represented as a tree structure.
@@ -9,11 +10,11 @@ import 'package:stager/tree/tree.dart';
 /// This class is the central hub for all data related to the sites, including the
 /// tree data itself, the currently selected node, and the overall label for the site collection.
 ///
-/// It implements the [ObservableSubject] pattern, allowing other parts of the application
+/// It implements the [ObservableSubject] interace, allowing other parts of the application
 /// to subscribe to state changes. When the state is modified (e.g., a node is selected,
 /// deleted, or a new site is added), it notifies all attached [SiteStateObserver]s.
-class SiteState implements ObservableSubject<SiteStateObserver> {
-  final List<SiteStateObserver> _observers = [];
+class SiteState implements ObservableSubject {
+  final List<NodeObserver> _observers = [];
   /// The top-level label for the site collection. Defaults to 'Sites'.
   String label = 'Sites';
 
@@ -94,12 +95,12 @@ class SiteState implements ObservableSubject<SiteStateObserver> {
   }
 
   @override
-  void attach(SiteStateObserver observer) {
+  void attach(NodeObserver observer) {
     _observers.add(observer);
   }
 
   @override
-  void detach(SiteStateObserver observer) {
+  void detach(NodeObserver observer) {
     _observers.remove(observer);
   }
 

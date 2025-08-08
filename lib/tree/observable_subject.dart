@@ -1,19 +1,21 @@
+import "package:stager/tree/node_observer.dart";
+
 /// An abstract class representing a subject in the Observer pattern.
 ///
-/// Classes that extend this will allow observers of type [T] to attach,
+/// Classes that extend this will allow node observers to attach,
 /// detach, and be notified of changes.
-abstract interface class ObservableSubject<T> {
+abstract interface class ObservableSubject {
   /// Attaches an [observer] to the subject.
   ///
-  /// [observer]: The observer to attach. Must be of type [T].
+  /// [observer]: The observer to attach.
   /// Type safety: Ensure that the attached observer correctly implements the expected observer interface.
-  void attach(T observer);
+  void attach(NodeObserver observer);
 
   /// Detaches an [observer] from the subject.
   ///
-  /// [observer]: The observer to detach. Must be of type [T].
+  /// [observer]: The observer to detach.
   /// Type safety: Ensure that the detached observer correctly implements the expected observer interface.
-  void detach(T observer);
+  void detach(NodeObserver observer);
 
   /// Notifies all attached observers of a change.
   ///
