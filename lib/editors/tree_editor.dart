@@ -9,15 +9,15 @@ import 'package:stager/tree/tree.dart';
 /// Abstract class for editing [NodeProperties].
 ///
 /// Implementations will provide UI for modifying a node's properties.
-abstract class AbstractNodePropertiesEditor extends StatefulWidget {
+abstract class AbstractNodePropertiesEditor extends StatelessWidget {
 
   const AbstractNodePropertiesEditor({super.key});
 
   /// Builds a widget that allows editing the properties of a [NodeProperties] instance.
   ///
-  /// [properties]: The [NodeProperties] instance to edit.
+  /// [node]: The node with properties to edit.
   /// Type safety: Implementations should handle various property types gracefully.
-  Widget buildPropertiesEditor(NodeProperties properties);
+  Widget buildPropertiesEditor(LeafNode node);
 }
 
 /// Abstract class for editing a [LeafNode].

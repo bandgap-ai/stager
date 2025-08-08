@@ -3,7 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/site_editor.dart';
 import 'package:stager/editors/widget_factory.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/editors/basic_widget_factory.dart';
@@ -17,7 +17,7 @@ abstract class EditorFactory {
   ///
   /// [context]: The build context for the widget.
   /// [state]: The Stager SiteState that defines the data to be edited.
-  StagerEditor createNodeEditor(BuildContext context, SiteState state);
+  SiteEditor createNodeEditor(BuildContext context, SiteState state);
 
   /// Creates a new StagerEditor that can edit an existing node in the site
   /// state.
@@ -26,7 +26,7 @@ abstract class EditorFactory {
   /// [state]: The Stager SiteState that defines the data to be edited.
   /// [widgetFactory]: An optional widget factory for the editor to use. The
   /// default is a [BasicWidgetFactory].
-  StagerEditor editNodeEditor(BuildContext context, SiteState state,
+  SiteEditor editNodeEditor(BuildContext context, SiteState state,
       [WidgetFactory widgetFactory = const BasicWidgetFactory()]);
 
   /// Creates a new StagerEditor that can safely delete an existing node in the
@@ -36,7 +36,7 @@ abstract class EditorFactory {
   /// [state]: The Stager SiteState that defines the data to be edited.
   /// [widgetFactory]: An optional widget factory for the editor to use. The
   /// default is a [BasicWidgetFactory].
-  StagerEditor deleteNodeEditor(BuildContext context, SiteState state,
+  SiteEditor deleteNodeEditor(BuildContext context, SiteState state,
       [WidgetFactory widgetFactory = const BasicWidgetFactory()]);
 
   /// Creates a new StagerEditor that can create a new site in the site state.
@@ -45,7 +45,7 @@ abstract class EditorFactory {
   /// [state]: The state manager for the Stager entity.
   /// [widgetFactory]: An optional widget factory for the editor to use. The
   /// default is a [BasicWidgetFactory].
-  StagerEditor addSiteEditor(BuildContext context, SiteState state,
+  SiteEditor addSiteEditor(BuildContext context, SiteState state,
       [WidgetFactory widgetFactory = const BasicWidgetFactory()]);
 
   /// Creates a new StagerEditor that can edit an existing site in the site
@@ -55,7 +55,7 @@ abstract class EditorFactory {
   /// [state]: The state manager for the Stager entity.
   /// [widgetFactory]: An optional widget factory for the editor to use. The
   /// default is a [BasicWidgetFactory].
-  StagerEditor editSiteEditor(BuildContext context, SiteState state,
+  SiteEditor editSiteEditor(BuildContext context, SiteState state,
       [WidgetFactory widgetFactory = const BasicWidgetFactory()]);
 
   /// Creates a new StagerEditor that can safetly delete an existing site in the
@@ -65,7 +65,7 @@ abstract class EditorFactory {
   /// [state]: The state manager for the Stager entity.
   /// [widgetFactory]: An optional widget factory for the editor to use. The
   /// default is a [BasicWidgetFactory].
-  StagerEditor deleteSiteEditor(BuildContext context, SiteState state,
+  SiteEditor deleteSiteEditor(BuildContext context, SiteState state,
       [WidgetFactory widgetFactory = const BasicWidgetFactory()]);
 
 }

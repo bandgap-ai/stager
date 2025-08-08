@@ -4,6 +4,7 @@ import 'package:stager/site_state.dart';
 import 'package:stager/editors/stager_tree_viewers.dart';
 import 'package:stager/tree/tree_node.dart';
 import 'package:stager/tree/leaf_node.dart';
+import 'package:stager/editors/node_properties_view.dart';
 
 /// A widget that displays the properties of the currently selected node in a
 /// bottom sheet.
@@ -76,7 +77,7 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   /// Builds the properties view
   Widget _buildPropertiesView(LeafNode selectedNode) {
     return SingleChildScrollView(
-      child: NodePropertiesView(properties: selectedNode.properties),
+      child: NodePropertiesView(state: selectedNode),
     );
   }
 

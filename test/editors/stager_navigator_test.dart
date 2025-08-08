@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager/site_state.dart';
-import 'package:stager/editors/site_editor.dart';
+import 'package:stager/editors/stager_navigator.dart';
 import 'package:stager/editors/tree_view.dart';
 import 'package:stager/tree/concrete_tree.dart';
 import 'package:stager/tree/tree.dart';
-
 import 'mock_file_handler.dart';
 
 void main() {
-  group('SiteEditor Widget Tests', () {
+  group('StagerNavigator Widget Tests', () {
     late SiteState siteState;
     late MockFileHandler mockFileHandler;
 
@@ -24,7 +23,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             // Pass the state object directly to the constructor
-            body: SiteEditor(
+            body: StagerNavigator(
               siteState: siteState,
               fileHandler: mockFileHandler,
             ),
@@ -47,6 +46,9 @@ void main() {
       // Arrange: Select a node in the state
       final node = ConcreteLeafNode(id: '1', name: 'Test Node');
       siteState.selectedNode = node;
+
+      /// FIXME! This test is failing because the edit button is currently disabled in the StagerNavigator.
+      /// Disregard until the merge is complete!
 
       // Act
       await pumpWidget(tester);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stager/editors/controller.dart';
-import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/site_editor.dart';
 import 'package:stager/tree/leaf_node.dart';
 import 'package:stager/tree/composite_node.dart';
 import 'package:stager/tree/concrete_leaf_node.dart';
@@ -12,7 +12,7 @@ class AddNodeController extends Controller {
   AddNodeController(super.state, super.editorFactory);
 
   @override
-  StagerEditor editor(BuildContext context) {
+  SiteEditor editor(BuildContext context) {
     return editorFactory.createNodeEditor(context, state);
   }
 
@@ -25,7 +25,7 @@ class AddNodeController extends Controller {
   void process(Object input) {
     LeafNode newNode;
     // Prepare the input
-    Map<String, Object> mapInput = input as Map<String, Object>;
+    Map<String, dynamic> mapInput = input as Map<String, dynamic>;
     String name = mapInput['name'] as String;
     // Create the ID
     var uuid = Uuid();

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:stager/editors/stager_editor.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/standard_widgets.dart';
+import 'package:stager/editors/basic_widget_factory.dart';
 
 /// A dialog for editing node properties.
 ///
@@ -9,12 +11,10 @@ import 'package:stager/editors/standard_widgets.dart';
 /// to edit the properties of a tree node. It dynamically generates input fields
 /// for each property, allowing for editing of string, latitude, and longitude
 /// values.
-class NodeEditor extends StatefulWidget {
-  /// The properties of the node to be edited.
-  final NodeProperties properties;
+class NodeEditor extends StagerEditor<LeafNode> {
 
   /// Creates a [NodeEditor] widget.
-  const NodeEditor({super.key, required this.properties});
+  const NodeEditor({super.key, required super.state, super.widgetFactory = const BasicWidgetFactory()});
 
   @override
   State<NodeEditor> createState() => _NodeEditorState();
@@ -25,6 +25,10 @@ class NodeEditor extends StatefulWidget {
 /// Manages the [TextEditingController]s for each property and handles the
 /// logic for saving and canceling edits.
 class _NodeEditorState extends State<NodeEditor> {
+
+  /// The properties of the node to be edited.
+  late NodeProperties properties;
+
   /// A map to store [TextEditingController]s for string-based properties.
   final Map<String, TextEditingController> _controllers = {};
 
@@ -34,15 +38,16 @@ class _NodeEditorState extends State<NodeEditor> {
   @override
   void initState() {
     super.initState();
+    properties = widget.state.properties;
     // Initialize controllers for each property based on their type.
-    widget.properties.map.forEach((key, value) {
+    properties.map.forEach((key, value) {
       // For all properties, create a TextEditingController.
       _controllers[key] = TextEditingController(text: value?.toString() ?? '');
     });
 
     // Initialize _pickFromMap based on whether latitude/longitude exist
-    _pickFromMap = !(widget.properties.map.containsKey('latitude') ||
-        widget.properties.map.containsKey('longitude'));
+    _pickFromMap = !(properties.map.containsKey('latitude') ||
+        properties.map.containsKey('longitude'));
   }
 
   // Call back for point picking on the map
@@ -75,7 +80,7 @@ class _NodeEditorState extends State<NodeEditor> {
             buildInfoLabel(context,info),
             // Dynamically build text field editors for all properties
             // except 'id', 'name', 'latitude', and 'longitude'.
-            ...widget.properties.map.entries.where((entry) => entry.key != 'id' && entry.key != 'name' && entry.key != 'latitude' && entry.key != 'longitude').map((entry) {
+            ...properties.map.entries.where((entry) => entry.key != 'id' && entry.key != 'name' && entry.key != 'latitude' && entry.key != 'longitude').map((entry) {
               return buildTextFieldEditor(
                 context,
                 _controllers[entry.key]!, // Use the pre-initialized controller
@@ -84,13 +89,13 @@ class _NodeEditorState extends State<NodeEditor> {
               );
             }).toList(),
             // If latitude or longitude properties exist, build a geographic coordinate editor.
-            if (widget.properties.map.containsKey('latitude') || widget.properties.map.containsKey('longitude'))
+            if (properties.map.containsKey('latitude') || properties.map.containsKey('longitude'))
               buildPositionMethodWidget(context, _pickFromMap, (value) {
                 setState(() {
                   _pickFromMap = value;
                 });
               }),
-            if (widget.properties.map.containsKey('latitude') || widget.properties.map.containsKey('longitude'))
+            if (properties.map.containsKey('latitude') || properties.map.containsKey('longitude'))
               SizedBox(
                 width: _pickFromMap ? MediaQuery.of(context).size.width * 0.8 : null,
                 height: _pickFromMap ? MediaQuery.of(context).size.height * 0.5 : null,
@@ -122,7 +127,7 @@ class _NodeEditorState extends State<NodeEditor> {
         TextButton(
           onPressed: () {
             // Create a mutable copy of the properties map.
-            final updatedProperties = Map<String, dynamic>.from(widget.properties.map);
+            final updatedProperties = Map<String, dynamic>.from(properties.map);
             _controllers.forEach((key, controller) {
               if (key == 'latitude' || key == 'longitude') {
                 updatedProperties[key] = double.tryParse(controller.text);

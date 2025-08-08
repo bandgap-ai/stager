@@ -17,7 +17,10 @@ class SiteState implements ObservableSubject<SiteStateObserver> {
   /// The top-level label for the site collection. Defaults to 'Sites'.
   String label = 'Sites';
 
+  /// The root-level nodes of the site hierarchy.
   late List<TreeNode> _treeData;
+
+  /// The currently selected node in the tree, or `null` if no node is selected.
   LeafNode? _selectedNode;
 
   /// Initializes the site state, loading the initial data from [fakeSites].

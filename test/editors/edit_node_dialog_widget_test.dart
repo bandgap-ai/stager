@@ -3,8 +3,10 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stager/site_state.dart';
 import 'package:stager/tree/concrete_tree.dart';
 import 'package:stager/editors/edit_node_dialog.dart';
+import 'package:stager/tree/tree_node.dart';
 
 void main() {
   group('EditNodeDialog Widget Tests', () {
@@ -18,7 +20,7 @@ void main() {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => EditNodeDialog(properties: testNode.properties),
+                  builder: (context) => EditNodeDialog(state: testNode),
                 );
               },
               child: const Text('Show Dialog'),
@@ -42,7 +44,7 @@ void main() {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => EditNodeDialog(properties: testNode.properties),
+                  builder: (context) => EditNodeDialog(state: testNode),
                 );
               },
               child: const Text('Show Dialog'),
@@ -72,7 +74,7 @@ void main() {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => EditNodeDialog(properties: testNode.properties),
+                  builder: (context) => EditNodeDialog(state: testNode),
                 );
               },
               child: const Text('Show Dialog'),

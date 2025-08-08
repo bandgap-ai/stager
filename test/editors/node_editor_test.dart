@@ -2,40 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager/editors/node_editor.dart';
 import 'package:stager/editors/single_point_map_editor.dart';
+import 'package:stager/tree/concrete_leaf_node.dart';
 import 'package:stager/tree/tree.dart';
 
-// Mock NodeProperties for testing
-class MockNodeProperties implements NodeProperties {
-  final Map<String, dynamic> _properties;
-
-  MockNodeProperties(this._properties);
-
-  @override
-  dynamic getProperty(String key) => _properties[key];
-
-  @override
-  void setProperty(String key, dynamic value) => _properties[key] = value;
-
-  @override
-  Map<String, dynamic> get map => _properties;
-
-  @override
-  void attach(NodePropertiesObserver observer) {}
-
-  @override
-  void detach(NodePropertiesObserver observer) {}
-
-  @override
-  void notify() {}
-}
-
 void main() {
+  late ConcreteLeafNode node;
+  late NodeProperties testProperties;
+
+  setUp(() {
+    node = ConcreteLeafNode(id: 'test_id', name: 'Test Node');
+    testProperties = node.properties;
+  });
+
   group('NodeEditor Tests', () {
     testWidgets('NodeEditor displays title and content', (WidgetTester tester) async {
-      final properties = MockNodeProperties({'name': 'Test Node', 'description': 'Some description'});
+      testProperties.setProperty('name', 'Test Node');
+      testProperties.setProperty('description', 'Some description');
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: NodeEditor(properties: properties),
+          body: NodeEditor(state:node),
         ),
       ));
 
@@ -46,10 +31,11 @@ void main() {
     });
 
     testWidgets('NodeEditor displays latitude and longitude', (WidgetTester tester) async {
-      final properties = MockNodeProperties({'latitude': 10.0, 'longitude': 20.0});
+      testProperties.setProperty('latitude', 10.0);
+      testProperties.setProperty('longitude', 20.0);
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: NodeEditor(properties: properties),
+          body: NodeEditor(state: node),
         ),
       ));
 
@@ -60,7 +46,11 @@ void main() {
     });
 
     testWidgets('NodeEditor returns updated properties on Save', (WidgetTester tester) async {
-      final properties = MockNodeProperties({'name': 'Old Name', 'description': 'Old Description', 'latitude': 1.0, 'longitude': 2.0});
+      testProperties.setProperty('name', 'Old Name');
+      testProperties.setProperty('description', 'Old Description');
+      testProperties.setProperty('latitude', 1.0);
+      testProperties.setProperty('longitude', 2.0);
+
       Map<String, dynamic>? result;
 
       await tester.pumpWidget(MaterialApp(
@@ -71,7 +61,7 @@ void main() {
                 result = await showDialog<Map<String, dynamic>>(
                   context: context,
                   builder: (BuildContext context) {
-                    return NodeEditor(properties: properties);
+                    return NodeEditor(state: node);
                   },
                 );
               },
@@ -100,10 +90,12 @@ void main() {
     });
 
     testWidgets('NodeEditor displays position method widget and switches editors', (WidgetTester tester) async {
-      final properties = MockNodeProperties({'latitude': 10.0, 'longitude': 20.0});
+      testProperties.setProperty('latitude', 10.0);
+      testProperties.setProperty('longitude', 20.0);
+
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: NodeEditor(properties: properties),
+          body: NodeEditor(state: node),
         ),
       ));
 

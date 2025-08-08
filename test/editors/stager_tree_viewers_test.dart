@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stager/editors/node_properties_view.dart';
 import 'package:stager/tree/concrete_tree.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/stager_tree_viewers.dart';
@@ -13,10 +14,12 @@ import 'package:stager/editors/tree_icon_provider.dart';
 
 void main() {
   group('NodePropertiesView Tests', () {
+    late ConcreteLeafNode node;
     late NodeProperties testProperties;
 
     setUp(() {
-      testProperties = ConcreteNodeProperties();
+      node = ConcreteLeafNode(id: 'test_id', name: 'Test Node');
+      testProperties = node.properties;
       testProperties.setProperty('id', 'test_id');
       testProperties.setProperty('name', 'Test Node');
       testProperties.setProperty('latitude', 36.73444);
@@ -27,7 +30,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: NodePropertiesView(properties: testProperties),
+            body: NodePropertiesView(state: node),
           ),
         ),
       );
@@ -48,7 +51,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: NodePropertiesView(properties: testProperties),
+            body: NodePropertiesView(state: node),
           ),
         ),
       );
@@ -70,7 +73,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: NodePropertiesView(properties: testProperties),
+            body: NodePropertiesView(state: node),
           ),
         ),
       );
@@ -93,7 +96,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: NodePropertiesView(properties: emptyProperties),
+            body: NodePropertiesView(state: node),
           ),
         ),
       );

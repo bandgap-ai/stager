@@ -2,7 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/site_editor.dart';
 import 'package:stager/editors/message_dialog.dart';
 import 'package:stager/editors/basic_widget_factory.dart';
 import 'package:stager/site_state.dart';
@@ -11,7 +11,7 @@ import 'package:stager/site_state.dart';
 ///
 /// This dialog provides a [TextField] for the user to enter the name of the new node.
 /// When the 'Add' button is pressed, the entered name is returned.
-class AddNodeDialog extends StagerEditor {
+class AddNodeDialog extends SiteEditor {
   /// Creates an [AddNodeDialog].
   const AddNodeDialog({super.key,
     required super.state,

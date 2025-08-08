@@ -4,7 +4,7 @@ import 'package:stager/site_state.dart';
 import 'package:stager/tree/concrete_tree.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/add_site_dialog.dart';
-import 'package:stager/editors/site_editor.dart';
+import 'package:stager/editors/stager_navigator.dart';
 
 void main() {
   group('SiteEditor', () {
@@ -14,7 +14,7 @@ void main() {
       final siteState = SiteState();
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: SiteEditor(siteState: siteState),
+          body: StagerNavigator(siteState: siteState),
         ),
       ));
 
@@ -36,7 +36,7 @@ void main() {
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: SiteEditor(siteState: siteState),
+          body: StagerNavigator(siteState: siteState),
         ),
       ));
 
@@ -67,7 +67,7 @@ void main() {
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: SiteEditor(siteState: siteState),
+          body: StagerNavigator(siteState: siteState),
         ),
       ));
 
@@ -84,7 +84,7 @@ void main() {
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: SiteEditor(siteState: siteState),
+          body: StagerNavigator(siteState: siteState),
         ),
       ));
 
@@ -102,7 +102,7 @@ void main() {
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: SiteEditor(siteState: siteState),
+          body: StagerNavigator(siteState: siteState),
         ),
       ));
 

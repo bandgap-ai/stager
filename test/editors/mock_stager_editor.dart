@@ -1,8 +1,8 @@
 import 'package:stager/editors/basic_widget_factory.dart';
-import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/site_editor.dart';
 import 'package:flutter/material.dart';
 
-class MockStagerEditor extends StagerEditor {
+class MockStagerEditor extends SiteEditor {
   /// A predefined [Key] that can be used to find this mock widget in tests.
   static const Key mockStagerEditorKey = Key('MockStagerEditorInstance');
 

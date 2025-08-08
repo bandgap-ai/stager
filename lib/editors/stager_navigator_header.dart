@@ -24,7 +24,7 @@ import 'package:stager/editors/basic_site_controls.dart';
 /// - Deleting any selected node (with confirmation).
 /// - Adding a new top-level site.
 /// - Importing and exporting data.
-class SiteEditorHeader extends StatelessWidget {
+class StagerNavigatorHeader extends StatelessWidget {
   /// The state manager for the site data.
   final SiteState siteState;
 
@@ -35,7 +35,7 @@ class SiteEditorHeader extends StatelessWidget {
   final SiteControls siteControls;
 
   /// Creates a site editor header.
-  const SiteEditorHeader({
+  const StagerNavigatorHeader({
     super.key,
     required this.siteState,
     required this.fileHandler,
@@ -87,11 +87,14 @@ class SiteEditorHeader extends StatelessWidget {
             children: [
               /// TODO Replace this with SiteControls.
               siteControls.buildAddNodeControl(context, siteState),
-              // Add the node creation button.
-     //         nodeEditorFactory.create(context, siteState),
               // Edit the properties of the selected node.
-              if (selectedNode != null) MessageDialog(content: 'This function is disabled.', title: 'Error'),
-    //            nodePropertiesEditor.buildEnhancedPropertiesEditor(selectedNode),
+              if (selectedNode != null)
+              //  siteControls.buildEditNodeControl(context, selectedNode),
+                // Note that this used to call buildEnhancedPropertiesEditor.
+                // That functionality should be migrated to Tracee and it should
+                // have a test to verify that the enhanced editor is being used
+                // instead of the regular one.
+                nodePropertiesEditor.buildPropertiesEditor(selectedNode),
               // Delete the selected node.
               if (selectedNode != null)
                 IconButton(

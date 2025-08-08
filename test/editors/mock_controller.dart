@@ -1,4 +1,4 @@
-import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/site_editor.dart';
 import 'package:stager/editors/controller.dart';
 import 'package:flutter/material.dart';
 import 'mock_stager_editor.dart';
@@ -22,10 +22,10 @@ class MockController extends Controller {
     _editor = MockStagerEditor(state:state);
   }
 
-  StagerEditor get editorRef => _editor;
+  SiteEditor get editorRef => _editor;
 
   @override
-  StagerEditor editor(BuildContext context) {
+  SiteEditor editor(BuildContext context) {
     return _editor;
   }
 

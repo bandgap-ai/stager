@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stager/editors/add_node_controller.dart';
 import 'package:stager/editors/controller.dart';
 import 'package:stager/editors/editor_factory.dart';
-import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/site_editor.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/tree/composite_node.dart';
 import 'package:stager/tree/tree_node.dart';
@@ -41,7 +41,7 @@ void main() {
           home: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                StagerEditor editor = controller.editor(context);
+                SiteEditor editor = controller.editor(context);
               },
               child: const Text('Show Dialog'),
             ),

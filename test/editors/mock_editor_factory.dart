@@ -1,7 +1,7 @@
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:stager/editors/basic_widget_factory.dart';
 import 'package:stager/editors/editor_factory.dart';
-import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/site_editor.dart';
 import 'package:stager/editors/widget_factory.dart';
 import 'package:stager/site_state.dart';
 
@@ -47,7 +47,7 @@ class MockEditorFactory extends EditorFactory {
   }
 
   @override
-  StagerEditor addSiteEditor(
+  SiteEditor addSiteEditor(
     BuildContext context,
     SiteState state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
@@ -57,7 +57,7 @@ class MockEditorFactory extends EditorFactory {
   }
 
   @override
-  StagerEditor createNodeEditor(
+  SiteEditor createNodeEditor(
     BuildContext context,
     SiteState state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
@@ -67,7 +67,7 @@ class MockEditorFactory extends EditorFactory {
   }
 
   @override
-  StagerEditor deleteNodeEditor(
+  SiteEditor deleteNodeEditor(
     BuildContext context,
     SiteState state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
@@ -77,7 +77,7 @@ class MockEditorFactory extends EditorFactory {
   }
 
   @override
-  StagerEditor deleteSiteEditor(
+  SiteEditor deleteSiteEditor(
     BuildContext context,
     SiteState state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
@@ -87,7 +87,7 @@ class MockEditorFactory extends EditorFactory {
   }
 
   @override
-  StagerEditor editNodeEditor(
+  SiteEditor editNodeEditor(
     BuildContext context,
     SiteState state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
@@ -97,7 +97,7 @@ class MockEditorFactory extends EditorFactory {
   }
 
   @override
-  StagerEditor editSiteEditor(
+  SiteEditor editSiteEditor(
     BuildContext context,
     SiteState state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),

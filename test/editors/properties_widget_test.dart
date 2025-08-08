@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stager/editors/node_properties_view.dart';
 import 'package:stager/tree/concrete_tree.dart';
 import 'package:stager/tree/concrete_leaf_node.dart';
 import 'package:stager/site_state.dart';

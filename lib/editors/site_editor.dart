@@ -1,48 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:stager/editors/stager_editor.dart';
+import 'package:stager/editors/basic_widget_factory.dart';
 import 'package:stager/site_state.dart';
-import 'package:stager/editors/file_handler.dart';
-import 'package:stager/editors/site_editor_header.dart';
-import 'package:stager/editors/tree_view.dart';
-import 'package:stager/editors/properties_widget.dart';
 
-/// A widget that provides a comprehensive editing interface for the entire site hierarchy.
+/// The Site Editor is an abstract base class for creating editors used by
+/// Stager applications. It provides two features to give developers/clients a
+/// head start:
+/// 1. It is a StatefulWidget.
+/// 2. It has a [widgetFactory] property that can be be overridden to provide
+/// a custom widget factory for widgets used in the editor.
 ///
-/// This widget serves as the main view for interacting with the site data. It is
-/// composed of two main parts:
-/// 1. A [SiteEditorHeader] that displays the site label and provides editing controls.
-/// 2. A [TreeView] that shows the entire site hierarchy.
+/// It uses a [BasicWidgetFactory] by default, which is a simple implementation
+/// that uses the [standard_widgets.dart] library to create widgets.
 ///
-/// It uses a [SiteState] object to manage and react to state changes.
-class SiteEditor extends StatelessWidget {
-  /// The state manager for the site data.
-  final SiteState siteState;
-  /// The handler for file import/export operations.
-  final FileHandler fileHandler;
+/// A StagerEditor can be anything that edits a Stager tree. For example,
+/// [EditNodeDialog] is a StagerEditor that edits a single node.
+abstract class SiteEditor extends StagerEditor<SiteState> {
 
-  /// Creates a site editor widget.
-  SiteEditor({super.key, required this.siteState, FileHandler? fileHandler})
-      : fileHandler = fileHandler ?? BasicFileHandler();
+  /// Creates a Site Editor.
+  /// [state] is the site state for the site being manipulated by the editor.
+  /// [widgetFactory] is an optional parameter that can be overridden to provide
+  /// a custom widget factory.
+  const SiteEditor({super.key, required super.state, super.widgetFactory = const BasicWidgetFactory()});
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SiteEditorHeader(
-          siteState: siteState,
-          fileHandler: fileHandler,
-        ),
-        Expanded(
-          child: TreeView(
-            sites: siteState.treeData,
-            selectedNode: siteState.selectedNode,
-            onNodeTap: (node) {
-              siteState.selectedNode = node;
-              Scaffold.of(context).showBottomSheet((context) => PropertiesWidget(siteState: siteState));
-            },
-          ),
-        ),
-      ],
-    );
-  }
 }
-

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/tree_editor.dart';
+import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/edit_node_dialog.dart';
 import 'package:stager/editors/enhanced_edit_node_dialog.dart';
 
@@ -17,13 +17,7 @@ class ConcreteNodePropertiesEditor extends AbstractNodePropertiesEditor {
   const ConcreteNodePropertiesEditor(this.context, {super.key});
 
   @override
-  State<ConcreteNodePropertiesEditor> createState() => _ConcreteNodePropertiesEditorState();
-
-}
-
-class _ConcreteNodePropertiesEditorState extends State<ConcreteNodePropertiesEditor> {
-  @override
-  Widget buildPropertiesEditor(NodeProperties properties) {
+  Widget buildPropertiesEditor(LeafNode node) {
     // This widget builds the UI element that triggers the edit action.
     return IconButton(
       icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.onPrimary),
@@ -32,12 +26,12 @@ class _ConcreteNodePropertiesEditorState extends State<ConcreteNodePropertiesEdi
         final newName = await showDialog<String>(
           context: context,
           // Assuming EditNodeDialog takes properties now
-          builder: (context) => EditNodeDialog(properties: properties),
+          builder: (context) => EditNodeDialog(state: node),
         );
 
         if (newName != null) {
           // This now triggers the notify() call within the properties object
-          properties.setProperty('name', newName);
+          node.properties.setProperty('name', newName);
         }
       },
     );
@@ -64,7 +58,7 @@ class _ConcreteNodePropertiesEditorState extends State<ConcreteNodePropertiesEdi
           // Use regular dialog for other levels
           final newName = await showDialog<String>(
             context: context,
-            builder: (context) => EditNodeDialog(properties: node.properties),
+            builder: (context) => EditNodeDialog(state: node),
           );
 
           if (newName != null) {
