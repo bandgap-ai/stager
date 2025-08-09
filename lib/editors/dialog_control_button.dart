@@ -8,15 +8,11 @@ import 'package:stager/editors/controller.dart';
 /// It delegates work to subclasses of Controller.
 class DialogControlButton extends StatelessWidget {
 
-  /// The site state.
-  final SiteState state;
-
   /// The controller for this control button.
   final Controller controller;
 
   const DialogControlButton({super.key,
-    required this.controller,
-    required this.state});
+    required this.controller});
 
   /// Handles the results from the editor and must be implemented by subclasses.
   ///

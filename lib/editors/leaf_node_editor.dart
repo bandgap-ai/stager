@@ -11,20 +11,20 @@ import 'package:stager/editors/basic_widget_factory.dart';
 /// to edit the properties of a tree node. It dynamically generates input fields
 /// for each property, allowing for editing of string, latitude, and longitude
 /// values.
-class NodeEditor extends StagerEditor<LeafNode> {
+class LeafNodeEditor extends StagerEditor<LeafNode> {
 
-  /// Creates a [NodeEditor] widget.
-  const NodeEditor({super.key, required super.state, super.widgetFactory = const BasicWidgetFactory()});
+  /// Creates a [LeafNodeEditor] widget.
+  const LeafNodeEditor({super.key, required super.state, super.widgetFactory = const BasicWidgetFactory()});
 
   @override
-  State<NodeEditor> createState() => _NodeEditorState();
+  State<LeafNodeEditor> createState() => _NodeEditorState();
 }
 
-/// The state for the [NodeEditor] widget.
+/// The state for the [LeafNodeEditor] widget.
 ///
 /// Manages the [TextEditingController]s for each property and handles the
 /// logic for saving and canceling edits.
-class _NodeEditorState extends State<NodeEditor> {
+class _NodeEditorState extends State<LeafNodeEditor> {
 
   /// The properties of the node to be edited.
   late NodeProperties properties;

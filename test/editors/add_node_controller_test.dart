@@ -4,6 +4,7 @@ import 'package:stager/editors/add_node_controller.dart';
 import 'package:stager/editors/controller.dart';
 import 'package:stager/editors/editor_factory.dart';
 import 'package:stager/editors/site_editor.dart';
+import 'package:stager/editors/stager_editor.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/tree/composite_node.dart';
 import 'package:stager/tree/concrete_composite_node.dart';
@@ -18,17 +19,15 @@ void main() {
   late CompositeNode parent;
   late MockEditorFactory editorFactory;
   late Controller controller;
-  late MockSiteStateObserver observer;
+  late MockCompositeNodeObserver observer;
 
   setUp(() {
-    state = SiteState();
-    TreeNode root = state.addSite('Test Site');
-    state.selectedNode = root;
-    state.attach(observer = MockSiteStateObserver());
+    SiteState state = SiteState();
+
     parent = ConcreteCompositeNode(id: "1", name: "Parent");
     parent.attach(observer = MockCompositeNodeObserver());
     editorFactory = MockEditorFactory(state);
-    controller = AddNodeController(root, editorFactory);
+    controller = AddNodeController(parent, editorFactory);
   });
 
   group('AddNodeController', () {
@@ -45,7 +44,7 @@ void main() {
           home: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                SiteEditor editor = controller.editor(context);
+                StagerEditor editor = controller.editor(context);
               },
               child: const Text('Show Dialog'),
             ),
@@ -63,7 +62,7 @@ void main() {
     test('Should return Icons.add', () {
       final SiteState state = SiteState();
       final EditorFactory editorFactory = MockEditorFactory(state);
-      final Controller controller = AddNodeController(state, editorFactory);
+      final Controller controller = AddNodeController(parent, editorFactory);
       expect(controller.iconData(), equals(Icons.add),);
     });
 
@@ -80,9 +79,9 @@ void main() {
       String name = 'Test Leaf Node';
       Map<String, Object> results = {'name': name, 'isGroup': false};
       controller.process(results);
-      expect((state.selectedNode! as CompositeNode).children.length, equals(1));
-      expect((state.selectedNode! as CompositeNode).children[0].properties.getProperty('name') as String, equals(name));
-      expect(() => Uuid.parse((state.selectedNode! as CompositeNode).children[0].properties.getProperty('id') as String), returnsNormally);
+      expect(parent.children.length, equals(1));
+      expect(parent.children[0].properties.getProperty('name') as String, equals(name));
+      expect(() => Uuid.parse(parent.children[0].properties.getProperty('id') as String), returnsNormally);
       // Make sure it was observed and reset the observer.
       expect(observer.updated, isTrue);
       observer.reset();
@@ -91,9 +90,9 @@ void main() {
       name = 'Test Composite Node';
       results = {'name': name, 'isGroup': true};
       controller.process(results);
-      expect((state.selectedNode! as CompositeNode).children.length, equals(2));
-      expect((state.selectedNode! as CompositeNode).children[1].properties.getProperty('name') as String, equals(name));
-      expect(() => Uuid.parse((state.selectedNode! as CompositeNode).children[1].properties.getProperty('id') as String), returnsNormally);
+      expect(parent.children.length, equals(2));
+      expect(parent.children[1].properties.getProperty('name') as String, equals(name));
+      expect(() => Uuid.parse(parent.children[1].properties.getProperty('id') as String), returnsNormally);
       // Make sure it was observed and reset the observer.
       expect(observer.updated, isTrue);
       observer.reset();

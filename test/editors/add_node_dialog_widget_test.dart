@@ -29,7 +29,7 @@ void main() {
               onPressed: () async {
                 final result = await showDialog<Map<String, dynamic>?>(
                   context: context,
-                  builder: (context) => AddNodeDialog(state: state),
+                  builder: (context) => AddNodeDialog(state: root),
                 );
                 // Verify the form of the results.
                 expect(result, isNotNull);
@@ -79,7 +79,7 @@ void main() {
               onPressed: () async {
                 final result = await showDialog<Map<String, dynamic>?>(
                   context: context,
-                  builder: (context) => AddNodeDialog(state: state),
+                  builder: (context) => AddNodeDialog(state: root),
                 );
                 // Verify the form of the results.
                 expect(result, isNotNull);
@@ -136,7 +136,7 @@ void main() {
               onPressed: () {
                 showDialog<String>(
                   context: context,
-                  builder: (context) => AddNodeDialog(state: state),
+                  builder: (context) => AddNodeDialog(state: root),
                 );
               },
               child: const Text('Show Dialog'),
@@ -154,86 +154,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AddNodeDialog), findsNothing);
-
-      return;
-    });
-
-    testWidgets('Should show message dialog when selected node is null', (WidgetTester tester) async {
-
-      // The key to access the dialog's result.
-      final resultKey = GlobalKey<NavigatorState>();
-
-      // Site State needs to be configured with a null selection for this test.
-      // Explicitly set it here.
-      final SiteState state = SiteState();
-      state.selectedNode = null;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          navigatorKey: resultKey,
-          home: Builder(
-            builder: (context) => ElevatedButton(
-              onPressed: () async {
-                final result = await showDialog<Map<String, dynamic>?>(
-                  context: context,
-                  builder: (context) => AddNodeDialog(state: state),
-                );
-              },
-              child: const Text('Show Dialog'),
-            ),
-          ),
-        ),
-      );
-
-      // Tap the button to show the dialog.
-      await tester.tap(find.text('Show Dialog'));
-      await tester.pumpAndSettle(); // Wait for the dialog to appear.
-
-      // Verify the dialog is visible.
-      expect(find.byType(AddNodeDialog), findsOneWidget);
-      expect(find.text("No node selected. "
-          "Please select a site or node and try again."), findsOneWidget);
-
-      return;
-    });
-
-    testWidgets('Should show error message when leaf node is selected', (WidgetTester tester) async {
-// The key to access the dialog's result.
-      final resultKey = GlobalKey<NavigatorState>();
-
-      // Site State needs to be configured with a null selection for this test.
-      // Explicitly set it here.
-      final SiteState state = SiteState();
-      TreeNode root = state.addSite('Test Site');
-      LeafNode leaf = ConcreteLeafNode(id: "1", name: "These Dreams...");
-      root.addChild(leaf);
-      state.selectedNode = leaf;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          navigatorKey: resultKey,
-          home: Builder(
-            builder: (context) => ElevatedButton(
-              onPressed: () async {
-                final result = await showDialog<Map<String, dynamic>?>(
-                  context: context,
-                  builder: (context) => AddNodeDialog(state: state),
-                );
-              },
-              child: const Text('Show Dialog'),
-            ),
-          ),
-        ),
-      );
-
-      // Tap the button to show the dialog.
-      await tester.tap(find.text('Show Dialog'));
-      await tester.pumpAndSettle(); // Wait for the dialog to appear.
-
-      // Verify the dialog is visible.
-      expect(find.byType(AddNodeDialog), findsOneWidget);
-      expect(find.text("Only groups can contain other objects. "
-          "Please select a group and try again."), findsOneWidget);
 
       return;
     });

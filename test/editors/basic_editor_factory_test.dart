@@ -5,17 +5,19 @@ import 'package:stager/editors/basic_editor_factory.dart';
 import 'package:stager/editors/basic_site_controls.dart';
 import 'package:stager/editors/site_controls.dart';
 import 'package:stager/site_state.dart';
+import 'package:stager/tree/composite_node.dart';
+import 'package:stager/tree/concrete_composite_node.dart';
 import 'mock_editor_factory.dart';
 import 'mock_widget_factory.dart';
 
 void main() {
 
-  late SiteState state;
+  late CompositeNode parent;
   late BasicEditorFactory factory;
   late MockWidgetFactory widgetFactory;
 
   setUp(() {
-    state = SiteState();
+    parent = ConcreteCompositeNode(id: "id", name: "name");
     factory = BasicEditorFactory();
     widgetFactory = MockWidgetFactory();
   });
@@ -28,7 +30,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
-              builder: (context) => factory.createNodeEditor(context,state, widgetFactory)
+              builder: (context) => factory.createNodeEditor(context, parent, widgetFactory)
           ),
         ),
       );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stager/editors/site_editor.dart';
+import 'package:stager/editors/stager_editor.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/editors/editor_factory.dart';
 
@@ -34,6 +35,6 @@ abstract class Controller<T> {
   /// Returns the editor that can perform the intended function.
   ///
   /// [context]: The build context.
-  SiteEditor editor(BuildContext context);
+  StagerEditor editor(BuildContext context);
 
 }

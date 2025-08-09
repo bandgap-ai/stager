@@ -6,6 +6,7 @@ import 'package:stager/editors/add_node_controller.dart';
 import 'package:stager/editors/controller.dart';
 import 'package:stager/editors/basic_editor_factory.dart';
 import 'package:stager/editors/editor_factory.dart';
+import 'package:stager/tree/composite_node.dart';
 
 /// This is a basic implementation of the Site Controls interface to create
 /// simple button icons to control what editors are launched.
@@ -20,9 +21,9 @@ class BasicSiteControls extends SiteControls {
   const BasicSiteControls([this.editorFactory = const BasicEditorFactory()]);
 
   @override
-  DialogControlButton buildAddNodeControl(BuildContext context, SiteState state) {
-    Controller controller = AddNodeController(state, editorFactory);
-    return DialogControlButton(controller: controller, state: state);
+  DialogControlButton buildAddNodeControl(BuildContext context, CompositeNode parent) {
+    Controller controller = AddNodeController(parent, editorFactory);
+    return DialogControlButton(controller: controller);
   }
 
   @override

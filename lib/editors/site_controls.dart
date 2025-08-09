@@ -3,6 +3,7 @@ import 'package:stager/editors/dialog_control_button.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/editors/editor_factory.dart';
 import 'package:stager/editors/basic_editor_factory.dart';
+import 'package:stager/tree/composite_node.dart';
 
 /// This is a factory interface for managing controls used to create editors
 /// in the Site Editor.
@@ -13,8 +14,8 @@ abstract class SiteControls {
   /// Creates a [DialogControlButton] for adding a new node.
   ///
   /// [context]: The build context.
-  /// [state]: The site state.
-  DialogControlButton buildAddNodeControl(BuildContext context, SiteState state);
+  /// [parent]: The parent node.
+  DialogControlButton buildAddNodeControl(BuildContext context, CompositeNode node);
 
   /// Creates a [DialogControlButton] for editing an existing node.
   ///

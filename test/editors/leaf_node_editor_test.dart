@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/editors/node_editor.dart';
+import 'package:stager/editors/leaf_node_editor.dart';
 import 'package:stager/editors/single_point_map_editor.dart';
 import 'package:stager/tree/concrete_leaf_node.dart';
 import 'package:stager/tree/tree.dart';
@@ -14,13 +14,13 @@ void main() {
     testProperties = node.properties;
   });
 
-  group('NodeEditor Tests', () {
-    testWidgets('NodeEditor displays title and content', (WidgetTester tester) async {
+  group('LeafNodeEditor Tests', () {
+    testWidgets('LeafNodeEditor displays title and content', (WidgetTester tester) async {
       testProperties.setProperty('name', 'Test Node');
       testProperties.setProperty('description', 'Some description');
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: NodeEditor(state:node),
+          body: LeafNodeEditor(state:node),
         ),
       ));
 
@@ -30,12 +30,12 @@ void main() {
       expect(find.widgetWithText(TextField, 'Some description'), findsOneWidget);
     });
 
-    testWidgets('NodeEditor displays latitude and longitude', (WidgetTester tester) async {
+    testWidgets('LeafNodeEditor displays latitude and longitude', (WidgetTester tester) async {
       testProperties.setProperty('latitude', 10.0);
       testProperties.setProperty('longitude', 20.0);
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: NodeEditor(state: node),
+          body: LeafNodeEditor(state: node),
         ),
       ));
 
@@ -45,7 +45,7 @@ void main() {
       expect(find.widgetWithText(TextField, '20.0'), findsOneWidget);
     });
 
-    testWidgets('NodeEditor returns updated properties on Save', (WidgetTester tester) async {
+    testWidgets('LeafNodeEditor returns updated properties on Save', (WidgetTester tester) async {
       testProperties.setProperty('name', 'Old Name');
       testProperties.setProperty('description', 'Old Description');
       testProperties.setProperty('latitude', 1.0);
@@ -61,7 +61,7 @@ void main() {
                 result = await showDialog<Map<String, dynamic>>(
                   context: context,
                   builder: (BuildContext context) {
-                    return NodeEditor(state: node);
+                    return LeafNodeEditor(state: node);
                   },
                 );
               },
@@ -89,13 +89,13 @@ void main() {
       expect(result!['longitude'], 200.0);
     });
 
-    testWidgets('NodeEditor displays position method widget and switches editors', (WidgetTester tester) async {
+    testWidgets('LeafNodeEditor displays position method widget and switches editors', (WidgetTester tester) async {
       testProperties.setProperty('latitude', 10.0);
       testProperties.setProperty('longitude', 20.0);
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: NodeEditor(state: node),
+          body: LeafNodeEditor(state: node),
         ),
       ));
 

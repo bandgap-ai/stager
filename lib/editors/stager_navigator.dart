@@ -4,6 +4,7 @@ import 'package:stager/editors/file_handler.dart';
 import 'package:stager/editors/stager_navigator_header.dart';
 import 'package:stager/editors/tree_view.dart';
 import 'package:stager/editors/properties_widget.dart';
+import 'package:stager/tree/leaf_node.dart';
 
 /// A widget that provides a comprehensive editing interface for the entire site hierarchy.
 ///
@@ -13,31 +14,69 @@ import 'package:stager/editors/properties_widget.dart';
 /// 2. A [TreeView] that shows the entire site hierarchy.
 ///
 /// It uses a [SiteState] object to manage and react to state changes.
-class StagerNavigator extends StatelessWidget {
+class StagerNavigator extends StatefulWidget {
   /// The state manager for the site data.
   final SiteState siteState;
+
   /// The handler for file import/export operations.
   final FileHandler fileHandler;
 
   /// Creates a site editor widget.
-  StagerNavigator({super.key, required this.siteState, FileHandler? fileHandler})
+  StagerNavigator(
+      {super.key, required this.siteState, FileHandler? fileHandler})
       : fileHandler = fileHandler ?? BasicFileHandler();
 
   @override
+  State<StatefulWidget> createState() => _StagerNavigatorState(
+    siteState: siteState,
+    fileHandler: fileHandler,
+  );
+
+}
+
+/// The state for the [StagerNavigator] widget.
+class _StagerNavigatorState extends State<StagerNavigator> {
+  late SiteState _siteState;
+  late FileHandler _fileHandler;
+  LeafNode? _selectedNode;
+
+  _StagerNavigatorState({required SiteState siteState,
+    required FileHandler fileHandler}) {
+    _siteState = siteState;
+    _fileHandler = fileHandler;
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    // !Create the header using the selected node instead of the siteState.
+    // FIXME! I have no idea if this will work.
+
+    // Create the header so it can be passed to the TreeView and used as a
+    // callback to process the selected node.
+    StagerNavigatorHeader header = StagerNavigatorHeader(
+      siteState: _siteState,
+      fileHandler: _fileHandler,
+      selectedNode: _selectedNode,
+    );
+
     return Column(
       children: [
-        StagerNavigatorHeader(
-          siteState: siteState,
-          fileHandler: fileHandler,
-        ),
+        header,
         Expanded(
           child: TreeView(
-            sites: siteState.treeData,
-            selectedNode: siteState.selectedNode,
+            sites: _siteState.treeData,
+            selectedNode: _siteState.selectedNode,
             onNodeTap: (node) {
-              siteState.selectedNode = node;
-              Scaffold.of(context).showBottomSheet((context) => PropertiesWidget(siteState: siteState));
+              setState(() {
+                // Update the state to force a redraw and update the other
+                // widgets.
+                // Pass the selection to the header for further processing.
+                _selectedNode = node;
+                _siteState.selectedNode = node;
+              });
+              // FIXME! This should take the node, not the siteState, but leaving for now.
+              Scaffold.of(context).showBottomSheet((context) => PropertiesWidget(siteState: _siteState));
             },
           ),
         ),
@@ -45,4 +84,3 @@ class StagerNavigator extends StatelessWidget {
     );
   }
 }
-

@@ -1,11 +1,11 @@
 import 'package:stager/editors/site_editor.dart';
 import 'package:stager/editors/controller.dart';
 import 'package:flutter/material.dart';
-import 'mock_stager_editor.dart';
+import 'mock_site_editor.dart';
 
 class MockController extends Controller {
 
-  late MockStagerEditor _editor;
+  late MockSiteEditor _editor;
 
   /// Observer bool to track if the widget has been built.
   bool _processed = false;
@@ -19,7 +19,7 @@ class MockController extends Controller {
   }
 
   MockController(super.state, super.editorFactory) {
-    _editor = MockStagerEditor(state:state);
+    _editor = MockSiteEditor(state:state);
   }
 
   SiteEditor get editorRef => _editor;

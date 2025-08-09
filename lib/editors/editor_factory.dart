@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:stager/editors/site_editor.dart';
+import 'package:stager/editors/stager_editor.dart';
 import 'package:stager/editors/widget_factory.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/editors/basic_widget_factory.dart';
@@ -18,7 +19,7 @@ abstract class EditorFactory {
   ///
   /// [context]: The build context for the widget.
   /// [parent]: The parent node for the new node.
-  SiteEditor createNodeEditor(BuildContext context, CompositeNode parent);
+  StagerEditor<CompositeNode> createNodeEditor(BuildContext context, CompositeNode parent);
 
   /// Creates a new StagerEditor that can edit an existing node in the site
   /// state.

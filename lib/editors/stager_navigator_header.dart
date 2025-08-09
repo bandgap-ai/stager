@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:stager/editors/message_dialog.dart';
-import 'package:stager/editors/node_editor_factory.dart';
 import 'package:stager/editors/site_controls.dart';
 import 'package:stager/editors/standard_widgets.dart';
 import 'package:stager/site_state.dart';
@@ -34,18 +32,22 @@ class StagerNavigatorHeader extends StatelessWidget {
   /// The SiteControls for building the editor buttons.
   final SiteControls siteControls;
 
+  /// The selected node in the tree.
+  final LeafNode? selectedNode;
+
   /// Creates a site editor header.
   const StagerNavigatorHeader({
     super.key,
     required this.siteState,
     required this.fileHandler,
+    required this.selectedNode,
     this.siteControls = const BasicSiteControls(),
   });
 
   /// Adds a new node to the site.
   ///
   /// [nodeInfo] is a map of node information and equivalent to the NodeProperties.
-  void _addNode(Map<String, Object> nodeInfo) {
+  void _addSite(Map<String, Object> nodeInfo) {
     TreeNode site = siteState.addSite(nodeInfo['name'] as String);
     NodeProperties properties = site.properties;
     properties.setProperty('latitude', double.parse(nodeInfo['latitude'] as String));
@@ -56,12 +58,10 @@ class StagerNavigatorHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final selectedNode = siteState.selectedNode;
 
-    final NodeEditorFactory nodeEditorFactory = NodeEditorFactory();
-
     final nodePropertiesEditor = ConcreteNodePropertiesEditor(context);
 
-    // Create the editors.
-
+    // VISITOR TIME!!! Figure out what we're dealing with here.
+    //node.accept(this);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
@@ -85,8 +85,9 @@ class StagerNavigatorHeader extends StatelessWidget {
           ),
           Row(
             children: [
-              /// TODO Replace this with SiteControls.
-              siteControls.buildAddNodeControl(context, siteState),
+              /// TODO Replace this with SiteControls - and figure out how to do this selection check better.
+              /// This should be conditional: If a composite noe is selected, the control is enabled, otherwise not.
+              siteControls.buildAddNodeControl(context, (selectedNode! as CompositeNode)),
               // Edit the properties of the selected node.
               if (selectedNode != null)
               //  siteControls.buildEditNodeControl(context, selectedNode),
@@ -119,7 +120,7 @@ class StagerNavigatorHeader extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (context) => AddSiteDialog(
-                      onAdd: (nodeInfo) => _addNode(nodeInfo),
+                      onAdd: (nodeInfo) => _addSite(nodeInfo),
                     ),
                   );
                 },

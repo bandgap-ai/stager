@@ -1,12 +1,13 @@
 import 'package:stager/editors/dialog_control_button.dart';
 
-class MockDialogControlButton extends DialogControlButton {
+/// This is a test implementation of the DialogControlButton class.
+class TestDialogControlButton extends DialogControlButton {
 
   bool _built = false;
 
   bool get built => _built;
 
-  MockDialogControlButton({super.key, required super.state, required super.controller});
+  TestDialogControlButton({super.key, required super.controller});
 
   @override
   void processResults(dynamic results) {

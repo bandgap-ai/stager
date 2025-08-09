@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/node_editor.dart';
+import 'package:stager/editors/leaf_node_editor.dart';
 import 'package:stager/editors/add_property_dialog.dart';
 import 'package:stager/editors/stager_editor.dart';
 
@@ -157,7 +157,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
             final updatedProperties = await showDialog<Map<String, dynamic>>(
               context: context,
               builder: (BuildContext context) {
-                return NodeEditor(state: widget.state);
+                return LeafNodeEditor(state: widget.state);
               },
             );
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stager/editors/editor_factory.dart';
 import 'package:stager/editors/site_editor.dart';
+import 'package:stager/editors/stager_editor.dart';
 import 'package:stager/editors/widget_factory.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/editors/basic_widget_factory.dart';
@@ -28,7 +29,7 @@ class BasicEditorFactory extends EditorFactory {
   }
 
   @override
-  SiteEditor createNodeEditor(
+  StagerEditor<CompositeNode> createNodeEditor(
     BuildContext context,
     CompositeNode state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),

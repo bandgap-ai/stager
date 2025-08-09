@@ -2,17 +2,24 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:stager/editors/basic_widget_factory.dart';
 import 'package:stager/editors/editor_factory.dart';
 import 'package:stager/editors/site_editor.dart';
+import 'package:stager/editors/stager_editor.dart';
 import 'package:stager/editors/widget_factory.dart';
 import 'package:stager/site_state.dart';
+import 'package:stager/tree/composite_node.dart';
+import 'package:stager/tree/concrete_composite_node.dart';
 
-import 'mock_stager_editor.dart';
+import 'mock_node_editor.dart';
+import 'mock_site_editor.dart';
 
 class MockEditorFactory extends EditorFactory {
 
-  late MockStagerEditor mockEditor;
+  late MockSiteEditor mockSiteEditor;
+  late MockCompositeNodeEditor mockCompositeNodeEditor;
 
   MockEditorFactory(SiteState state) {
-    mockEditor = MockStagerEditor(state: state);
+    mockSiteEditor = MockSiteEditor(state: state);
+    ConcreteCompositeNode node = ConcreteCompositeNode(id: '1', name: 'Test Node');
+    mockCompositeNodeEditor = MockCompositeNodeEditor(state: node);
   }
 
   // Bools for tracking if the editor was called
@@ -53,17 +60,17 @@ class MockEditorFactory extends EditorFactory {
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
   ]) {
     _addSiteCalled = true;
-    return mockEditor;
+    return mockSiteEditor;
   }
 
   @override
-  SiteEditor createNodeEditor(
+  StagerEditor<CompositeNode> createNodeEditor(
     BuildContext context,
-    SiteState state, [
+    CompositeNode parent, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
   ]) {
     _addNodeCalled = true;
-    return mockEditor;
+    return mockCompositeNodeEditor;
   }
 
   @override

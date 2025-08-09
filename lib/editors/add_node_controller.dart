@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stager/editors/controller.dart';
-import 'package:stager/editors/site_editor.dart';
+import 'package:stager/editors/stager_editor.dart';
 import 'package:stager/tree/leaf_node.dart';
 import 'package:stager/tree/composite_node.dart';
 import 'package:stager/tree/concrete_leaf_node.dart';
@@ -12,7 +12,7 @@ class AddNodeController extends Controller<CompositeNode> {
   AddNodeController(super.state, super.editorFactory);
 
   @override
-  SiteEditor editor(BuildContext context) {
+  StagerEditor editor(BuildContext context) {
     return editorFactory.createNodeEditor(context, state);
   }
 

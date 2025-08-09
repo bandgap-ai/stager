@@ -4,10 +4,10 @@ import 'package:stager/editors/dialog_control_button.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/tree/tree_node.dart';
 import 'mock_controller.dart';
-import 'mock_dialog_control_button.dart';
+import 'test_dialog_control_button.dart';
 import 'mock_editor_factory.dart';
 import 'mock_site_state_observer.dart';
-import 'mock_stager_editor.dart';
+import 'mock_site_editor.dart';
 
 void main() {
 
@@ -21,7 +21,6 @@ void main() {
       state = SiteState();
       TreeNode root = state.addSite('Test Site');
       state.selectedNode = root;
-      state.attach(observer = MockSiteStateObserver());
       mockEditorFactory = MockEditorFactory(state);
       mockController = MockController(state, mockEditorFactory);
     });
@@ -38,7 +37,7 @@ void main() {
     }
 
     testWidgets('should render an IconButton', (WidgetTester tester) async {
-      final controlWidget = MockDialogControlButton(controller: mockController, state: state,);
+      final controlWidget = TestDialogControlButton(controller: mockController);
 
       await pumpStagerControlWidget(tester, controlWidget);
 
@@ -55,23 +54,21 @@ void main() {
               reason: "MockController should not have been processed yet");
 
           // Ensure the mock editor's built flag is false before the interaction
-          MockStagerEditor mockEditor = mockController.editorRef as MockStagerEditor;
+          MockSiteEditor mockEditor = mockController.editorRef as MockSiteEditor;
           mockEditor
               .reset(); // Or create a new instance: mockEditor = MockStagerEditor();
           expect(mockEditor.built, isFalse,
               reason: "MockEditor should not be built yet");
 
-          final MockDialogControlButton controlWidget = MockDialogControlButton(
-            controller: mockController,
-            state: state,
-          );
+          final TestDialogControlButton controlWidget = TestDialogControlButton(
+            controller: mockController);
 
           await pumpStagerControlWidget(tester, controlWidget);
 
           // Verify no dialog or our mock editor's default view is present initially
           expect(find.byType(Dialog), findsNothing);
           expect(
-              find.byKey(MockStagerEditor.mockStagerEditorKey), findsNothing);
+              find.byKey(MockSiteEditor.mockStagerEditorKey), findsNothing);
 
           // Tap the IconButton
           await tester.tap(find.byType(IconButton));
@@ -103,9 +100,8 @@ void main() {
     testWidgets('IconButton should use the IconData passed to the constructor',
             (WidgetTester tester) async {
 
-          final controlWidget = MockDialogControlButton(
-            controller: mockController,
-            state: state,
+          final controlWidget = TestDialogControlButton(
+            controller: mockController
           );
 
           await pumpStagerControlWidget(tester, controlWidget);
