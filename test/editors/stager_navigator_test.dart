@@ -8,7 +8,7 @@ import 'package:stager/tree/tree.dart';
 import 'mock_file_handler.dart';
 
 void main() {
-  group('StagerNavigator Widget Tests', () {
+  group('StagerNavigator Widget Tests (Header mostly)', () {
     late SiteState siteState;
     late MockFileHandler mockFileHandler;
 

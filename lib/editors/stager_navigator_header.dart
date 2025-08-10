@@ -87,7 +87,7 @@ class StagerNavigatorHeader extends StatelessWidget {
             children: [
               /// TODO Replace this with SiteControls - and figure out how to do this selection check better.
               /// This should be conditional: If a composite noe is selected, the control is enabled, otherwise not.
-              siteControls.buildAddNodeControl(context, (selectedNode! as CompositeNode)),
+              if (selectedNode != null && selectedNode is CompositeNode) siteControls.buildAddNodeControl(context, selectedNode),
               // Edit the properties of the selected node.
               if (selectedNode != null)
               //  siteControls.buildEditNodeControl(context, selectedNode),

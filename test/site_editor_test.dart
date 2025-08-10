@@ -7,7 +7,7 @@ import 'package:stager/editors/add_site_dialog.dart';
 import 'package:stager/editors/stager_navigator.dart';
 
 void main() {
-  group('SiteEditor', () {
+  group('Site Editor functions', () {
     // Test for the "Add Site" button functionality.
     testWidgets('should display the add site button and open a dialog on tap', (WidgetTester tester) async {
       // Arrange
