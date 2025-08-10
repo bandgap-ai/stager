@@ -56,7 +56,7 @@ class StagerNavigatorHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedNode = siteState.selectedNode;
+    //final selectedNode = selectedNode;
 
     final nodePropertiesEditor = ConcreteNodePropertiesEditor(context);
 
@@ -87,7 +87,7 @@ class StagerNavigatorHeader extends StatelessWidget {
             children: [
               /// TODO Replace this with SiteControls - and figure out how to do this selection check better.
               /// This should be conditional: If a composite noe is selected, the control is enabled, otherwise not.
-              if (selectedNode != null && selectedNode is CompositeNode) siteControls.buildAddNodeControl(context, selectedNode),
+              if (selectedNode != null && selectedNode is CompositeNode) siteControls.buildAddNodeControl(context, selectedNode as CompositeNode),
               // Edit the properties of the selected node.
               if (selectedNode != null)
               //  siteControls.buildEditNodeControl(context, selectedNode),
@@ -95,7 +95,7 @@ class StagerNavigatorHeader extends StatelessWidget {
                 // That functionality should be migrated to Tracee and it should
                 // have a test to verify that the enhanced editor is being used
                 // instead of the regular one.
-                nodePropertiesEditor.buildPropertiesEditor(selectedNode),
+                nodePropertiesEditor.buildPropertiesEditor(selectedNode!),
               // Delete the selected node.
               if (selectedNode != null)
                 IconButton(
@@ -108,7 +108,7 @@ class StagerNavigatorHeader extends StatelessWidget {
                           'Are you sure you want to delete this node?'),
                     );
                     if (confirm == true) {
-                      siteState.deleteNode(selectedNode);
+                      siteState.deleteNode(selectedNode!);
                     }
                   },
                 ),

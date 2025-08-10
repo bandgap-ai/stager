@@ -88,6 +88,8 @@ void main() {
         ),
       ));
 
+      // OK - this test is failing because it is no longer possible to send a leaf node to the editor.
+
       expect(find.byIcon(Icons.add), findsOneWidget);
     });
 

@@ -48,10 +48,6 @@ class _StagerNavigatorState extends State<StagerNavigator> {
 
   @override
   Widget build(BuildContext context) {
-
-    // !Create the header using the selected node instead of the siteState.
-    // FIXME! I have no idea if this will work.
-
     // Create the header so it can be passed to the TreeView and used as a
     // callback to process the selected node.
     StagerNavigatorHeader header = StagerNavigatorHeader(
