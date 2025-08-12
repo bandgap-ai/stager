@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stager/editors/add_node_controller.dart';
 import 'package:stager/editors/controller.dart';
 import 'package:stager/editors/editor_factory.dart';
-import 'package:stager/editors/stager_editor.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/tree/composite_node.dart';
 import 'package:stager/tree/concrete_composite_node.dart';
