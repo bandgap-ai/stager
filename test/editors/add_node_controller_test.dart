@@ -41,7 +41,7 @@ void main() {
           home: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                StagerEditor editor = controller.editor(context);
+                controller.editor(context);
               },
               child: const Text('Show Dialog'),
             ),
