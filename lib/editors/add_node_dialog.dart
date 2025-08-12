@@ -2,11 +2,8 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:stager/editors/site_editor.dart';
-import 'package:stager/editors/message_dialog.dart';
 import 'package:stager/editors/basic_widget_factory.dart';
 import 'package:stager/editors/stager_editor.dart';
-import 'package:stager/site_state.dart';
 import 'package:stager/tree/composite_node.dart';
 
 /// A dialog widget for adding a new [TreeNode].
