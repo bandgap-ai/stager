@@ -7,8 +7,6 @@ class MockCompositeNodeEditor extends StagerEditor<CompositeNode> {
   /// A predefined [Key] that can be used to find this mock widget in tests.
   static const Key mockStagerEditorKey = Key('MockStagerEditorInstance');
 
-  /// Observer bool to track if the widget has been built.
-  bool built = false;
 
   /// Creates an instance of [MockCompositeNodeEditor].
   ///
@@ -17,15 +15,10 @@ class MockCompositeNodeEditor extends StagerEditor<CompositeNode> {
   /// You can pass a real or mocked [WidgetFactory] here.
   /// [childWidget]: An optional widget that this mock's [build] method will return.
   /// Useful if you need the mock to display a specific minimal UI for testing.
-  MockCompositeNodeEditor({
+  const MockCompositeNodeEditor({
     super.key,
     super.widgetFactory = const BasicWidgetFactory(), required super.state, // Use the default from StagerEditor or allow override
   });
-
-  /// Mark the observer bool as false to reset the mock.
-  void reset() {
-    built = false;
-  }
 
   @override
   // ignore: library_private_types_in_public_api
@@ -35,7 +28,6 @@ class MockCompositeNodeEditor extends StagerEditor<CompositeNode> {
 class _MockStagerEditorState extends State<MockCompositeNodeEditor> {
   @override
   Widget build(BuildContext context) {
-    widget.built = true; // Set the observer flag to true
     return AlertDialog(
       key: MockCompositeNodeEditor.mockStagerEditorKey,
       title: const Text("Mock Editor Dialog"),
