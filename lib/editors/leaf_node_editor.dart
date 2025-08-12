@@ -87,7 +87,7 @@ class _NodeEditorState extends State<LeafNodeEditor> {
                 '${_spruceUpKey(entry.key)}:', // Spruce up the key for display
                 'Enter ${entry.key}', // Hint text
               );
-            }).toList(),
+            }),
             // If latitude or longitude properties exist, build a geographic coordinate editor.
             if (properties.map.containsKey('latitude') || properties.map.containsKey('longitude'))
               buildPositionMethodWidget(context, _pickFromMap, (value) {

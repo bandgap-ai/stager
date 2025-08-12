@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:stager/site_state.dart';
 import 'package:stager/editors/controller.dart';
 
 /// The StagerControlWidget is a simple button to control when to open an

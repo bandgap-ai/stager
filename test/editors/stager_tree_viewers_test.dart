@@ -3,6 +3,7 @@
 /// This file contains a comprehensive set of widget tests for `NodePropertiesView`,
 /// `LeafNodeView`, and `CompositeNodeView`, ensuring their correct rendering,
 /// behavior, and interaction with node properties and the tree structure.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -91,8 +92,7 @@ void main() {
     });
 
     testWidgets('should handle null properties gracefully', (WidgetTester tester) async {
-      final emptyProperties = ConcreteNodeProperties();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

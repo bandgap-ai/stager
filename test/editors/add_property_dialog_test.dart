@@ -3,6 +3,8 @@
 /// This file contains a series of widget tests for the [AddPropertyDialog],
 /// ensuring its correct rendering, input handling, and the return of new
 /// property data.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager/editors/add_property_dialog.dart';

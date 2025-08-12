@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:stager/editors/dialog_control_button.dart';
 import 'package:stager/site_state.dart';
-import 'package:stager/editors/editor_factory.dart';
-import 'package:stager/editors/basic_editor_factory.dart';
 import 'package:stager/tree/composite_node.dart';
 
 /// This is a factory interface for managing controls used to create editors

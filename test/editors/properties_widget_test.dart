@@ -5,7 +5,6 @@ import 'package:stager/tree/concrete_tree.dart';
 import 'package:stager/tree/concrete_leaf_node.dart';
 import 'package:stager/site_state.dart';
 import 'package:stager/editors/properties_widget.dart';
-import 'package:stager/editors/stager_tree_viewers.dart';
 
 /// Widget tests for the `PropertiesWidget`.
 ///

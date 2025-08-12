@@ -1,4 +1,3 @@
-import 'package:stager/tree/leaf_node_observer.dart';
 import 'package:stager/tree/node_properties.dart';
 import 'package:stager/tree/observable_subject.dart';
 import 'package:stager/tree/node_visitor.dart';

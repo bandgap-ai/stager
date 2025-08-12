@@ -1,4 +1,3 @@
-import 'package:stager/tree/node_properties_observer.dart';
 import 'package:stager/tree/observable_subject.dart';
 
 /// An abstract class defining the contract for properties associated with a tree node.

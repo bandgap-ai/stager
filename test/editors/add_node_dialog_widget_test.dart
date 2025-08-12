@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager/editors/add_node_dialog.dart';
 import 'package:stager/site_state.dart';
-import 'package:stager/tree/concrete_tree.dart';
-import 'package:stager/tree/leaf_node.dart';
 import 'package:stager/tree/tree_node.dart';
 
 void main() {

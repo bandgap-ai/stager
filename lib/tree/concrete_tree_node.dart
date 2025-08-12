@@ -10,7 +10,6 @@ import 'package:stager/tree/tree.dart';
 import 'package:stager/tree/iterators.dart';
 import 'package:stager/tree/concrete_composite_node.dart';
 import 'package:stager/tree/node_summary.dart';
-import 'package:stager/tree/node_properties.dart';
 
 class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
   /// Creates a [ConcreteTreeNode] instance.

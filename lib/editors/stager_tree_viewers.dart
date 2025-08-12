@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/tree/node_summary.dart';
 import 'package:stager/editors/tree_icon_provider.dart';
-import 'package:stager/editors/leaf_node_editor.dart';
-import 'package:stager/editors/add_property_dialog.dart';
 
 
 
