@@ -7,8 +7,15 @@ import 'package:stager_platform/tree/concrete_leaf_node.dart';
 import 'package:stager_platform/tree/concrete_composite_node.dart';
 import 'package:uuid/uuid.dart';
 
-/// This is a controller that creates a new node in the site state.
+/// This is a controller that creates a new child node in the parent node it
+/// is configured with when created.
 class AddNodeController extends Controller<CompositeNode> {
+
+  /// Creates a new AddNodeController.
+  ///
+  /// [state]: The CompositeNode that is the parent of the node that will be
+  /// created.
+  /// [editorFactory]: The editor factory to be used.
   AddNodeController(super.state, super.editorFactory);
 
   @override

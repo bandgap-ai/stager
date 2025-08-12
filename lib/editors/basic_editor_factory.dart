@@ -9,8 +9,14 @@ import 'package:stager_platform/editors/add_node_dialog.dart';
 
 import '/tree/composite_node.dart';
 
+/// The BasicEditorFactory is an extension of the EditorFactory abstract base
+/// class that provides a default implementation using widgets that are
+/// defined in and implemented in Stager. It is a simple utility that provides
+/// basic functionality to developers.
 class BasicEditorFactory extends EditorFactory {
 
+  /// The widget factory used by the editor, which can be overridden as needed
+  /// to customize its behavior.
   final WidgetFactory widgetFactory;
 
   /// Constructor for the BasicEditorFactory class.
