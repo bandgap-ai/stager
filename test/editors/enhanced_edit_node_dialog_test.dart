@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/tree/concrete_composite_node.dart';
-import 'package:stager/tree/concrete_leaf_node.dart';
-import 'package:stager/tree/concrete_node_properties.dart';
-import 'package:stager/editors/enhanced_edit_node_dialog.dart';
+import 'package:stager_platform/tree/concrete_composite_node.dart';
+import 'package:stager_platform/tree/concrete_leaf_node.dart';
+import 'package:stager_platform/tree/concrete_node_properties.dart';
+import 'package:stager_platform/editors/enhanced_edit_node_dialog.dart';
 
 void main() {
   group('EnhancedEditNodeDialog Widget Tests', () {

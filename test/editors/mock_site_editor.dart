@@ -1,5 +1,5 @@
-import 'package:stager/editors/basic_widget_factory.dart';
-import 'package:stager/editors/site_editor.dart';
+import 'package:stager_platform/editors/basic_widget_factory.dart';
+import 'package:stager_platform/editors/site_editor.dart';
 import 'package:flutter/material.dart';
 
 class MockSiteEditor extends SiteEditor {

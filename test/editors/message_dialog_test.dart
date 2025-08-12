@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/editors/message_dialog.dart';
+import 'package:stager_platform/editors/message_dialog.dart';
 
 void main() {
   group('MessageDialog Widget Tests', () {

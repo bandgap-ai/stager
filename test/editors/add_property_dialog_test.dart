@@ -7,7 +7,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/editors/add_property_dialog.dart';
+import 'package:stager_platform/editors/add_property_dialog.dart';
 
 void main() {
   group('AddPropertyDialog Tests', () {

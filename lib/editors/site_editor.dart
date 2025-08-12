@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:stager/editors/stager_editor.dart';
-import 'package:stager/editors/basic_widget_factory.dart';
-import 'package:stager/site_state.dart';
+import 'package:stager_platform/editors/stager_editor.dart';
+import 'package:stager_platform/editors/basic_widget_factory.dart';
+import 'package:stager_platform/site_state.dart';
 
 /// The Site Editor is an abstract base class for creating editors used by
 /// Stager applications. It provides two features to give developers/clients a

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:stager/editors/stager_editor.dart';
-import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/standard_widgets.dart';
-import 'package:stager/editors/basic_widget_factory.dart';
+import 'package:stager_platform/editors/stager_editor.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/editors/standard_widgets.dart';
+import 'package:stager_platform/editors/basic_widget_factory.dart';
 
 /// A dialog for editing node properties.
 ///

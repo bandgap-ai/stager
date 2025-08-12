@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:stager/editors/site_controls.dart';
-import 'package:stager/editors/standard_widgets.dart';
-import 'package:stager/site_state.dart';
-import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/add_site_dialog.dart';
-import 'package:stager/editors/concrete_node_properties_editor.dart';
-import 'package:stager/editors/file_handler.dart';
-import 'package:stager/editors/import_export_menu.dart';
-import 'package:stager/editors/basic_site_controls.dart';
+import 'package:stager_platform/editors/site_controls.dart';
+import 'package:stager_platform/editors/standard_widgets.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/editors/add_site_dialog.dart';
+import 'package:stager_platform/editors/concrete_node_properties_editor.dart';
+import 'package:stager_platform/editors/file_handler.dart';
+import 'package:stager_platform/editors/import_export_menu.dart';
+import 'package:stager_platform/editors/basic_site_controls.dart';
 
 /// The header for the [SiteEditor].
 ///

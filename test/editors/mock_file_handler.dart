@@ -1,5 +1,5 @@
-import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/file_handler.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/editors/file_handler.dart';
 
 class MockFileHandler implements FileHandler {
   bool exportCalled = false;

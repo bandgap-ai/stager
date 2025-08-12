@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:stager/editors/widget_factory.dart';
-import 'package:stager/editors/basic_widget_factory.dart';
+import 'package:stager_platform/editors/widget_factory.dart';
+import 'package:stager_platform/editors/basic_widget_factory.dart';
 
 /// This is an abstract base class for editors in Stager. It reduces the
 /// Dart boilerplate code required to create a new typed editor widget with a

@@ -1,9 +1,9 @@
 // test/stager/site_state_test.dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/tree/concrete_tree.dart';
-import 'package:stager/site_state.dart';
-import 'package:stager/site_state_observer.dart';
-import 'package:stager/tree/tree.dart';
+import 'package:stager_platform/tree/concrete_tree.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/site_state_observer.dart';
+import 'package:stager_platform/tree/tree.dart';
 
 // A mock observer to verify notification functionality.
 class MockSiteStateObserver implements SiteStateObserver {

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/editors/stager_navigator_header.dart';
-import 'package:stager/editors/tree_view.dart';
-import 'package:stager/site_state.dart';
-import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/add_site_dialog.dart';
-import 'package:stager/editors/stager_navigator.dart';
+import 'package:stager_platform/editors/stager_navigator_header.dart';
+import 'package:stager_platform/editors/tree_view.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/editors/add_site_dialog.dart';
+import 'package:stager_platform/editors/stager_navigator.dart';
 
 void main() {
   group('Site Editor functions', () {

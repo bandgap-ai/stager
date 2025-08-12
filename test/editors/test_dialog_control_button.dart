@@ -1,4 +1,4 @@
-import 'package:stager/editors/dialog_control_button.dart';
+import 'package:stager_platform/editors/dialog_control_button.dart';
 
 /// This is a test implementation of the DialogControlButton class.
 class TestDialogControlButton extends DialogControlButton {

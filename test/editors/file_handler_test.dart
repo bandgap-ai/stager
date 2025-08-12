@@ -3,10 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/tree/concrete_tree.dart';
-import 'package:stager/editors/file_handler.dart';
-import 'package:stager/persistence/json_codec.dart';
-import 'package:stager/tree/leaf_node.dart';
+import 'package:stager_platform/tree/concrete_tree.dart';
+import 'package:stager_platform/editors/file_handler.dart';
+import 'package:stager_platform/persistence/json_codec.dart';
+import 'package:stager_platform/tree/leaf_node.dart';
 
 void main() {
 

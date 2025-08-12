@@ -1,6 +1,6 @@
 import 'package:flutter/src/widgets/editable_text.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:stager/editors/widget_factory.dart';
+import 'package:stager_platform/editors/widget_factory.dart';
 
 class MockWidgetFactory extends WidgetFactory {
   @override

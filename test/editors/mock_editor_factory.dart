@@ -1,12 +1,12 @@
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:stager/editors/basic_widget_factory.dart';
-import 'package:stager/editors/editor_factory.dart';
-import 'package:stager/editors/site_editor.dart';
-import 'package:stager/editors/stager_editor.dart';
-import 'package:stager/editors/widget_factory.dart';
-import 'package:stager/site_state.dart';
-import 'package:stager/tree/composite_node.dart';
-import 'package:stager/tree/concrete_composite_node.dart';
+import 'package:stager_platform/editors/basic_widget_factory.dart';
+import 'package:stager_platform/editors/editor_factory.dart';
+import 'package:stager_platform/editors/site_editor.dart';
+import 'package:stager_platform/editors/stager_editor.dart';
+import 'package:stager_platform/editors/widget_factory.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/tree/composite_node.dart';
+import 'package:stager_platform/tree/concrete_composite_node.dart';
 
 import 'mock_node_editor.dart';
 import 'mock_site_editor.dart';

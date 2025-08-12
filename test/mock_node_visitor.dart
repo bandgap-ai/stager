@@ -1,4 +1,4 @@
-import 'package:stager/tree/node_visitor.dart';
+import 'package:stager_platform/tree/node_visitor.dart';
 
 /// Node visitor mock for testing
 class MockNodeVisitor extends NodeVisitor {

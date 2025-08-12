@@ -2,8 +2,8 @@
 ///
 /// This class stores properties in a simple [Map<String, Object?>].
 library;
-import 'package:stager/tree/tree.dart';
-import 'package:stager/tree/node_observer.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/tree/node_observer.dart';
 
 class ConcreteNodeProperties implements NodeProperties {
   /// The internal map holding the node's properties.

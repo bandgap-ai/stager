@@ -1,4 +1,4 @@
-import 'package:stager/tree/leaf_node.dart';
+import 'package:stager_platform/tree/leaf_node.dart';
 
 /// An abstract class representing a composite node in a tree structure.
 ///

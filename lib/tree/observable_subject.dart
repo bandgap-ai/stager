@@ -1,4 +1,4 @@
-import "package:stager/tree/node_observer.dart";
+import "package:stager_platform/tree/node_observer.dart";
 
 /// An abstract class representing a subject in the Observer pattern.
 ///

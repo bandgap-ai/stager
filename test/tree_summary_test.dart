@@ -3,8 +3,8 @@ library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:stager/tree/concrete_tree.dart';
-import 'package:stager/tree/node_summary.dart';
+import 'package:stager_platform/tree/concrete_tree.dart';
+import 'package:stager_platform/tree/node_summary.dart';
 
 void main() {
   group('NodeSummary', () {

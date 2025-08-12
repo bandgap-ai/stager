@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:stager/editors/single_point_map_editor.dart';
+import 'package:stager_platform/editors/single_point_map_editor.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 /// Builds a function that can be used as a callback to post a notification.

@@ -1,8 +1,8 @@
 /// This file provides sample data for the tree structure in the Tracee application.
 /// This data is used for development and testing purposes.
 library;
-import 'package:stager/tree/concrete_tree.dart';
-import 'package:stager/tree/tree.dart';
+import 'package:stager_platform/tree/concrete_tree.dart';
+import 'package:stager_platform/tree/tree.dart';
 
 /// A list of [TreeNode]s representing sample sites for testing and development.
 ///

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:stager/editors/dialog_control_button.dart';
-import 'package:stager/site_state.dart';
-import 'package:stager/tree/composite_node.dart';
+import 'package:stager_platform/editors/dialog_control_button.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/tree/composite_node.dart';
 
 /// This is a factory interface for managing controls used to create editors
 /// in the Site Editor.

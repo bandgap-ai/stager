@@ -1,8 +1,8 @@
 /// This file defines the EditNodeDialog widget, used for editing a TreeNode's name.
 library;
 import 'package:flutter/material.dart';
-import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/leaf_node_editor.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/editors/leaf_node_editor.dart';
 
 /// A dialog widget for editing the name of a [LeafNode].
 ///

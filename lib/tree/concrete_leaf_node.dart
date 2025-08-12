@@ -2,10 +2,10 @@
 ///
 /// This class represents a basic node in the tree that does not have children.
 library;
-import 'package:stager/tree/node_visitor.dart';
-import 'package:stager/tree/tree.dart';
-import 'package:stager/tree/concrete_node_properties.dart';
-import 'package:stager/tree/node_observer.dart';
+import 'package:stager_platform/tree/node_visitor.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/tree/concrete_node_properties.dart';
+import 'package:stager_platform/tree/node_observer.dart';
 
 class ConcreteLeafNode implements LeafNode {
   /// The properties of this node.

@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:stager/persistence/json_codec.dart';
-import 'package:stager/tree/tree.dart';
+import 'package:stager_platform/persistence/json_codec.dart';
+import 'package:stager_platform/tree/tree.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'dart:convert';
 

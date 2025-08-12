@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:stager/editors/widget_factory.dart';
-import 'package:stager/editors/standard_widgets.dart';
+import 'package:stager_platform/editors/widget_factory.dart';
+import 'package:stager_platform/editors/standard_widgets.dart';
 
 /// A simple implementation of [WidgetFactory] that uses the
 /// [standard_widgets.dart] utility functions to create basic widgets, mostly,

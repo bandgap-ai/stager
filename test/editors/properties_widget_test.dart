@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/editors/node_properties_view.dart';
-import 'package:stager/tree/concrete_tree.dart';
-import 'package:stager/tree/concrete_leaf_node.dart';
-import 'package:stager/site_state.dart';
-import 'package:stager/editors/properties_widget.dart';
+import 'package:stager_platform/editors/node_properties_view.dart';
+import 'package:stager_platform/tree/concrete_tree.dart';
+import 'package:stager_platform/tree/concrete_leaf_node.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/editors/properties_widget.dart';
 
 /// Widget tests for the `PropertiesWidget`.
 ///

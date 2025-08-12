@@ -4,8 +4,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/outline_area_map_editor.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/editors/outline_area_map_editor.dart';
 
 /// A dialog widget for editing Level 1 nodes with support for outline areas.
 ///

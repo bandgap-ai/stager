@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:stager/editors/tree_editor.dart';
-import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/edit_node_dialog.dart';
-import 'package:stager/editors/enhanced_edit_node_dialog.dart';
+import 'package:stager_platform/editors/tree_editor.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/editors/edit_node_dialog.dart';
+import 'package:stager_platform/editors/enhanced_edit_node_dialog.dart';
 
 /// A concrete implementation of [AbstractNodePropertiesEditor].
 ///

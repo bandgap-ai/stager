@@ -7,11 +7,11 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/editors/node_properties_view.dart';
-import 'package:stager/tree/concrete_tree.dart';
-import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/stager_tree_viewers.dart';
-import 'package:stager/editors/tree_icon_provider.dart';
+import 'package:stager_platform/editors/node_properties_view.dart';
+import 'package:stager_platform/tree/concrete_tree.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/editors/stager_tree_viewers.dart';
+import 'package:stager_platform/editors/tree_icon_provider.dart';
 
 void main() {
   group('NodePropertiesView Tests', () {

@@ -1,5 +1,5 @@
-import 'package:stager/tree/node_properties.dart';
-import 'package:stager/tree/node_observer.dart';
+import 'package:stager_platform/tree/node_properties.dart';
+import 'package:stager_platform/tree/node_observer.dart';
 
 /// An interface for observers that are interested in changes to [NodeProperties].
 ///

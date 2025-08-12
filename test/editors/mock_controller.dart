@@ -1,5 +1,5 @@
-import 'package:stager/editors/site_editor.dart';
-import 'package:stager/editors/controller.dart';
+import 'package:stager_platform/editors/site_editor.dart';
+import 'package:stager_platform/editors/controller.dart';
 import 'package:flutter/material.dart';
 import 'mock_site_editor.dart';
 

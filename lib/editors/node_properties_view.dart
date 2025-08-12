@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/leaf_node_editor.dart';
-import 'package:stager/editors/add_property_dialog.dart';
-import 'package:stager/editors/stager_editor.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/editors/leaf_node_editor.dart';
+import 'package:stager_platform/editors/add_property_dialog.dart';
+import 'package:stager_platform/editors/stager_editor.dart';
 
 /// A stateful widget that displays the properties of a [NodeProperties] object
 /// and automatically updates itself when the properties change.

@@ -1,5 +1,5 @@
-import 'package:stager/site_state.dart';
-import 'package:stager/site_state_observer.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/site_state_observer.dart';
 
 
 /// This is a Mock [SiteStateObserver] for testing.

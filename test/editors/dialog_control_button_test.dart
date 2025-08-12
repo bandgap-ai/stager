@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/editors/dialog_control_button.dart';
-import 'package:stager/site_state.dart';
-import 'package:stager/tree/tree_node.dart';
+import 'package:stager_platform/editors/dialog_control_button.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/tree/tree_node.dart';
 import 'mock_controller.dart';
 import 'test_dialog_control_button.dart';
 import 'mock_editor_factory.dart';

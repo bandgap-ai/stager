@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stager/editors/controller.dart';
+import 'package:stager_platform/editors/controller.dart';
 
 /// The StagerControlWidget is a simple button to control when to open an
 /// editor or launch an independent function on behalf of a user.

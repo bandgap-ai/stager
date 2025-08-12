@@ -1,6 +1,6 @@
-import 'package:stager/tree/composite_node.dart';
-import 'package:stager/tree/leaf_node.dart';
-import 'package:stager/tree/node_summary.dart';
+import 'package:stager_platform/tree/composite_node.dart';
+import 'package:stager_platform/tree/leaf_node.dart';
+import 'package:stager_platform/tree/node_summary.dart';
 
 /// An abstract class representing a tree node with advanced traversal and search capabilities.
 ///

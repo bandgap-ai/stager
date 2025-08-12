@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:stager/editors/stager_editor.dart';
-import 'package:stager/editors/editor_factory.dart';
+import 'package:stager_platform/editors/stager_editor.dart';
+import 'package:stager_platform/editors/editor_factory.dart';
 
 /// This is a simple interface to centralize the control logic for processing
 /// state updates gathered from editors. It is implemented for each type of

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:stager/site_state.dart';
-import 'package:stager/editors/file_handler.dart';
-import 'package:stager/editors/standard_widgets.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/editors/file_handler.dart';
+import 'package:stager_platform/editors/standard_widgets.dart';
 
 /// A popup menu button that provides "Import" and "Export" options.
 ///

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:stager/tree/tree.dart';
-import 'package:stager/editors/stager_tree_viewers.dart';
-import 'package:stager/editors/tree_icon_provider.dart';
+import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/editors/stager_tree_viewers.dart';
+import 'package:stager_platform/editors/tree_icon_provider.dart';
 
 /// A widget that
 /// displays a hierarchical list of [LeafNode]s.

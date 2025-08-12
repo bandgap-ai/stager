@@ -3,9 +3,9 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/editors/add_node_dialog.dart';
-import 'package:stager/site_state.dart';
-import 'package:stager/tree/tree_node.dart';
+import 'package:stager_platform/editors/add_node_dialog.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/tree/tree_node.dart';
 
 void main() {
 

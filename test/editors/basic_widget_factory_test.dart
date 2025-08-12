@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/editors/basic_widget_factory.dart';
+import 'package:stager_platform/editors/basic_widget_factory.dart';
 
 // Helper function to pump a widget tree with a Scaffold and MaterialApp
 Future<void> pumpBaseWidget(WidgetTester tester, Widget child) async {

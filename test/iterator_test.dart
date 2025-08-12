@@ -4,8 +4,8 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/tree/concrete_tree.dart';
-import 'package:stager/tree/iterators.dart';
+import 'package:stager_platform/tree/concrete_tree.dart';
+import 'package:stager_platform/tree/iterators.dart';
 
 void main() {
   group('Iterators', () {

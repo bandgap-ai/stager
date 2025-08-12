@@ -2,7 +2,7 @@
 /// This file contains concrete implementations of iterators for the Stager tree.
 library;
 
-import 'package:stager/tree/tree.dart';
+import 'package:stager_platform/tree/tree.dart';
 
 /// A depth-first iterator for [LeafNode]s.
 ///

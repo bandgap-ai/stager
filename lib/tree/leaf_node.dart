@@ -1,6 +1,6 @@
-import 'package:stager/tree/node_properties.dart';
-import 'package:stager/tree/observable_subject.dart';
-import 'package:stager/tree/node_visitor.dart';
+import 'package:stager_platform/tree/node_properties.dart';
+import 'package:stager_platform/tree/observable_subject.dart';
+import 'package:stager_platform/tree/node_visitor.dart';
 
 /// An abstract class representing a leaf node in a tree structure.
 ///

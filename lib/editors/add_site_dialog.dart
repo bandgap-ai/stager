@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:stager/editors/standard_widgets.dart';
+import 'package:stager_platform/editors/standard_widgets.dart';
 
 /// A dialog for adding a new site.
 ///

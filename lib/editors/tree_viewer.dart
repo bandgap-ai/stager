@@ -4,7 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:stager/tree/tree.dart';
+import 'package:stager_platform/tree/tree.dart';
 
 /// Abstract class for viewing [NodeProperties].
 ///

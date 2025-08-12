@@ -3,8 +3,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager/tree/concrete_tree.dart';
-import 'package:stager/editors/edit_node_dialog.dart';
+import 'package:stager_platform/tree/concrete_tree.dart';
+import 'package:stager_platform/editors/edit_node_dialog.dart';
 
 void main() {
   group('EditNodeDialog Widget Tests', () {

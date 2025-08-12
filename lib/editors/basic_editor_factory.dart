@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:stager/editors/editor_factory.dart';
-import 'package:stager/editors/site_editor.dart';
-import 'package:stager/editors/stager_editor.dart';
-import 'package:stager/editors/widget_factory.dart';
-import 'package:stager/site_state.dart';
-import 'package:stager/editors/basic_widget_factory.dart';
-import 'package:stager/editors/add_node_dialog.dart';
+import 'package:stager_platform/editors/editor_factory.dart';
+import 'package:stager_platform/editors/site_editor.dart';
+import 'package:stager_platform/editors/stager_editor.dart';
+import 'package:stager_platform/editors/widget_factory.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/editors/basic_widget_factory.dart';
+import 'package:stager_platform/editors/add_node_dialog.dart';
 
 import '/tree/composite_node.dart';
 

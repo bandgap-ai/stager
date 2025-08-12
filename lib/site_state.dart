@@ -1,9 +1,9 @@
 // lib/stager/site_state.dart
-import 'package:stager/tree/concrete_tree.dart';
-import 'package:stager/data/basic_sample_data.dart';
-import 'package:stager/site_state_observer.dart';
-import 'package:stager/tree/node_observer.dart';
-import 'package:stager/tree/tree.dart';
+import 'package:stager_platform/tree/concrete_tree.dart';
+import 'package:stager_platform/data/basic_sample_data.dart';
+import 'package:stager_platform/site_state_observer.dart';
+import 'package:stager_platform/tree/node_observer.dart';
+import 'package:stager_platform/tree/tree.dart';
 
 /// Manages the application's state for a collection of sites, represented as a tree structure.
 ///

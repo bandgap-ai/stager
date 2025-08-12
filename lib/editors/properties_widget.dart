@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:stager/site_state.dart';
-import 'package:stager/editors/stager_tree_viewers.dart';
-import 'package:stager/tree/tree_node.dart';
-import 'package:stager/tree/leaf_node.dart';
-import 'package:stager/editors/node_properties_view.dart';
+import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/editors/stager_tree_viewers.dart';
+import 'package:stager_platform/tree/tree_node.dart';
+import 'package:stager_platform/tree/leaf_node.dart';
+import 'package:stager_platform/editors/node_properties_view.dart';
 
 /// A widget that displays the properties of the currently selected node in a
 /// bottom sheet.

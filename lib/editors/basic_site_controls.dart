@@ -1,12 +1,12 @@
-import 'package:stager/editors/site_controls.dart';
-import 'package:stager/editors/dialog_control_button.dart';
-import 'package:stager/site_state.dart';
+import 'package:stager_platform/editors/site_controls.dart';
+import 'package:stager_platform/editors/dialog_control_button.dart';
+import 'package:stager_platform/site_state.dart';
 import 'package:flutter/material.dart';
-import 'package:stager/editors/add_node_controller.dart';
-import 'package:stager/editors/controller.dart';
-import 'package:stager/editors/basic_editor_factory.dart';
-import 'package:stager/editors/editor_factory.dart';
-import 'package:stager/tree/composite_node.dart';
+import 'package:stager_platform/editors/add_node_controller.dart';
+import 'package:stager_platform/editors/controller.dart';
+import 'package:stager_platform/editors/basic_editor_factory.dart';
+import 'package:stager_platform/editors/editor_factory.dart';
+import 'package:stager_platform/tree/composite_node.dart';
 
 /// This is a basic implementation of the Site Controls interface to create
 /// simple button icons to control what editors are launched.
