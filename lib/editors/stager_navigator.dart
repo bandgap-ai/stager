@@ -62,7 +62,7 @@ class _StagerNavigatorState extends State<StagerNavigator> {
         Expanded(
           child: TreeView(
             sites: _siteState.treeData,
-            selectedNode: _siteState.selectedNode,
+            selectedNode: _selectedNode,
             onNodeTap: (node) {
               setState(() {
                 // Update the state to force a redraw and update the other

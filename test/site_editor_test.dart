@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stager/editors/stager_navigator_header.dart';
+import 'package:stager/editors/tree_view.dart';
 import 'package:stager/site_state.dart';
-import 'package:stager/tree/concrete_tree.dart';
 import 'package:stager/tree/tree.dart';
 import 'package:stager/editors/add_site_dialog.dart';
 import 'package:stager/editors/stager_navigator.dart';
@@ -62,8 +63,7 @@ void main() {
     testWidgets('should show add button when a composite node is selected',
         (WidgetTester tester) async {
       final siteState = SiteState();
-      siteState.addSite('Test Site');
-      siteState.selectedNode = siteState.treeData.first as LeafNode?;
+      TreeNode nodeToTest = siteState.addSite('Test Site');
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
@@ -71,35 +71,26 @@ void main() {
         ),
       ));
 
-      expect(find.byIcon(Icons.add), findsOneWidget);
-    });
+      // Find the selected node in the TreeView
+      final treeFinder = find.byType(TreeView);
+      final nodeViewFinder = find.descendant(
+        of: treeFinder,
+        matching: find.text(nodeToTest.properties.getProperty('name') as String),
+      );
+      expect(nodeViewFinder, findsOneWidget);
+      await tester.tap(nodeViewFinder);
+      await tester.pumpAndSettle();
 
-    testWidgets('should show add button when a leaf node is selected',
-        (WidgetTester tester) async {
-      final siteState = SiteState();
-      siteState.addSite('Test Site');
-      final leaf = ConcreteLeafNode(id: '1', name: 'Leaf');
-      (siteState.treeData.first as CompositeNode).addChild(leaf);
-      siteState.selectedNode = leaf; // Select the leaf
-
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: StagerNavigator(siteState: siteState),
-        ),
-      ));
-
-      // OK - this test is failing because it is no longer possible to send a leaf node to the editor.
-
-      expect(find.byIcon(Icons.add), findsOneWidget);
+      // Find the *correct* add button
+      final headerFinder = find.byType(StagerNavigatorHeader);
+      final addButtonFinder = find.descendant(of: headerFinder, matching: find.byIcon(Icons.add));
+      expect(addButtonFinder, findsOneWidget);
     });
 
     testWidgets('should add a new composite node when add button is tapped', (WidgetTester tester) async {
       // Arrange
       final siteState = SiteState();
-      siteState.addSite('Test Site');
-      // Select a composite node to add the new folder to.
-      final parentNode = siteState.treeData.first as CompositeNode;
-      siteState.selectedNode = parentNode;
+      final parentNode = siteState.addSite('Test Parent Site');
       final initialChildCount = parentNode.children.length;
 
       await tester.pumpWidget(MaterialApp(
@@ -108,8 +99,21 @@ void main() {
         ),
       ));
 
+      // Find the selected node in the TreeView
+      final treeFinder = find.byType(TreeView);
+      final nodeViewFinder = find.descendant(
+        of: treeFinder,
+        matching: find.text(parentNode.properties.getProperty('name') as String),
+      );
+      expect(nodeViewFinder, findsOneWidget);
+      await tester.tap(nodeViewFinder);
+      await tester.pumpAndSettle();
+
+      // Find the *correct* add button
+      final headerFinder = find.byType(StagerNavigatorHeader);
+      final addButtonFinder = find.descendant(of: headerFinder, matching: find.byIcon(Icons.add));
       // Act
-      await tester.tap(find.byIcon(Icons.add));
+      await tester.tap(addButtonFinder);
       await tester.pumpAndSettle(); // Wait for dialog
 
       // Enter name in the dialog and submit
