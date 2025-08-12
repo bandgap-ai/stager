@@ -40,7 +40,9 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (context) => ElevatedButton(
-              onPressed: () async {},
+              onPressed: () async {
+                StagerEditor editor = controller.editor(context);
+              },
               child: const Text('Show Dialog'),
             ),
           ),
