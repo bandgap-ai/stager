@@ -26,7 +26,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
-              builder: (context) => factory.createNodeEditor(context, parent, widgetFactory)
+              builder: (context) => factory.createNodeBuilder(context, parent, widgetFactory)
           ),
         ),
       );
@@ -35,6 +35,26 @@ void main() {
       expect(find.byType(AddNodeDialog), findsOne);
       // Find the AlertDialog that implements the editor on the happy path
       expect(find.byType(AlertDialog), findsOne);
+
+    });
+
+    testWidgets('Should open the Edit Node dialog - Happy Path', (WidgetTester tester) async {
+
+      // Open the "Create a Node Editor"
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+              builder: (context) => factory.createNodeBuilder(context, parent, widgetFactory)
+          ),
+        ),
+      );
+
+      // Find the parent dialog
+      expect(find.byType(AddNodeDialog), findsOne);
+      // Find the AlertDialog that implements the editor on the happy path
+      expect(find.byType(AlertDialog), findsOne);
+
+      fail('Test not implemented');
 
     });
 

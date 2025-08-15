@@ -46,5 +46,29 @@ void main() {
       // Nothing else required. The dialog is thoroughly tested in its own test.
     });
 
+    testWidgets('Should build the Edit Node Control', (WidgetTester tester) async {
+
+      // Reset the editor factory just in case
+      editorFactory.reset();
+
+      // Create a minimal Material App. This is actually easier than mocking or
+      // faking it and it gives us additional testing options.
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) => siteControls.buildEditNodeControl(context, node),
+          ),
+        ),
+      );
+      // Make sure to press the button! >:-D
+      await tester.tap(find.byType(IconButton));
+      await tester.pumpAndSettle();
+
+      // Check the factory was called
+      expect(editorFactory.editNodeCalled, isTrue);
+
+      fail("Not yet implemented");
+    });
+
   });
 }

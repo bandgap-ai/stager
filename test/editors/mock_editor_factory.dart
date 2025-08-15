@@ -7,6 +7,7 @@ import 'package:stager_platform/editors/widget_factory.dart';
 import 'package:stager_platform/site_state.dart';
 import 'package:stager_platform/tree/composite_node.dart';
 import 'package:stager_platform/tree/concrete_composite_node.dart';
+import 'package:stager_platform/tree/leaf_node.dart';
 
 import 'mock_node_editor.dart';
 import 'mock_site_editor.dart';
@@ -64,7 +65,7 @@ class MockEditorFactory extends EditorFactory {
   }
 
   @override
-  StagerEditor<CompositeNode> createNodeEditor(
+  StagerEditor<CompositeNode> createNodeBuilder(
     BuildContext context,
     CompositeNode parent, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
@@ -94,22 +95,24 @@ class MockEditorFactory extends EditorFactory {
   }
 
   @override
-  SiteEditor editNodeEditor(
-    BuildContext context,
-    SiteState state, [
-    WidgetFactory widgetFactory = const BasicWidgetFactory(),
-  ]) {
-    // TODO: implement editNodeEditor
-    throw UnimplementedError();
-  }
-
-  @override
   SiteEditor editSiteEditor(
     BuildContext context,
     SiteState state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
   ]) {
     // TODO: implement editSiteEditor
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor<CompositeNode> createCompositeNodeEditor(BuildContext context, CompositeNode node) {
+    // TODO: implement createCompositeNodeEditor
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor<LeafNode> createLeafNodeEditor(BuildContext context, LeafNode node) {
+    // TODO: implement createLeafNodeEditor
     throw UnimplementedError();
   }
 }

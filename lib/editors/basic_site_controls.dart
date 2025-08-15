@@ -7,11 +7,15 @@ import 'package:stager_platform/editors/controller.dart';
 import 'package:stager_platform/editors/basic_editor_factory.dart';
 import 'package:stager_platform/editors/editor_factory.dart';
 import 'package:stager_platform/tree/composite_node.dart';
+import 'package:stager_platform/tree/leaf_node.dart';
+import 'package:stager_platform/editors/edit_node_controller.dart';
 
 /// This is a basic implementation of the Site Controls interface to create
 /// simple button icons to control what editors are launched.
 class BasicSiteControls extends SiteControls {
 
+  /// The editor factory to use for creating editors. By default, this is a
+  /// [BasicEditorFactory].
   final EditorFactory editorFactory;
 
   /// Constructor for the SiteControls class.
@@ -45,8 +49,8 @@ class BasicSiteControls extends SiteControls {
   }
 
   @override
-  DialogControlButton buildEditNodeControl(BuildContext context, SiteState state) {
-    // TODO: implement buildEditNodeControl
+  DialogControlButton buildEditNodeControl(BuildContext context, LeafNode state) {
+    Controller controller = EditNodeController(state, editorFactory);
     throw UnimplementedError();
   }
 

@@ -20,7 +20,7 @@ class AddNodeController extends Controller<CompositeNode> {
 
   @override
   StagerEditor editor(BuildContext context) {
-    return editorFactory.createNodeEditor(context, state);
+    return editorFactory.createNodeBuilder(context, state);
   }
 
   @override
@@ -44,9 +44,7 @@ class AddNodeController extends Controller<CompositeNode> {
     }
     // Add the new node to the tree
     state.addChild(newNode);
-    // FIXME - I think the state should register as a listener of all nodes
-    // and, thus, notify whenever the tree changes without explicitly calling it
-    // like this.
+    // Let the watchers know
     state.notify();
   }
 }

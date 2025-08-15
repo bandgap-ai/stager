@@ -6,8 +6,8 @@ import 'package:stager_platform/editors/widget_factory.dart';
 import 'package:stager_platform/site_state.dart';
 import 'package:stager_platform/editors/basic_widget_factory.dart';
 import 'package:stager_platform/editors/add_node_dialog.dart';
-
-import '/tree/composite_node.dart';
+import 'package:stager_platform/tree/leaf_node.dart';
+import 'package:stager_platform/tree/composite_node.dart';
 
 /// The BasicEditorFactory is an extension of the EditorFactory abstract base
 /// class that provides a default implementation using widgets that are
@@ -35,7 +35,7 @@ class BasicEditorFactory extends EditorFactory {
   }
 
   @override
-  StagerEditor<CompositeNode> createNodeEditor(
+  StagerEditor<CompositeNode> createNodeBuilder(
     BuildContext context,
     CompositeNode state, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
@@ -64,11 +64,21 @@ class BasicEditorFactory extends EditorFactory {
   }
 
   @override
-  SiteEditor editNodeEditor(
+  StagerEditor<LeafNode> createLeafNodeEditor(
     BuildContext context,
-    SiteState state, [
+    LeafNode node, [
     WidgetFactory widgetFactory = const BasicWidgetFactory(),
   ]) {
+    // TODO: implement editNodeEditor
+    throw UnimplementedError();
+  }
+
+  @override
+  StagerEditor<CompositeNode> createCompositeNodeEditor(
+      BuildContext context,
+      CompositeNode node, [
+        WidgetFactory widgetFactory = const BasicWidgetFactory(),
+      ]) {
     // TODO: implement editNodeEditor
     throw UnimplementedError();
   }

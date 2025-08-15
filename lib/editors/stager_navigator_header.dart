@@ -87,15 +87,15 @@ class StagerNavigatorHeader extends StatelessWidget {
             children: [
               /// TODO Replace this with SiteControls - and figure out how to do this selection check better.
               /// This should be conditional: If a composite noe is selected, the control is enabled, otherwise not.
-              if (selectedNode != null && selectedNode is CompositeNode) siteControls.buildAddNodeControl(context, selectedNode as CompositeNode),
+              if (_checkNode(selectedNode)) siteControls.buildAddNodeControl(context, selectedNode as CompositeNode),
               // Edit the properties of the selected node.
-              if (selectedNode != null)
-              //  siteControls.buildEditNodeControl(context, selectedNode),
+              if (_checkNode(selectedNode))
+                siteControls.buildEditNodeControl(context, selectedNode!),
                 // Note that this used to call buildEnhancedPropertiesEditor.
                 // That functionality should be migrated to Tracee and it should
                 // have a test to verify that the enhanced editor is being used
                 // instead of the regular one.
-                nodePropertiesEditor.buildPropertiesEditor(selectedNode!),
+               // nodePropertiesEditor.buildPropertiesEditor(selectedNode!),
               // Delete the selected node.
               if (selectedNode != null)
                 IconButton(
@@ -132,6 +132,13 @@ class StagerNavigatorHeader extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Checks if the selected node is a composite node.
+  ///
+  /// [selectedNode] is the node to check.
+  _checkNode(LeafNode? selectedNode) {
+    return (selectedNode != null && selectedNode.isComposite);
   }
 
 }
