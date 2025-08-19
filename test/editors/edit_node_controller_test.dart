@@ -6,7 +6,6 @@ import 'package:stager_platform/editors/editor_factory.dart';
 import 'package:stager_platform/site_state.dart';
 import 'package:stager_platform/tree/composite_node.dart';
 import 'package:stager_platform/tree/concrete_composite_node.dart';
-import 'package:uuid/uuid.dart';
 import 'mock_composite_node_observer.dart';
 import 'mock_editor_factory.dart';
 

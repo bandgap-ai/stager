@@ -3,7 +3,6 @@ import 'package:stager_platform/editors/controller.dart';
 import 'package:stager_platform/editors/stager_editor.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/tree/composite_node.dart';
-import 'package:stager_platform/tree/node_properties.dart';
 
 /// This is a controller that creates a new child node in the parent node it
 /// is configured with when created.
