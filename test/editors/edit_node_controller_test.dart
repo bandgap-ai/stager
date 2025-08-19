@@ -66,30 +66,28 @@ void main() {
 
       // The simplest way to determine if the process method was called is to
       // see if there is now a new node in the site state. First, create some
-      // results to process for a Leaf node.
+      // results to process for a parent.node.
 
       // Make sure the observer has not been updated without being reset.
       expect(observer.updated, isFalse);
 
-      // Check adding a leaf node.
-      String name = 'Test Leaf Node';
-      Map<String, Object> results = {'name': name, 'isGroup': false};
-      controller.process(results);
-      expect(parent.children.length, equals(1));
-      expect(parent.children[0].properties.getProperty('name') as String, equals(name));
-      expect(() => Uuid.parse(parent.children[0].properties.getProperty('id') as String), returnsNormally);
-      // Make sure it was observed and reset the observer.
-      expect(observer.updated, isTrue);
-      observer.reset();
+      // Make some new property values
+      Map<String, dynamic> results = {
+        'name': 'Updated Name',
+        'value': 456,
+        'is_active': false,
+      };
 
-      // Check adding a composite node.
-      name = 'Test Composite Node';
-      results = {'name': name, 'isGroup': true};
+      // Update them
       controller.process(results);
-      expect(parent.children.length, equals(2));
-      expect(parent.children[1].properties.getProperty('name') as String, equals(name));
-      expect(() => Uuid.parse(parent.children[1].properties.getProperty('id') as String), returnsNormally);
-      // Make sure it was observed and reset the observer.
+
+      // Get and check the properties.
+      expect(parent.properties.getProperty('name'), 'Updated Name');
+      expect(parent.properties.getProperty('value'), 456);
+      expect(parent.properties.getProperty('is_active'), false);
+      // There should now be 4 properties
+      expect(parent.properties.map.length, 4);
+      // Ensure that observers were notified the state changed.
       expect(observer.updated, isTrue);
       observer.reset();
 

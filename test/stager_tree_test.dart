@@ -52,6 +52,36 @@ void main() {
   });
 
   group('LeafNode', () {
+
+    test('ConcreteLeafNode can load properties from a map', () {
+      String id = 'l1';
+      final leaf = ConcreteLeafNode(id: id, name: 'Leaf 1');
+      TestLeafNodeObserver observer = TestLeafNodeObserver();
+      leaf.attach(observer);
+      expect(observer.lastUpdatedNode, isNull);
+
+      // Make some new property values
+      Map<String, dynamic> mapInput = {
+        'name': 'Updated Name',
+        'value': 456,
+        'is_active': false,
+      };
+
+      // Set them.
+      leaf.loadPropertiesFromMap(mapInput);
+
+      // Get and check the properties. The id should be unchanged:
+      expect(leaf.properties.getProperty('id'), id);
+      expect(leaf.properties.getProperty('name'), 'Updated Name');
+      expect(leaf.properties.getProperty('value'), 456);
+      expect(leaf.properties.getProperty('is_active'), false);
+      // There should now be 4 properties
+      expect(leaf.properties.map.length, 4);
+      // Ensure that observers were notified the state changed.
+      expect(observer.lastUpdatedNode, isNotNull);
+
+    });
+
     test('ConcreteLeafNode initializes correctly', () {
       final leaf = ConcreteLeafNode(id: 'l1', name: 'Leaf 1');
       expect(leaf.properties.getProperty('id'), 'l1');

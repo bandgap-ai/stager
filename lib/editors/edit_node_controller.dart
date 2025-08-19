@@ -3,9 +3,7 @@ import 'package:stager_platform/editors/controller.dart';
 import 'package:stager_platform/editors/stager_editor.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/tree/composite_node.dart';
-import 'package:stager_platform/tree/concrete_leaf_node.dart';
-import 'package:stager_platform/tree/concrete_composite_node.dart';
-import 'package:uuid/uuid.dart';
+import 'package:stager_platform/tree/node_properties.dart';
 
 /// This is a controller that creates a new child node in the parent node it
 /// is configured with when created.
@@ -36,21 +34,10 @@ class EditNodeController extends Controller<LeafNode> {
 
   @override
   void process(Object input) {
-    // LeafNode newNode;
-    // // Prepare the input
-    // Map<String, dynamic> mapInput = input as Map<String, dynamic>;
-    // String name = mapInput['name'] as String;
-    // // Create the ID
-    // var uuid = Uuid();
-    // String id = uuid.v7();
-    // if (mapInput['isGroup'] as bool) {
-    //   newNode = ConcreteCompositeNode(id: id, name: name);
-    // } else {
-    //   newNode = ConcreteLeafNode(id: id, name: name);
-    // }
-    // // Add the new node to the tree
-    // state.addChild(newNode);
-    // // Let the watchers know
-    // state.notify();
+    // Prepare the input
+    Map<String, dynamic> mapInput = input as Map<String, dynamic>;
+    // Process the results
+    state.loadPropertiesFromMap(mapInput);
+    return;
   }
 }

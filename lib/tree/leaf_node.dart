@@ -64,4 +64,24 @@ abstract class LeafNode implements ObservableSubject {
   ///
   /// [visitor]: The [NodeVisitor] to accept.
   void accept(NodeVisitor visitor);
+
+  /// Loads the properties from a map. The map should contain key-value pairs
+  /// representing the properties already set by the node.
+  ///
+  /// The implementation is responsible for accurately loading the properties
+  /// from the provided map and casting to the appropriate types. If a key
+  /// exists that is not already on the node, it should attempt to add it and
+  /// preserve its type (i.e., don't cast it). The base class implementation
+  /// should also notify observers by calling notify() once the properties are
+  /// updated.
+  ///
+  /// Subclasses that override this method should call
+  /// super.loadPropertiesFromMap() to ensure that super-type properties are
+  /// accurately loaded. Likewise, overriding this method should only capture
+  /// new properties not already handled by super classes unless there is some
+  /// special processing required.
+  ///
+  /// [mapInput]: The map containing the properties to be loaded.
+  void loadPropertiesFromMap(Map<String, dynamic> mapInput);
+
 }
