@@ -28,7 +28,8 @@ class MockEditorFactory extends EditorFactory {
   bool _editSiteCalled = false;
   bool _deleteSiteCalled = false;
   bool _addNodeCalled = false;
-  bool _editNodeCalled = false;
+  bool _editLeafNodeCalled = false;
+  bool _editCompositeNodeCalled = false;
   bool _deleteNodeCalled = false;
 
   /// Tracks if the addSiteEditor method was called.
@@ -39,8 +40,10 @@ class MockEditorFactory extends EditorFactory {
   bool get deleteSiteCalled => _deleteSiteCalled;
   /// Tracks if the addNodeEditor method was called.
   bool get addNodeCalled => _addNodeCalled;
-  /// Tracks if the editNodeEditor method was called.
-  bool get editNodeCalled => _editNodeCalled;
+  /// Tracks if createLeafNodeEditor method was called.
+  bool get editLeafNodeCalled => _editLeafNodeCalled;
+  /// Tracks if createCompositeNodeEditor method was called.
+  bool get editCompositeNodeCalled => _editCompositeNodeCalled;
   /// Tracks if the deleteNodeEditor method was called.
   bool get deleteNodeCalled => _deleteNodeCalled;
 
@@ -50,7 +53,8 @@ class MockEditorFactory extends EditorFactory {
     _editSiteCalled = false;
     _deleteSiteCalled = false;
     _addNodeCalled = false;
-    _editNodeCalled = false;
+    _editLeafNodeCalled = false;
+    _editCompositeNodeCalled = false;
     _deleteNodeCalled = false;
   }
 
@@ -106,13 +110,13 @@ class MockEditorFactory extends EditorFactory {
 
   @override
   StagerEditor<CompositeNode> createCompositeNodeEditor(BuildContext context, CompositeNode node) {
-    // TODO: implement createCompositeNodeEditor
-    throw UnimplementedError();
+    _editCompositeNodeCalled = true;
+    return mockCompositeNodeEditor;
   }
 
   @override
   StagerEditor<LeafNode> createLeafNodeEditor(BuildContext context, LeafNode node) {
-    // TODO: implement createLeafNodeEditor
-    throw UnimplementedError();
+    _editLeafNodeCalled = true;
+    return mockCompositeNodeEditor;
   }
 }

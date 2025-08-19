@@ -4,7 +4,6 @@ import 'package:stager_platform/editors/standard_widgets.dart';
 import 'package:stager_platform/site_state.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/editors/add_site_dialog.dart';
-import 'package:stager_platform/editors/concrete_node_properties_editor.dart';
 import 'package:stager_platform/editors/file_handler.dart';
 import 'package:stager_platform/editors/import_export_menu.dart';
 import 'package:stager_platform/editors/basic_site_controls.dart';
@@ -56,12 +55,6 @@ class StagerNavigatorHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final selectedNode = selectedNode;
-
-    final nodePropertiesEditor = ConcreteNodePropertiesEditor(context);
-
-    // VISITOR TIME!!! Figure out what we're dealing with here.
-    //node.accept(this);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
@@ -89,8 +82,7 @@ class StagerNavigatorHeader extends StatelessWidget {
               /// This should be conditional: If a composite noe is selected, the control is enabled, otherwise not.
               if (_checkNode(selectedNode)) siteControls.buildAddNodeControl(context, selectedNode as CompositeNode),
               // Edit the properties of the selected node.
-              if (_checkNode(selectedNode))
-                siteControls.buildEditNodeControl(context, selectedNode!),
+              if (selectedNode != null) siteControls.buildEditNodeControl(context, selectedNode!),
                 // Note that this used to call buildEnhancedPropertiesEditor.
                 // That functionality should be migrated to Tracee and it should
                 // have a test to verify that the enhanced editor is being used

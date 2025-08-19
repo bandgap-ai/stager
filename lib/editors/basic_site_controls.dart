@@ -51,7 +51,7 @@ class BasicSiteControls extends SiteControls {
   @override
   DialogControlButton buildEditNodeControl(BuildContext context, LeafNode state) {
     Controller controller = EditNodeController(state, editorFactory);
-    throw UnimplementedError();
+    return DialogControlButton(controller: controller);
   }
 
   @override

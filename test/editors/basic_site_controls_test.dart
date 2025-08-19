@@ -65,9 +65,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Check the factory was called
-      expect(editorFactory.editNodeCalled, isTrue);
-
-      fail("Not yet implemented");
+      expect(editorFactory.editLeafNodeCalled, isFalse);
+      expect(editorFactory.editCompositeNodeCalled, isTrue);
     });
 
   });

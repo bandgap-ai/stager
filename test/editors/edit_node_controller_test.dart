@@ -27,11 +27,11 @@ void main() {
   });
 
   group('EditNodeController', () {
-    testWidgets('Should open the Add Node dialog', (WidgetTester tester) async {
+    testWidgets('Should open the Edit Node dialog', (WidgetTester tester) async {
 
       // Clean and check the mock editor factory
       editorFactory.reset();
-      expect(editorFactory.editNodeCalled, isFalse);
+      expect(editorFactory.editCompositeNodeCalled, isFalse);
 
       // Create a minimal Material App. This is actually easier than mocking or
       // faking it and it gives us additional testing options.
@@ -52,14 +52,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // First check the factory was called
-      expect(editorFactory.editNodeCalled, isTrue);
+      expect(editorFactory.editCompositeNodeCalled, isTrue);
     });
 
-    test('Should return Icons.add', () {
+    test('Should return Icons.edit', () {
       final SiteState state = SiteState();
       final EditorFactory editorFactory = MockEditorFactory(state);
       final Controller controller = EditNodeController(parent, editorFactory);
-      expect(controller.iconData(), equals(Icons.add),);
+      expect(controller.iconData(), equals(Icons.edit),);
     });
 
     test('Should process input', () {
