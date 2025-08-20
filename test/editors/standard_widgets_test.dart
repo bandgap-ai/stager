@@ -67,10 +67,11 @@ void main() {
       ));
 
       expect(find.byType(SegmentedButton<bool>), findsOneWidget);
-      expect(find.text('Input Coordinates'), findsOneWidget);
-      expect(find.text('Select on Map'), findsOneWidget);
+      expect(find.byIcon(Icons.keyboard), findsOneWidget);
+      Finder iconFinder = find.byIcon(Icons.pin_drop);
+      expect(iconFinder, findsOneWidget);
 
-      await tester.tap(find.text('Select on Map'));
+      await tester.tap(iconFinder);
       await tester.pump();
 
       expect(selection, isTrue);

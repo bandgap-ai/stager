@@ -146,7 +146,7 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
                       Icon(
                         Icons.image_outlined,
                         size: 64,
-                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+                        color: Theme.of(context).colorScheme.secondary,
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -215,18 +215,15 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
                   segments: [
                     const ButtonSegment<String>(
                       value: 'properties',
-                      label: Text('Properties'),
                       icon: Icon(Icons.info_outline),
                     ),
                     ButtonSegment<String>(
                       value: 'summary',
-                      label: const Text('Summary'),
                       icon: const Icon(Icons.analytics_outlined),
                       enabled: selectedNode is TreeNode,
                     ),
                     const ButtonSegment<String>(
                       value: 'images',
-                      label: Text('Images'),
                       icon: Icon(Icons.image_outlined),
                     ),
                   ],

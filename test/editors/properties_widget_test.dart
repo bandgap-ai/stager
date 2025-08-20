@@ -57,7 +57,7 @@ void main() {
       expect(find.byWidgetPredicate((widget) => widget is SegmentedButton<String>), findsOneWidget);
       
       // Switch to images tab to find the Add Image button
-      await tester.tap(find.text('Images'));
+      await tester.tap(find.byIcon(Icons.image_outlined));
       await tester.pump();
       expect(find.text('Add Image'), findsOneWidget);
     });

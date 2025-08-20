@@ -177,13 +177,11 @@ Widget buildPositionMethodWidget(BuildContext context,
         segments: const [
           ButtonSegment(
             value: false,
-            label: Text('Input Coordinates'),
-            icon: Icon(Icons.list, size: 16),
+            icon: Icon(Icons.keyboard, size: 16),
           ),
           ButtonSegment(
             value: true,
-            label: Text('Select on Map'),
-            icon: Icon(Icons.map, size: 16),
+            icon: Icon(Icons.pin_drop, size: 16),
           ),
         ],
         selected: {initialSelection},
