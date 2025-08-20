@@ -25,7 +25,7 @@ void main() {
       ));
 
       expect(find.text('Edit Node Properties'), findsOneWidget);
-      expect(find.text('Please configure the site information.'), findsOneWidget);
+      expect(find.text('Please configure the node.'), findsOneWidget);
       expect(find.text('Description:'), findsOneWidget);
       expect(find.widgetWithText(TextField, 'Some description'), findsOneWidget);
     });

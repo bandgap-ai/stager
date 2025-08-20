@@ -68,7 +68,7 @@ class _NodeEditorState extends State<LeafNodeEditor> {
 
   @override
   Widget build(BuildContext context) {
-    String info = 'Please configure the site information.';
+    String info = 'Please configure the node.';
 
     return AlertDialog(
       title: const Text('Edit Node Properties'),
@@ -79,8 +79,9 @@ class _NodeEditorState extends State<LeafNodeEditor> {
             // Display an informational label at the top of the dialog.
             buildInfoLabel(context,info),
             // Dynamically build text field editors for all properties
-            // except 'id', 'name', 'latitude', and 'longitude'.
-            ...properties.map.entries.where((entry) => entry.key != 'id' && entry.key != 'name' && entry.key != 'latitude' && entry.key != 'longitude').map((entry) {
+            // except 'id' (because it is private), and lat/long because
+            // they are edited with a different widget.
+            ...properties.map.entries.where((entry) => entry.key != 'id' && entry.key != 'latitude' && entry.key != 'longitude').map((entry) {
               return buildTextFieldEditor(
                 context,
                 _controllers[entry.key]!, // Use the pre-initialized controller
@@ -95,6 +96,7 @@ class _NodeEditorState extends State<LeafNodeEditor> {
                   _pickFromMap = value;
                 });
               }),
+            SizedBox(height: 8),
             if (properties.map.containsKey('latitude') || properties.map.containsKey('longitude'))
               SizedBox(
                 width: _pickFromMap ? MediaQuery.of(context).size.width * 0.8 : null,

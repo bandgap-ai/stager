@@ -9,10 +9,12 @@ import 'package:stager_platform/tree/node_observer.dart';
 
 /// A concrete implementation of a [LeafNode] that provides basic functionality.
 ///
-/// With respect to loading properties, subclasses should override
-/// [loadPropertiesFromMap] to accurately load their own properties, but they
-/// can leave adding new properties that they don't own to ConcreteLeafNode as
-/// it will add all properties not already stored.
+/// With respect to loading properties from a map, this class will attempt to
+/// load all properties it receives and preserve their type (i.e., it doesn't
+/// cast the data). It notifies observers after it updates the properties.
+/// Subclasses can override this behavior as needed, or allow ConcreteLeafNode
+/// to load the properties and overwrite them after the initial values are
+/// loaded.
 class ConcreteLeafNode implements LeafNode {
   /// The properties of this node.
   @override
@@ -93,20 +95,9 @@ class ConcreteLeafNode implements LeafNode {
 
   @override
   void loadPropertiesFromMap(Map<String, dynamic> mapInput) {
-    // Leaf nodes only care about the id and name properties, so load them if
-    // they exist.
-    if (mapInput.containsKey('id')) {
-      properties.setProperty('id', mapInput['id'] as String);
-    }
-    if (mapInput.containsKey('name')) {
-      properties.setProperty('name', mapInput['name'] as String);
-    }
-    // For all other entries in map input that are not in the properties, add
-    // them to the properties as strings.
+    // Load all the properties
     for (final entry in mapInput.entries) {
-      if (!properties.map.containsKey(entry.key)) {
         properties.setProperty(entry.key, entry.value);
-      }
     }
 
     // Notify observers about the change in properties
