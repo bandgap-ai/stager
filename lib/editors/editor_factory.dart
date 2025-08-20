@@ -18,6 +18,11 @@ abstract class EditorFactory {
 
   /// Creates a new StagerEditor that can create new nodes in the site state.
   ///
+  /// Note that this editor can create either a [LeafNode] or a [CompositeNode].
+  /// The return type indicates that it is an editor on the CompositeNode
+  /// [parent] received as input, not the type of the child, (which is,
+  /// admittedly, a bit confusing...).
+  ///
   /// [context]: The build context for the widget.
   /// [parent]: The parent node for the new node.
   StagerEditor<CompositeNode> createNodeBuilder(BuildContext context, CompositeNode parent);

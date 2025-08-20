@@ -165,6 +165,7 @@ class BasicFileHandler implements FileHandler {
     }
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
+      dialogTitle: 'Select a file:',
       allowedExtensions: ['json'],
     );
     return result?.files.single.path;
