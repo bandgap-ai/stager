@@ -12,12 +12,10 @@ void main() {
 
   late CompositeNode parent;
   late BasicEditorFactory factory;
-  late MockWidgetFactory widgetFactory;
 
   setUp(() {
     parent = ConcreteCompositeNode(id: "id", name: "name");
     factory = BasicEditorFactory();
-    widgetFactory = MockWidgetFactory();
   });
 
   group('BasicEditorFactory', () {

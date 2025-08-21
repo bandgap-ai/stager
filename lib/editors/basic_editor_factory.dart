@@ -11,7 +11,6 @@ import 'package:stager_platform/tree/composite_node.dart';
 import 'package:stager_platform/editors/leaf_node_editor.dart';
 import 'package:stager_platform/editors/composite_node_editor.dart';
 import 'package:stager_platform/tree/basic_node_builder.dart';
-import 'package:stager_platform/tree/node_builder.dart';
 
 /// The BasicEditorFactory is an extension of the EditorFactory abstract base
 /// class that provides a default implementation using widgets that are

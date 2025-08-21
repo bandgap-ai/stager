@@ -4,6 +4,8 @@
 * Removed editors that belong in client apps.
 * Addressed some static analysis and code quality issues, including dependency updates.
 * Added example information.
+* Added support for injecting SiteControls. 
+* Added a builder for Nodes.
 
 ## 0.0.1
 

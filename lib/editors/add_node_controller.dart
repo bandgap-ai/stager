@@ -3,8 +3,6 @@ import 'package:stager_platform/editors/controller.dart';
 import 'package:stager_platform/editors/stager_editor.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/tree/composite_node.dart';
-import 'package:stager_platform/tree/concrete_leaf_node.dart';
-import 'package:stager_platform/tree/concrete_composite_node.dart';
 import 'package:uuid/uuid.dart';
 import 'package:stager_platform/tree/node_builder.dart';
 import 'package:stager_platform/tree/basic_node_builder.dart';

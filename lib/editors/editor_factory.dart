@@ -5,12 +5,9 @@ library;
 import 'package:flutter/material.dart';
 import 'package:stager_platform/editors/site_editor.dart';
 import 'package:stager_platform/editors/stager_editor.dart';
-import 'package:stager_platform/editors/widget_factory.dart';
 import 'package:stager_platform/site_state.dart';
-import 'package:stager_platform/editors/basic_widget_factory.dart';
 import 'package:stager_platform/tree/composite_node.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
-import 'package:stager_platform/tree/node_builder.dart';
 import 'package:stager_platform/tree/basic_node_builder.dart';
 
 /// This is an abstract factory class definition for creating editors.

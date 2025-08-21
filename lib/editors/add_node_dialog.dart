@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:stager_platform/editors/basic_widget_factory.dart';
 import 'package:stager_platform/editors/stager_editor.dart';
 import 'package:stager_platform/tree/composite_node.dart';
-import 'package:stager_platform/tree/node_builder.dart';
 
 /// A dialog widget for adding a new [TreeNode].
 ///
