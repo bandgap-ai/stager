@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stager_platform/editors/controller.dart';
 import 'package:stager_platform/editors/stager_editor.dart';
-import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/tree/composite_node.dart';
 import 'package:uuid/uuid.dart';
 import 'package:stager_platform/tree/node_builder.dart';
@@ -35,21 +34,18 @@ class AddNodeController extends Controller<CompositeNode> {
 
   @override
   void process(Object input) {
-    LeafNode newNode;
     // Prepare the input
     Map<String, dynamic> mapInput = input as Map<String, dynamic>;
     String name = mapInput['name'] as String;
     // Create the ID
     var uuid = Uuid();
     String id = uuid.v7();
+    // Create the node. The build will handle linking it to the parent (state)
+    // and notifying the observers.
     if (mapInput['isGroup'] as bool) {
-      newNode = nodeBuilder.buildCompositeNode(id, name);
+      nodeBuilder.buildCompositeNode(id, name, state);
     } else {
-      newNode = nodeBuilder.buildLeafNode(id, name);
+      nodeBuilder.buildLeafNode(id, name, state);
     }
-    // Add the new node to the tree
-    state.addChild(newNode);
-    // Let the watchers know
-    state.notify();
   }
 }

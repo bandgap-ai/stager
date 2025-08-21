@@ -12,12 +12,14 @@ abstract class NodeBuilder {
   ///
   /// [id]: The ID of the new node.
   /// [name]: The name of the new node.
-  LeafNode buildLeafNode(String id, String name);
+  /// [parent]: Optionally, the parent of the new node.
+  LeafNode buildLeafNode(String id, String name, [CompositeNode? parent]);
 
   /// Builds a new composite node with the given ID and name.
   ///
   /// [id]: The ID of the new node.
   /// [name]: The name of the new node.
-  CompositeNode buildCompositeNode(String id, String name);
+  /// [parent]: Optionally, the parent of the new node.
+  CompositeNode buildCompositeNode(String id, String name, [CompositeNode? parent]);
 
 }
