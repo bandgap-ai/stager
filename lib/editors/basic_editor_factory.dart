@@ -10,6 +10,8 @@ import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/tree/composite_node.dart';
 import 'package:stager_platform/editors/leaf_node_editor.dart';
 import 'package:stager_platform/editors/composite_node_editor.dart';
+import 'package:stager_platform/tree/basic_node_builder.dart';
+import 'package:stager_platform/tree/node_builder.dart';
 
 /// The BasicEditorFactory is an extension of the EditorFactory abstract base
 /// class that provides a default implementation using widgets that are
@@ -25,6 +27,8 @@ class BasicEditorFactory extends EditorFactory {
   ///
   /// [widgetFactory]: An optional widget factory for the editor to use. The
   /// default is a [BasicWidgetFactory].
+  /// [nodeBuilder]: An optional node builder for the editor to use. The
+  /// default is a [BasicNodeBuilder].
   const BasicEditorFactory([this.widgetFactory = const BasicWidgetFactory()]);
 
   @override
@@ -39,18 +43,14 @@ class BasicEditorFactory extends EditorFactory {
   @override
   StagerEditor<CompositeNode> createNodeBuilder(
     BuildContext context,
-    CompositeNode state, [
-    WidgetFactory widgetFactory = const BasicWidgetFactory(),
-  ]) {
+    CompositeNode state) {
      return AddNodeDialog(state: state);
   }
 
   @override
   SiteEditor deleteNodeEditor(
     BuildContext context,
-    SiteState state, [
-    WidgetFactory widgetFactory = const BasicWidgetFactory(),
-  ]) {
+    SiteState state) {
     // TODO: implement deleteNodeEditor
     throw UnimplementedError();
   }
@@ -58,9 +58,7 @@ class BasicEditorFactory extends EditorFactory {
   @override
   SiteEditor deleteSiteEditor(
     BuildContext context,
-    SiteState state, [
-    WidgetFactory widgetFactory = const BasicWidgetFactory(),
-  ]) {
+    SiteState state) {
     // TODO: implement deleteSiteEditor
     throw UnimplementedError();
   }
@@ -68,27 +66,21 @@ class BasicEditorFactory extends EditorFactory {
   @override
   StagerEditor<LeafNode> createLeafNodeEditor(
     BuildContext context,
-    LeafNode node, [
-    WidgetFactory widgetFactory = const BasicWidgetFactory(),
-  ]) {
+    LeafNode node) {
     return LeafNodeEditor(state: node);
   }
 
   @override
   StagerEditor<CompositeNode> createCompositeNodeEditor(
       BuildContext context,
-      CompositeNode node, [
-        WidgetFactory widgetFactory = const BasicWidgetFactory(),
-      ]) {
+      CompositeNode node) {
     return CompositeNodeEditor(state: node);
   }
 
   @override
   SiteEditor editSiteEditor(
     BuildContext context,
-    SiteState state, [
-    WidgetFactory widgetFactory = const BasicWidgetFactory(),
-  ]) {
+    SiteState state) {
     // TODO: implement editSiteEditor
     throw UnimplementedError();
   }

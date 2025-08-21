@@ -28,7 +28,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
-              builder: (context) => factory.createNodeBuilder(context, parent, widgetFactory)
+              builder: (context) => factory.createNodeBuilder(context, parent)
           ),
         ),
       );
@@ -46,7 +46,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
-              builder: (context) => factory.createLeafNodeEditor(context, parent, widgetFactory)
+              builder: (context) => factory.createLeafNodeEditor(context, parent)
           ),
         ),
       );
@@ -63,7 +63,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
-              builder: (context) => factory.createCompositeNodeEditor(context, parent, widgetFactory)
+              builder: (context) => factory.createCompositeNodeEditor(context, parent)
           ),
         ),
       );

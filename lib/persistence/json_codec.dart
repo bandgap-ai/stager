@@ -7,8 +7,7 @@ import 'package:logger/logger.dart';
 /// A codec for serializing and deserializing a tree of [TreeNode]s to and from JSON.
 class JsonCodec {
 
-  /// Logger for this class.
-  final logger = Logger();
+  const JsonCodec();
 
   /// Serializes a list of [LeafNode]s to a JSON string.
   String serialize(List<LeafNode> nodes) {
@@ -86,9 +85,9 @@ class JsonCodec {
         }
       }
     } catch (e){
-      logger.e('Error deserializing JSON: $e');
       throw FormatException('Invalid JSON format: '
-          'Expected a list but received ${jsonString.runtimeType}');
+          'Expected a list but received ${jsonString.runtimeType}.'
+          'Full stack trace: $e');
     }
     return rootNodes;
   }

@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:stager_platform/editors/basic_widget_factory.dart';
 import 'package:stager_platform/editors/stager_editor.dart';
 import 'package:stager_platform/tree/composite_node.dart';
+import 'package:stager_platform/tree/node_builder.dart';
 
 /// A dialog widget for adding a new [TreeNode].
 ///
 /// This dialog provides a [TextField] for the user to enter the name of the new node.
 /// When the 'Add' button is pressed, the entered name is returned.
 class AddNodeDialog extends StagerEditor<CompositeNode> {
+
   /// Creates an [AddNodeDialog].
   const AddNodeDialog({super.key,
     required super.state,

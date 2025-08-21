@@ -47,7 +47,9 @@ abstract class FileHandler {
 /// A basic implementation of [FileHandler] that uses the `file_picker` package
 /// and a `JsonCodec` to handle file operations.
 class BasicFileHandler implements FileHandler {
-  final JsonCodec _codec = JsonCodec();
+  final JsonCodec _codec = const JsonCodec();
+
+  const BasicFileHandler();
 
   @override
   Future<void> writeToFile(String path, List<LeafNode> nodes) async {

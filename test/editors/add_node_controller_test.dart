@@ -9,6 +9,7 @@ import 'package:stager_platform/tree/concrete_composite_node.dart';
 import 'package:uuid/uuid.dart';
 import 'mock_composite_node_observer.dart';
 import 'mock_editor_factory.dart';
+import 'mock_node_builder.dart';
 
 void main() {
 
@@ -92,6 +93,26 @@ void main() {
       // Make sure it was observed and reset the observer.
       expect(observer.updated, isTrue);
       observer.reset();
+
+      return;
+    });
+
+    test('Should process input with mock builder', () {
+
+      CompositeNode customParent = ConcreteCompositeNode(id: "1", name: "Parent");
+      Controller customController = AddNodeController(customParent, editorFactory, MockNodeBuilder());
+
+      // Check adding a leaf node.
+      String name = 'Test Mock Leaf Node';
+      Map<String, Object> results = {'name': name, 'isGroup': false};
+      customController.process(results);
+      expect(customParent.children[0].properties.getProperty('isMock'),isFalse);
+
+      // Check adding a composite node.
+      name = 'Test Mock Composite Node';
+      results = {'name': name, 'isGroup': true};
+      customController.process(results);
+      expect(customParent.children[1].properties.getProperty('isMock'),isTrue);
 
       return;
     });

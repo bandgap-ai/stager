@@ -6,15 +6,18 @@ import 'package:stager_platform/editors/tree_view.dart';
 import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'mock_file_handler.dart';
+import 'mock_site_controls.dart';
 
 void main() {
   group('StagerNavigator Widget Tests (Header mostly)', () {
     late SiteState siteState;
     late MockFileHandler mockFileHandler;
+    late MockSiteControls mockSiteControls;
 
     setUp(() {
       siteState = SiteState();
       mockFileHandler = MockFileHandler();
+      mockSiteControls = MockSiteControls();
     });
 
     // Helper to build the widget
@@ -26,6 +29,7 @@ void main() {
             body: StagerNavigator(
               siteState: siteState,
               fileHandler: mockFileHandler,
+              siteControls: mockSiteControls,
             ),
           ),
         ),
@@ -79,6 +83,10 @@ void main() {
       expect(iconFinder, findsOneWidget);
       await tester.tap(iconFinder);
       await tester.pumpAndSettle();
+
+      // Assert the mock was called
+      expect(mockSiteControls.buildEditNodeCalled, isTrue);
+      mockSiteControls.reset();
 
     });
 
