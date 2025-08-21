@@ -6,7 +6,6 @@ import 'package:stager_platform/editors/composite_node_editor.dart';
 import 'package:stager_platform/editors/leaf_node_editor.dart';
 import 'package:stager_platform/tree/composite_node.dart';
 import 'package:stager_platform/tree/concrete_composite_node.dart';
-import 'mock_widget_factory.dart';
 
 void main() {
 
