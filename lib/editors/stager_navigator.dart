@@ -64,6 +64,9 @@ class _StagerNavigatorState extends State<StagerNavigator> {
       siteControls: widget.siteControls,
     );
 
+    // Add an optional pin button handler to the constructor.
+    // If the pin button handler exists, make the header pinnable.
+
     return Column(
       children: [
         header,

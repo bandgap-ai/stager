@@ -55,6 +55,7 @@ class StagerNavigatorHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool pinnable = false;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
@@ -67,6 +68,7 @@ class StagerNavigatorHeader extends StatelessWidget {
             children: [
               Icon(Icons.public, color: Theme.of(context).colorScheme.onPrimary),
               const SizedBox(width: 8.0),
+              // The label at the top of the header
               Text(
                 siteState.label,
                 style: TextStyle(
@@ -74,6 +76,12 @@ class StagerNavigatorHeader extends StatelessWidget {
                   fontSize: 24,
                 ),
               ),
+              // If the navigator can be pinned open, add the pin button.
+              if (pinnable) const Spacer(),
+              if (pinnable) IconButton(
+                  icon: Icon(Icons.lock_outlined, color: Theme.of(context).colorScheme.onPrimary),
+                  onPressed: () {}
+              )
             ],
           ),
           Row(

@@ -25,6 +25,8 @@ class DialogControlButton extends StatelessWidget {
   /// [context] is the build context.
   void _handleButtonPressed(BuildContext context) async {
 
+    // This awaits the completion of the modal dialog and forwards the result to
+    // the controller for processing.
     final results = await showDialog(
       context: context,
       builder: (context) => controller.editor(context),
