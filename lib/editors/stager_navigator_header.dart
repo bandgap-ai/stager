@@ -137,7 +137,7 @@ class StagerNavigatorHeader extends StatelessWidget {
   /// Checks if the selected node is a composite node.
   ///
   /// [selectedNode] is the node to check.
-  _checkNode(LeafNode? selectedNode) {
+  bool _checkNode(LeafNode? selectedNode) {
     return (selectedNode != null && selectedNode.isComposite);
   }
 

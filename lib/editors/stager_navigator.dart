@@ -27,17 +27,14 @@ class StagerNavigator extends StatefulWidget {
   final SiteControls siteControls;
 
   /// Creates a site editor widget.
-  StagerNavigator(
+  const StagerNavigator(
       {super.key, required this.siteState,
         this.fileHandler = const BasicFileHandler(),
         this.siteControls = const BasicSiteControls(),
       });
 
   @override
-  State<StatefulWidget> createState() => _StagerNavigatorState(
-    siteState: siteState,
-    fileHandler: fileHandler,
-  );
+  State<StatefulWidget> createState() => _StagerNavigatorState();
 
 }
 
@@ -47,10 +44,11 @@ class _StagerNavigatorState extends State<StagerNavigator> {
   late FileHandler _fileHandler;
   LeafNode? _selectedNode;
 
-  _StagerNavigatorState({required SiteState siteState,
-    required FileHandler fileHandler}) {
-    _siteState = siteState;
-    _fileHandler = fileHandler;
+  @override
+  void initState() {
+    super.initState();
+    _siteState = widget.siteState;
+    _fileHandler = widget.fileHandler;
   }
 
   @override
