@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/site_state.dart';
 import 'package:stager_platform/editors/stager_navigator.dart';
 import 'package:stager_platform/editors/tree_view.dart';
@@ -21,7 +22,7 @@ void main() {
     });
 
     // Helper to build the widget
-    Future<void> pumpWidget(WidgetTester tester) async {
+    Future<void> pumpWidget(WidgetTester tester, {StagerPin? pin}) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -30,6 +31,7 @@ void main() {
               siteState: siteState,
               fileHandler: mockFileHandler,
               siteControls: mockSiteControls,
+              pin: pin,
             ),
           ),
         ),
@@ -100,6 +102,32 @@ void main() {
 
       // Assert
       expect(find.byIcon(Icons.edit), findsNothing);
+    });
+
+    testWidgets('should display pin when provided and call onPinChanged on tap', (WidgetTester tester) async {
+      // Arrange
+      bool callbackCalled = false;
+      final StagerPin pin = StagerPin(
+        initialPinState: false,
+        onPinChanged: (bool isPinned) {
+          callbackCalled = true;
+        },
+      );
+
+      // Act
+      await pumpWidget(tester, pin: pin);
+      await tester.pump();
+
+      // Assert the widget is found
+      final pinFinder = find.byType(StagerPin);
+      expect(pinFinder, findsOneWidget);
+
+      // Tap the pin
+      await tester.tap(pinFinder);
+      await tester.pump();
+
+      // Assert callback is called
+      expect(callbackCalled, isTrue);
     });
 
     testWidgets('tapping delete on a composite node and confirming it is deleted', (WidgetTester tester) async {

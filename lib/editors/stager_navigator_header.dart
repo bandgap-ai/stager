@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stager_platform/editors/site_controls.dart';
+import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/editors/standard_widgets.dart';
 import 'package:stager_platform/site_state.dart';
 import 'package:stager_platform/tree/tree.dart';
@@ -34,6 +35,9 @@ class StagerNavigatorHeader extends StatelessWidget {
   /// The selected node in the tree.
   final LeafNode? selectedNode;
 
+  /// An optional StagerPin widget to pin the navigator.
+  final StagerPin? pin;
+
   /// Creates a site editor header.
   const StagerNavigatorHeader({
     super.key,
@@ -41,6 +45,7 @@ class StagerNavigatorHeader extends StatelessWidget {
     required this.fileHandler,
     required this.selectedNode,
     this.siteControls = const BasicSiteControls(),
+    this.pin,
   });
 
   /// Adds a new node to the site.
@@ -55,7 +60,7 @@ class StagerNavigatorHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool pinnable = false;
+    bool pinnable = pin != null;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
@@ -78,10 +83,7 @@ class StagerNavigatorHeader extends StatelessWidget {
               ),
               // If the navigator can be pinned open, add the pin button.
               if (pinnable) const Spacer(),
-              if (pinnable) IconButton(
-                  icon: Icon(Icons.lock_outlined, color: Theme.of(context).colorScheme.onPrimary),
-                  onPressed: () {}
-              )
+              if (pinnable) pin!,
             ],
           ),
           Row(

@@ -7,6 +7,7 @@ import 'package:stager_platform/editors/tree_view.dart';
 import 'package:stager_platform/editors/properties_widget.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/editors/basic_site_controls.dart';
+import 'package:stager_platform/editors/stager_pin.dart';
 
 /// A widget that provides a comprehensive editing interface for the entire site hierarchy.
 ///
@@ -26,16 +27,20 @@ class StagerNavigator extends StatefulWidget {
   /// The SiteControls for building the editor buttons.
   final SiteControls siteControls;
 
+  /// An optional StagerPin widget to pin the navigator.
+  final StagerPin? pin;
+
   /// Creates a site editor widget.
-  const StagerNavigator(
-      {super.key, required this.siteState,
-        this.fileHandler = const BasicFileHandler(),
-        this.siteControls = const BasicSiteControls(),
-      });
+  const StagerNavigator({
+    super.key,
+    required this.siteState,
+    this.fileHandler = const BasicFileHandler(),
+    this.siteControls = const BasicSiteControls(),
+    this.pin,
+  });
 
   @override
   State<StatefulWidget> createState() => _StagerNavigatorState();
-
 }
 
 /// The state for the [StagerNavigator] widget.
@@ -43,12 +48,16 @@ class _StagerNavigatorState extends State<StagerNavigator> {
   late SiteState _siteState;
   late FileHandler _fileHandler;
   LeafNode? _selectedNode;
+  StagerPin? _pin;
+  late SiteControls _siteControls;
 
   @override
   void initState() {
     super.initState();
     _siteState = widget.siteState;
     _fileHandler = widget.fileHandler;
+    _pin = widget.pin;
+    _siteControls = widget.siteControls;
   }
 
   @override
@@ -59,7 +68,8 @@ class _StagerNavigatorState extends State<StagerNavigator> {
       siteState: _siteState,
       fileHandler: _fileHandler,
       selectedNode: _selectedNode,
-      siteControls: widget.siteControls,
+      siteControls: _siteControls,
+      pin: _pin,
     );
 
     // Add an optional pin button handler to the constructor.
