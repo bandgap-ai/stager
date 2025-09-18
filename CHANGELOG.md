@@ -1,3 +1,7 @@
+## 0.0.3
+
+* Added a generic Selection class and observer to manage UI selection state.
+
 ## 0.0.2
 
 * Enhancements to add node editing to the new UI architecture.

@@ -91,6 +91,7 @@ class _StagerNavigatorState extends State<StagerNavigator> {
                 _siteState.selectedNode = node;
               });
               // FIXME! This should take the node, not the siteState, but leaving for now.
+              // This is bad, mkay?
               Scaffold.of(context).showBottomSheet((context) => PropertiesWidget(siteState: _siteState));
             },
           ),
