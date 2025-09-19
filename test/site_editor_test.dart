@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stager_platform/editors/selection.dart';
 import 'package:stager_platform/editors/stager_navigator_header.dart';
 import 'package:stager_platform/editors/tree_view.dart';
 import 'package:stager_platform/site_state.dart';
@@ -9,13 +10,16 @@ import 'package:stager_platform/editors/stager_navigator.dart';
 
 void main() {
   group('Site Editor functions', () {
+
+    final Selection<LeafNode> selection = Selection<LeafNode>();
+
     // Test for the "Add Site" button functionality.
     testWidgets('should display the add site button and open a dialog on tap', (WidgetTester tester) async {
       // Arrange
       final siteState = SiteState();
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: StagerNavigator(siteState: siteState),
+          body: StagerNavigator(siteState: siteState, selection: selection),
         ),
       ));
 
@@ -37,7 +41,7 @@ void main() {
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: StagerNavigator(siteState: siteState),
+          body: StagerNavigator(siteState: siteState, selection: selection),
         ),
       ));
 
@@ -67,7 +71,7 @@ void main() {
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: StagerNavigator(siteState: siteState),
+          body: StagerNavigator(siteState: siteState, selection: selection),
         ),
       ));
 
@@ -95,7 +99,7 @@ void main() {
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: StagerNavigator(siteState: siteState),
+          body: StagerNavigator(siteState: siteState, selection: selection),
         ),
       ));
 

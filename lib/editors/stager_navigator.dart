@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:stager_platform/editors/selection.dart';
 import 'package:stager_platform/editors/site_controls.dart';
 import 'package:stager_platform/site_state.dart';
 import 'package:stager_platform/editors/file_handler.dart';
 import 'package:stager_platform/editors/stager_navigator_header.dart';
 import 'package:stager_platform/editors/tree_view.dart';
-import 'package:stager_platform/editors/properties_widget.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/editors/basic_site_controls.dart';
 import 'package:stager_platform/editors/stager_pin.dart';
@@ -21,6 +21,9 @@ class StagerNavigator extends StatefulWidget {
   /// The state manager for the site data.
   final SiteState siteState;
 
+  /// The Selection handler for the currently selected node
+  final Selection<LeafNode> selection;
+
   /// The handler for file import/export operations.
   final FileHandler fileHandler;
 
@@ -34,6 +37,7 @@ class StagerNavigator extends StatefulWidget {
   const StagerNavigator({
     super.key,
     required this.siteState,
+    required this.selection,
     this.fileHandler = const BasicFileHandler(),
     this.siteControls = const BasicSiteControls(),
     this.pin,
@@ -46,8 +50,8 @@ class StagerNavigator extends StatefulWidget {
 /// The state for the [StagerNavigator] widget.
 class _StagerNavigatorState extends State<StagerNavigator> {
   late SiteState _siteState;
+  late Selection<LeafNode> _selection;
   late FileHandler _fileHandler;
-  LeafNode? _selectedNode;
   StagerPin? _pin;
   late SiteControls _siteControls;
 
@@ -55,6 +59,7 @@ class _StagerNavigatorState extends State<StagerNavigator> {
   void initState() {
     super.initState();
     _siteState = widget.siteState;
+    _selection = widget.selection;
     _fileHandler = widget.fileHandler;
     _pin = widget.pin;
     _siteControls = widget.siteControls;
@@ -67,7 +72,7 @@ class _StagerNavigatorState extends State<StagerNavigator> {
     StagerNavigatorHeader header = StagerNavigatorHeader(
       siteState: _siteState,
       fileHandler: _fileHandler,
-      selectedNode: _selectedNode,
+      selectedNode: _selection.value,
       siteControls: _siteControls,
       pin: _pin,
     );
@@ -81,18 +86,14 @@ class _StagerNavigatorState extends State<StagerNavigator> {
         Expanded(
           child: TreeView(
             sites: _siteState.treeData,
-            selectedNode: _selectedNode,
+            selectedNode: _selection.value,
             onNodeTap: (node) {
               setState(() {
                 // Update the state to force a redraw and update the other
                 // widgets.
-                // Pass the selection to the header for further processing.
-                _selectedNode = node;
+                _selection.value = node;
                 _siteState.selectedNode = node;
               });
-              // FIXME! This should take the node, not the siteState, but leaving for now.
-              // This is bad, mkay?
-              Scaffold.of(context).showBottomSheet((context) => PropertiesWidget(siteState: _siteState));
             },
           ),
         ),
