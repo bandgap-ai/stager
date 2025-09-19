@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/selection.dart';
-import 'package:stager_platform/editors/selection_observer.dart';
 
 import 'mock_selection_observer.dart';
 
