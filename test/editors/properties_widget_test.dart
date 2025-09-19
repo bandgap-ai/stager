@@ -1,32 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/node_properties_view.dart';
+import 'package:stager_platform/editors/selection.dart';
 import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';
-import 'package:stager_platform/site_state.dart';
 import 'package:stager_platform/editors/properties_widget.dart';
+import 'package:stager_platform/tree/leaf_node.dart';
 
 /// Widget tests for the `PropertiesWidget`.
 ///
 /// This file contains a comprehensive set of widget tests for the `PropertiesWidget`,
 /// ensuring its correct rendering, state management, and interaction with the
-/// `SiteState` and other components like `NodePropertiesView` and `ImagePicker`.
+/// `selectedNode` and other components like `NodePropertiesView` and `ImagePicker`.
 /// It covers various scenarios including node selection, tab switching, image
 /// addition, and dialog interactions.
 void main() {
   group('PropertiesWidget', () {
-    late SiteState siteState;
-
-    setUp(() {
-      siteState = SiteState();
-    });
+    Selection<LeafNode> selectedNode = Selection<LeafNode>();
 
     /// Pumps the [PropertiesWidget] into the tester.
     Future<void> pumpWidget(WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PropertiesWidget(siteState: siteState),
+            body: PropertiesWidget(selectedNode: selectedNode),
           ),
         ),
       );
@@ -34,7 +31,7 @@ void main() {
 
     testWidgets('renders nothing when no node is selected', (WidgetTester tester) async {
       // Arrange: Ensure no node is selected
-      siteState.selectedNode = null;
+      selectedNode.value = null;
 
       // Act
       await pumpWidget(tester);
@@ -45,7 +42,7 @@ void main() {
 
     testWidgets('renders BottomSheet with properties when a node is selected', (WidgetTester tester) async {
       // Arrange: Select a node
-      siteState.selectedNode = ConcreteLeafNode(id: '1', name: 'Test Node');
+      selectedNode.value = ConcreteLeafNode(id: '1', name: 'Test Node');
 
       // Act
       await pumpWidget(tester);
@@ -64,7 +61,7 @@ void main() {
 
     testWidgets('onClosing callback clears the selected node', (WidgetTester tester) async {
       // Arrange: Select a node
-      siteState.selectedNode = ConcreteLeafNode(id: '1', name: 'Test Node');
+      selectedNode.value = ConcreteLeafNode(id: '1', name: 'Test Node');
       await pumpWidget(tester);
       await tester.pumpAndSettle();
 
@@ -73,11 +70,11 @@ void main() {
       // Act: Simulate the onClosing event by setting the node to null,
       // which is what the onClosing callback does.
       // A more direct test would require access to the onClosing callback itself.
-      siteState.selectedNode = null;
+      selectedNode.value = null;
       await tester.pumpAndSettle();
 
       // Assert
-      expect(siteState.selectedNode, isNull);
+      expect(selectedNode.value, isNull);
     });
   });
 }

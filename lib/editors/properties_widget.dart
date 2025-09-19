@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/editors/selection.dart';
+import 'package:stager_platform/editors/selection_observer.dart';
 import 'package:stager_platform/editors/stager_tree_viewers.dart';
 import 'package:stager_platform/tree/tree_node.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
@@ -14,17 +15,20 @@ import 'package:stager_platform/editors/node_properties_view.dart';
 /// and to add images to the node.
 class PropertiesWidget extends StatefulWidget {
   /// The state manager for the site data.
-  final SiteState siteState;
+  final Selection<LeafNode> selectedNode;
 
   /// Creates a properties widget.
-  const PropertiesWidget({super.key, required this.siteState});
+  const PropertiesWidget({super.key, required this.selectedNode});
 
   @override
   State<StatefulWidget> createState() => _PropertiesWidgetState();
 }
 
 class _PropertiesWidgetState extends State<PropertiesWidget>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin implements SelectionObserver<LeafNode> {
+  // TickerProviderStateMixin is used to create an animation controller.
+
+  late Selection<LeafNode> selectedNode;
 
   /// Animation controller for the bottom sheet
   AnimationController? _bottomSheetAnimationController;
@@ -36,12 +40,24 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   void initState() {
     super.initState();
     _bottomSheetAnimationController = BottomSheet.createAnimationController(this);
+    // Configure the selection and observe it.
+    selectedNode = widget.selectedNode;
+    selectedNode.attach(this);
   }
 
   @override
   void dispose() {
+    // Detach as an observer of the selection
+    selectedNode.detach(this);
+    // Dispose the animation controller
     _bottomSheetAnimationController?.dispose();
     super.dispose();
+  }
+
+  @override
+  void update(selection) {
+    // Redraw the widget when the selection changes
+    setState(() {});
   }
 
   /// Opens the image picker to select an image from the gallery and adds it
@@ -49,13 +65,12 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   void _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    final selectedNode = widget.siteState.selectedNode;
 
     if (pickedFile != null) {
-      if (selectedNode != null) {
-        final currentImagePaths = (selectedNode.properties.getProperty('imagePaths') as List<String>?) ?? [];
-        selectedNode.properties.setProperty('imagePaths', [...currentImagePaths, pickedFile.path]);
-        widget.siteState.notify();
+      if (selectedNode.value != null) {
+        LeafNode node = selectedNode.value!;
+        final currentImagePaths = (node.properties.getProperty('imagePaths') as List<String>?) ?? [];
+        node.properties.setProperty('imagePaths', [...currentImagePaths, pickedFile.path]);
       }
     }
   }
@@ -188,10 +203,9 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
 
   @override
   Widget build(BuildContext context) {
-    final selectedNode = widget.siteState.selectedNode;
 
     // If no node is selected, show nothing.
-    if (selectedNode == null) {
+    if (selectedNode.value == null) {
       return const SizedBox.shrink();
     }
 
@@ -238,7 +252,7 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
               const SizedBox(height: 16.0),
               // Content area based on selected view
               Expanded(
-                child: _buildSelectedView(selectedNode),
+                child: _buildSelectedView(selectedNode.value!),
               ),
             ],
           ),
@@ -246,4 +260,5 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
       },
     );
   }
+
 }
