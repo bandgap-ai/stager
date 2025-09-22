@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/node_properties_view.dart';
 import 'package:stager_platform/editors/selection.dart';
+import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';
 import 'package:stager_platform/editors/properties_widget.dart';
@@ -16,20 +17,27 @@ import 'package:stager_platform/tree/leaf_node.dart';
 /// addition, and dialog interactions.
 void main() {
   group('PropertiesWidget', () {
-    Selection<LeafNode> selectedNode = Selection<LeafNode>();
+    late Selection<LeafNode> selectedNode;
+
+    setUp(() {
+      selectedNode = Selection<LeafNode>();
+      selectedNode.value = ConcreteLeafNode(id: '1', name: 'Test Node');
+    });
 
     /// Pumps the [PropertiesWidget] into the tester.
-    Future<void> pumpWidget(WidgetTester tester) async {
+    Future<void> pumpWidget(WidgetTester tester, {StagerPin? pin}) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PropertiesWidget(selectedNode: selectedNode),
+            body: PropertiesWidget(selectedNode: selectedNode, pin: pin),
           ),
         ),
       );
     }
 
-    testWidgets('renders nothing when no node is selected', (WidgetTester tester) async {
+    testWidgets('renders nothing when no node is selected', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Ensure no node is selected
       selectedNode.value = null;
 
@@ -40,7 +48,9 @@ void main() {
       expect(find.byType(BottomSheet), findsNothing);
     });
 
-    testWidgets('renders BottomSheet with properties when a node is selected', (WidgetTester tester) async {
+    testWidgets('renders BottomSheet with properties when a node is selected', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Select a node
       selectedNode.value = ConcreteLeafNode(id: '1', name: 'Test Node');
 
@@ -51,15 +61,20 @@ void main() {
       // Assert
       expect(find.byType(BottomSheet), findsOneWidget);
       expect(find.byType(NodePropertiesView), findsOneWidget);
-      expect(find.byWidgetPredicate((widget) => widget is SegmentedButton<String>), findsOneWidget);
-      
+      expect(
+        find.byWidgetPredicate((widget) => widget is SegmentedButton<String>),
+        findsOneWidget,
+      );
+
       // Switch to images tab to find the Add Image button
       await tester.tap(find.byIcon(Icons.image_outlined));
       await tester.pump();
       expect(find.text('Add Image'), findsOneWidget);
     });
 
-    testWidgets('onClosing callback clears the selected node', (WidgetTester tester) async {
+    testWidgets('onClosing callback clears the selected node', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Select a node
       selectedNode.value = ConcreteLeafNode(id: '1', name: 'Test Node');
       await pumpWidget(tester);
@@ -76,5 +91,34 @@ void main() {
       // Assert
       expect(selectedNode.value, isNull);
     });
+
+    testWidgets(
+      'should display pin when provided and call onPinChanged on tap',
+      (WidgetTester tester) async {
+        // Arrange
+        bool callbackCalled = false;
+        final StagerPin pin = StagerPin(
+          initialPinState: false,
+          onPinChanged: (bool isPinned) {
+            callbackCalled = true;
+          },
+        );
+
+        // Act
+        await pumpWidget(tester, pin: pin);
+        await tester.pump();
+
+        // Assert the widget is found
+        final pinFinder = find.byType(StagerPin);
+        expect(pinFinder, findsOneWidget);
+
+        // Tap the pin
+        await tester.tap(pinFinder);
+        await tester.pump();
+
+        // Assert callback is called
+        expect(callbackCalled, isTrue);
+      },
+    );
   });
 }

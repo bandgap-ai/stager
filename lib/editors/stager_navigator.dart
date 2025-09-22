@@ -34,6 +34,12 @@ class StagerNavigator extends StatefulWidget {
   final StagerPin? pin;
 
   /// Creates a site editor widget.
+  ///
+  /// [siteState]: The state manager for the site data.
+  /// [selection]: The Selection handler for the currently selected node
+  /// [fileHandler]: The handler for file import/export operations.
+  /// [siteControls]: The SiteControls for building the editor buttons.
+  /// [pin]: An optional StagerPin widget to pin the navigator.
   const StagerNavigator({
     super.key,
     required this.siteState,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:stager_platform/editors/selection.dart';
 import 'package:stager_platform/editors/selection_observer.dart';
+import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/editors/stager_tree_viewers.dart';
 import 'package:stager_platform/tree/tree_node.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
@@ -17,18 +18,26 @@ class PropertiesWidget extends StatefulWidget {
   /// The state manager for the site data.
   final Selection<LeafNode> selectedNode;
 
+  /// An optional StagerPin widget to pin the navigator.
+  final StagerPin? pin;
+
   /// Creates a properties widget.
-  const PropertiesWidget({super.key, required this.selectedNode});
+  ///
+  /// [selectedNode]: The currently selected node.
+  /// [pin]: An optional StagerPin widget to pin the properties view.
+  const PropertiesWidget({super.key, required this.selectedNode, this.pin});
 
   @override
   State<StatefulWidget> createState() => _PropertiesWidgetState();
 }
 
 class _PropertiesWidgetState extends State<PropertiesWidget>
-    with TickerProviderStateMixin implements SelectionObserver<LeafNode> {
+    with TickerProviderStateMixin
+    implements SelectionObserver<LeafNode> {
   // TickerProviderStateMixin is used to create an animation controller.
 
   late Selection<LeafNode> selectedNode;
+  StagerPin? _pin;
 
   /// Animation controller for the bottom sheet
   AnimationController? _bottomSheetAnimationController;
@@ -39,10 +48,14 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   @override
   void initState() {
     super.initState();
-    _bottomSheetAnimationController = BottomSheet.createAnimationController(this);
+    _bottomSheetAnimationController = BottomSheet.createAnimationController(
+      this,
+    );
     // Configure the selection and observe it.
     selectedNode = widget.selectedNode;
     selectedNode.attach(this);
+    // Configure the pin used to pin the window
+    _pin = widget.pin;
   }
 
   @override
@@ -69,8 +82,12 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     if (pickedFile != null) {
       if (selectedNode.value != null) {
         LeafNode node = selectedNode.value!;
-        final currentImagePaths = (node.properties.getProperty('imagePaths') as List<String>?) ?? [];
-        node.properties.setProperty('imagePaths', [...currentImagePaths, pickedFile.path]);
+        final currentImagePaths =
+            (node.properties.getProperty('imagePaths') as List<String>?) ?? [];
+        node.properties.setProperty('imagePaths', [
+          ...currentImagePaths,
+          pickedFile.path,
+        ]);
       }
     }
   }
@@ -137,8 +154,10 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
 
   /// Builds the images view
   Widget _buildImagesView(LeafNode selectedNode) {
-    final imagePaths = (selectedNode.properties.getProperty('imagePaths') as List<String>?) ?? [];
-    
+    final imagePaths =
+        (selectedNode.properties.getProperty('imagePaths') as List<String>?) ??
+        [];
+
     return Column(
       children: [
         // Add Image Button
@@ -166,9 +185,10 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
                       const SizedBox(height: 16),
                       Text(
                         'No Images',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       const Text(
@@ -189,10 +209,7 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
                   itemBuilder: (context, index) {
                     return Card(
                       clipBehavior: Clip.antiAlias,
-                      child: Image.asset(
-                        imagePaths[index],
-                        fit: BoxFit.cover,
-                      ),
+                      child: Image.asset(imagePaths[index], fit: BoxFit.cover),
                     );
                   },
                 ),
@@ -201,9 +218,43 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     );
   }
 
+  Stack _buildButtonHeader(BuildContext context) {
+    bool pinnable = _pin != null;
+
+    return Stack(
+      children: [
+        Center(
+          child: SegmentedButton<String>(
+            segments: [
+              const ButtonSegment<String>(
+                value: 'properties',
+                icon: Icon(Icons.info_outline),
+              ),
+              ButtonSegment<String>(
+                value: 'summary',
+                icon: const Icon(Icons.analytics_outlined),
+                enabled: selectedNode is TreeNode,
+              ),
+              const ButtonSegment<String>(
+                value: 'images',
+                icon: Icon(Icons.image_outlined),
+              ),
+            ],
+            selected: {_selectedView},
+            onSelectionChanged: (Set<String> newSelection) {
+              setState(() {
+                _selectedView = newSelection.first;
+              });
+            },
+          ),
+        ),
+        if (pinnable) Align(alignment: Alignment.centerRight, child: _pin! ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-
     // If no node is selected, show nothing.
     if (selectedNode.value == null) {
       return const SizedBox.shrink();
@@ -211,7 +262,9 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
 
     // When a node is selected, display its properties in a bottom sheet.
     return BottomSheet(
-      onClosing: () { Navigator.of(context).pop();  },
+      onClosing: () {
+        Navigator.of(context).pop();
+      },
       animationController: _bottomSheetAnimationController!,
       enableDrag: true,
       showDragHandle: true,
@@ -223,42 +276,14 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Segmented Button for view selection
-              Center(
-                child: SegmentedButton<String>(
-                  segments: [
-                    const ButtonSegment<String>(
-                      value: 'properties',
-                      icon: Icon(Icons.info_outline),
-                    ),
-                    ButtonSegment<String>(
-                      value: 'summary',
-                      icon: const Icon(Icons.analytics_outlined),
-                      enabled: selectedNode is TreeNode,
-                    ),
-                    const ButtonSegment<String>(
-                      value: 'images',
-                      icon: Icon(Icons.image_outlined),
-                    ),
-                  ],
-                  selected: {_selectedView},
-                  onSelectionChanged: (Set<String> newSelection) {
-                    setState(() {
-                      _selectedView = newSelection.first;
-                    });
-                  },
-                ),
-              ),
+              _buildButtonHeader(context),
               const SizedBox(height: 16.0),
               // Content area based on selected view
-              Expanded(
-                child: _buildSelectedView(selectedNode.value!),
-              ),
+              Expanded(child: _buildSelectedView(selectedNode.value!)),
             ],
           ),
         );
       },
     );
   }
-
 }
