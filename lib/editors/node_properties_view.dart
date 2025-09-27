@@ -11,7 +11,9 @@ class NodePropertiesView extends StagerEditor<LeafNode> {
   const NodePropertiesView({super.key, required super.state});
 
   @override
-  State<NodePropertiesView> createState() => _NodePropertiesViewState();
+  State<NodePropertiesView> createState() {
+    return _NodePropertiesViewState();
+  }
 }
 
 class _NodePropertiesViewState extends State<NodePropertiesView>
@@ -30,6 +32,8 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
   @override
   void didUpdateWidget(NodePropertiesView oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    properties = widget.state.properties;
     NodeProperties oldProps = oldWidget.state.properties;
     if (properties != oldProps) {
       oldProps.detach(this);
@@ -102,7 +106,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
   /// [properties]: The [NodeProperties] object containing the properties to display.
   Widget _createTableWidget(BuildContext context, NodeProperties properties) {
 
-    final props = properties.map.entries.where((entry) =>
+    final Iterable<MapEntry<String, Object?>> props = properties.map.entries.where((entry) =>
     entry.key != 'id' &&
         entry.key != 'name' &&
         entry.key != 'imagePaths').toList();

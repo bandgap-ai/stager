@@ -93,31 +93,32 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   }
 
   /// Builds the content widget based on the selected view
-  Widget _buildSelectedView(LeafNode selectedNode) {
+  Widget _buildSelectedView(LeafNode node) {
     switch (_selectedView) {
       case 'properties':
-        return _buildPropertiesView(selectedNode);
+        return _buildPropertiesView(node);
       case 'summary':
-        return _buildSummaryView(selectedNode);
+        return _buildSummaryView(node);
       case 'images':
-        return _buildImagesView(selectedNode);
+        return _buildImagesView(node);
       default:
-        return _buildPropertiesView(selectedNode);
+        return _buildPropertiesView(node);
     }
   }
 
   /// Builds the properties view
-  Widget _buildPropertiesView(LeafNode selectedNode) {
+  Widget _buildPropertiesView(LeafNode node) {
+    print('Building properties view for ${node.properties.getProperty('name')}');
     return SingleChildScrollView(
-      child: NodePropertiesView(state: selectedNode),
+        child: NodePropertiesView(state: node),
     );
   }
 
   /// Builds the summary view
-  Widget _buildSummaryView(LeafNode selectedNode) {
-    if (selectedNode is TreeNode) {
+  Widget _buildSummaryView(LeafNode node) {
+    if (node is TreeNode) {
       return SingleChildScrollView(
-        child: NodeSummaryView(summary: selectedNode.summarize()),
+        child: NodeSummaryView(summary: node.summarize()),
       );
     } else {
       return Center(
@@ -153,9 +154,9 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   }
 
   /// Builds the images view
-  Widget _buildImagesView(LeafNode selectedNode) {
+  Widget _buildImagesView(LeafNode node) {
     final imagePaths =
-        (selectedNode.properties.getProperty('imagePaths') as List<String>?) ??
+        (node.properties.getProperty('imagePaths') as List<String>?) ??
         [];
 
     return Column(
