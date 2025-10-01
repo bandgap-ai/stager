@@ -4,6 +4,7 @@ import 'package:stager_platform/editors/selection.dart';
 import 'package:stager_platform/editors/selection_observer.dart';
 import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/editors/stager_tree_viewers.dart';
+import 'package:stager_platform/editors/standard_widgets.dart';
 import 'package:stager_platform/tree/tree_node.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/editors/node_properties_view.dart';
@@ -108,10 +109,10 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
 
   /// Builds the properties view
   Widget _buildPropertiesView(LeafNode node) {
-    print('Building properties view for ${node.properties.getProperty('name')}');
-    return SingleChildScrollView(
-        child: NodePropertiesView(state: node),
+    print(
+      'Building properties view for ${node.properties.getProperty('name')}',
     );
+    return SingleChildScrollView(child: NodePropertiesView(state: node));
   }
 
   /// Builds the summary view
@@ -156,8 +157,7 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   /// Builds the images view
   Widget _buildImagesView(LeafNode node) {
     final imagePaths =
-        (node.properties.getProperty('imagePaths') as List<String>?) ??
-        [];
+        (node.properties.getProperty('imagePaths') as List<String>?) ?? [];
 
     return Column(
       children: [
@@ -249,9 +249,28 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
             },
           ),
         ),
-        if (pinnable) Align(alignment: Alignment.centerRight, child: _pin! ),
+        if (pinnable) Align(alignment: Alignment.centerRight, child: _pin!),
       ],
     );
+  }
+
+  WidgetBuilder _getBottomSheetBuilder() {
+    return (context) {
+      return Container(
+        padding: const EdgeInsets.all(16.0),
+        height: 400, // Fixed height for better testing and UX
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildButtonHeader(context),
+            const SizedBox(height: 16.0),
+            // Content area based on selected view
+            Expanded(child: _buildSelectedView(selectedNode.value!)),
+          ],
+        ),
+      );
+    };
   }
 
   @override
@@ -262,29 +281,6 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     }
 
     // When a node is selected, display its properties in a bottom sheet.
-    return BottomSheet(
-      onClosing: () {
-        Navigator.of(context).pop();
-      },
-      animationController: _bottomSheetAnimationController!,
-      enableDrag: true,
-      showDragHandle: true,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(16.0),
-          height: 400, // Fixed height for better testing and UX
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildButtonHeader(context),
-              const SizedBox(height: 16.0),
-              // Content area based on selected view
-              Expanded(child: _buildSelectedView(selectedNode.value!)),
-            ],
-          ),
-        );
-      },
-    );
+    return buildBottomSheet(context, _getBottomSheetBuilder(), this);
   }
 }

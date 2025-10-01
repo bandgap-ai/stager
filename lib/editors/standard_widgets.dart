@@ -157,6 +157,28 @@ Widget buildInfoLabel(BuildContext context, String info) {
   );
 }
 
+/// Builds a bottom sheet containing the enclosed widget. The bottom sheet calls
+/// Navigator.of(context).pop() when the sheet is closed.
+///
+/// [context] is the context for the dialog.
+/// [childBuilder] a builder for the widget to be displayed in the bottom sheet.
+/// [vsync] is an optional TickerProvider for the animation controller.
+Widget buildBottomSheet(BuildContext context, WidgetBuilder childBuilder,
+    TickerProvider? vsync) {
+  return BottomSheet(
+      onClosing: () {
+        Navigator.of(context).pop();
+      },
+      animationController: (vsync != null) ? BottomSheet.createAnimationController(vsync) : null,
+      enableDrag: true,
+      showDragHandle: true,
+      builder: childBuilder,
+  );
+
+}
+
+// ----- These methods will be removed from Stager in a future release. -----
+
 /// Builds the position method widget for the dialog. The selectedOption
 /// parameter is updated in place.
 ///
