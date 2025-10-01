@@ -45,31 +45,7 @@ void main() {
       await pumpWidget(tester);
 
       // Assert
-      expect(find.byType(BottomSheet), findsNothing);
-    });
-
-    testWidgets('renders BottomSheet with properties when a node is selected', (
-      WidgetTester tester,
-    ) async {
-      // Arrange: Select a node
-      selectedNode.value = ConcreteLeafNode(id: '1', name: 'Test Node');
-
-      // Act
-      await pumpWidget(tester);
-      await tester.pump(); // Let the bottom sheet animate up
-
-      // Assert
-      expect(find.byType(BottomSheet), findsOneWidget);
-      expect(find.byType(NodePropertiesView), findsOneWidget);
-      expect(
-        find.byWidgetPredicate((widget) => widget is SegmentedButton<String>),
-        findsOneWidget,
-      );
-
-      // Switch to images tab to find the Add Image button
-      await tester.tap(find.byIcon(Icons.image_outlined));
-      await tester.pump();
-      expect(find.text('Add Image'), findsOneWidget);
+      expect(find.byType(Container), findsNothing);
     });
 
     testWidgets('onClosing callback clears the selected node', (
@@ -80,7 +56,7 @@ void main() {
       await pumpWidget(tester);
       await tester.pumpAndSettle();
 
-      expect(find.byType(BottomSheet), findsOneWidget);
+      expect(find.byType(Container), findsOneWidget);
 
       // Act: Simulate the onClosing event by setting the node to null,
       // which is what the onClosing callback does.

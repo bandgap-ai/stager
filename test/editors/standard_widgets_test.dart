@@ -2,9 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:stager_platform/editors/node_properties_view.dart';
+import 'package:stager_platform/editors/properties_widget.dart';
+import 'package:stager_platform/editors/selection.dart';
+import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/editors/standard_widgets.dart';
 import 'package:stager_platform/editors/single_point_map_editor.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:stager_platform/tree/concrete_leaf_node.dart';
+import 'package:stager_platform/tree/leaf_node.dart';
 
 class MockTileProvider extends TileProvider {
   @override
@@ -460,6 +466,66 @@ void main() {
           });
     });
 
+    group('buildBottomSheet', () {
+
+      Selection<LeafNode> selectedNode = Selection<LeafNode>();
+
+      WidgetBuilder _getPropertiesWidgetBuilder(PropertiesWidget widget) {
+        return (BuildContext context) {
+          return widget;
+        };
+      }
+
+      /// Pumps the [PropertiesWidget] into the tester.
+      Future<void> pumpPropertiesWidget(WidgetTester tester, {StagerPin? pin}) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Builder(
+                  builder: (BuildContext context) {
+                    // Create the widget for the test
+                    PropertiesWidget propertiesWidget = PropertiesWidget(
+                      selectedNode: selectedNode,
+                      pin: pin,
+                    );
+                    // Build the bottom sheet that will actually be tested
+                    return buildBottomSheet(context, _getPropertiesWidgetBuilder(propertiesWidget), null);
+                  },
+              ),
+            ),
+          )
+        );
+      }
+
+      testWidgets('renders BottomSheet with properties when a node is selected', (
+          WidgetTester tester,
+          ) async {
+
+        // This is an older test taken from properties_widget_test.dart when
+        // the PropertiesWidget directly returned a bottom sheet.
+
+        // Arrange: Select a node
+        selectedNode.value = ConcreteLeafNode(id: '1', name: 'Test Node');
+
+        // Act
+        await pumpPropertiesWidget(tester);
+        await tester.pump(); // Let the bottom sheet animate up
+
+        // Assert
+        expect(find.byType(BottomSheet), findsOneWidget);
+        expect(find.byType(NodePropertiesView), findsOneWidget);
+        expect(
+          find.byWidgetPredicate((widget) => widget is SegmentedButton<String>),
+          findsOneWidget,
+        );
+
+        // Switch to images tab to find the Add Image button
+        await tester.tap(find.byIcon(Icons.image_outlined));
+        await tester.pump();
+        expect(find.text('Add Image'), findsOneWidget);
+      });
+    });
+
     group('buildEditAndSubmitDialog', () {
       const String dialogTitle = 'Edit Value';
       const String inputLabel = 'Enter value:'; // Using your parameter name
@@ -576,18 +642,8 @@ void main() {
             expect(saveCalled, isTrue, reason: "Save callback should have been called");
             expect(cancelCalled, isFalse, reason: "Cancel callback should NOT have been called");
             expect(find.byType(AlertDialog), findsNothing);
-            // The actual saving of testController.text would happen within the save callback,
-            // which is external to the dialog's direct responsibility in this design.
-            // We've verified the callback is called and the controller has the correct value.
           });
-
-      // Optional: Test if save/cancel callbacks are NOT called if dialog is dismissed externally
-      // (e.g., if barrierDismissible were true and user tapped outside)
-      // This depends on whether you want to allow barrier dismissal and what should happen.
-      // If barrierDismissible is false (as in the helper now), this test isn't relevant.
-
     });
-
   });
 }
 

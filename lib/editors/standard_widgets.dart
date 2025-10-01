@@ -166,6 +166,7 @@ Widget buildInfoLabel(BuildContext context, String info) {
 Widget buildBottomSheet(BuildContext context, WidgetBuilder childBuilder,
     TickerProvider? vsync) {
   return BottomSheet(
+      // It might be worth externalizing the onClosing callback in the future.
       onClosing: () {
         Navigator.of(context).pop();
       },

@@ -254,25 +254,6 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     );
   }
 
-  WidgetBuilder _getBottomSheetBuilder() {
-    return (context) {
-      return Container(
-        padding: const EdgeInsets.all(16.0),
-        height: 400, // Fixed height for better testing and UX
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildButtonHeader(context),
-            const SizedBox(height: 16.0),
-            // Content area based on selected view
-            Expanded(child: _buildSelectedView(selectedNode.value!)),
-          ],
-        ),
-      );
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
     // If no node is selected, show nothing.
@@ -280,7 +261,19 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
       return const SizedBox.shrink();
     }
 
-    // When a node is selected, display its properties in a bottom sheet.
-    return buildBottomSheet(context, _getBottomSheetBuilder(), this);
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      height: 400, // Fixed height for better testing and UX
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildButtonHeader(context),
+          const SizedBox(height: 16.0),
+          // Content area based on selected view
+          Expanded(child: _buildSelectedView(selectedNode.value!)),
+        ],
+      ),
+    );
   }
 }
