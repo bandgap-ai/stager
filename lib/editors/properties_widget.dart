@@ -4,7 +4,6 @@ import 'package:stager_platform/editors/selection.dart';
 import 'package:stager_platform/editors/selection_observer.dart';
 import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/editors/stager_tree_viewers.dart';
-import 'package:stager_platform/editors/standard_widgets.dart';
 import 'package:stager_platform/tree/tree_node.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/editors/node_properties_view.dart';
