@@ -43,8 +43,9 @@ class _StagerPinState extends State<StagerPin> {
   void _flipPin() {
     setState(() {
       _isPinned = !_isPinned;
+      widget.onPinChanged(_isPinned);
     });
-    widget.onPinChanged(_isPinned);
+
   }
 
   @override

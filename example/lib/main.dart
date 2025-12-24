@@ -23,12 +23,12 @@ class UITestRigApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Stager UI Test Rig',
+      title: 'Stager Platform Example',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      home: const UITestRigHomePage(title: 'Stager UI Test Rig Home Page'),
+      home: const UITestRigHomePage(title: 'Stager Platform Example'),
     );
   }
 }

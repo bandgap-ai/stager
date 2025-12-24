@@ -109,9 +109,6 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
 
   /// Builds the properties view
   Widget _buildPropertiesView(LeafNode node) {
-    print(
-      'Building properties view for ${node.properties.getProperty('name')}',
-    );
     return SingleChildScrollView(child: NodePropertiesView(state: node));
   }
 
