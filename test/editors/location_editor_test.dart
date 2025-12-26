@@ -1,0 +1,62 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:stager_platform/editors/location_editor.dart';
+import '../providers/mock_location_provider.dart';
+
+void main() {
+  group('LocationEditor', () {
+    late MockLocationProvider mockLocationProvider;
+
+    setUp(() {
+      mockLocationProvider = MockLocationProvider();
+    });
+
+    testWidgets('Should update location when button is pressed', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LocationEditor(locationProvider: mockLocationProvider),
+          ),
+        ),
+      );
+
+      // Find the button and tap it
+      await tester.tap(find.text('Get my location'));
+      await tester.pumpAndSettle();
+
+      // Check if the text fields are updated by inspecting their controllers.
+      final latitudeField = tester.widget<TextField>(find.ancestor(
+        of: find.text('Latitude:'),
+        matching: find.byType(TextField),
+      ));
+      expect(latitudeField.controller!.text, '42.0');
+
+      final longitudeField = tester.widget<TextField>(find.ancestor(
+        of: find.text('Longitude:'),
+        matching: find.byType(TextField),
+      ));
+      expect(longitudeField.controller!.text, '-42.0');
+    });
+
+    testWidgets('Should show snackbar when location services are disabled', (WidgetTester tester) async {
+      // Configure the mock to simulate disabled location services
+      mockLocationProvider.isServiceEnabled = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LocationEditor(locationProvider: mockLocationProvider),
+          ),
+        ),
+      );
+
+      // Find the button and tap it
+      await tester.tap(find.text('Get my location'));
+      await tester.pump(); // pumpAndSettle will wait forever for the snackbar
+
+      // Check if the snackbar is shown with the correct message
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text('Location services are disabled.'), findsOneWidget);
+    });
+  });
+}

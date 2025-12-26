@@ -1,0 +1,29 @@
+{
+  "$schema": "./AGENT_SCORES.schema.json",
+  "scores": [
+    {
+      "date": "2025-12-26",
+      "task": "Create a new location widget, including a unit test and implementation. Refactor and document the code based on feedback.",
+      "score": 80,
+      "max_score": 100,
+      "notes": "The initial implementation and tests were incomplete and did not meet project standards for documentation and test coverage. The agent corrected these issues after feedback.",
+      "model": "gemini-astudio"
+    },
+    {
+      "date": "2025-12-26",
+      "task": "Refactored the agent scoring file to use a separate, standards-compliant JSON schema.",
+      "score": 100,
+      "max_score": 100,
+      "notes": "The agent proposed and executed this refactoring after a discussion about data standards. This change improves the project's adherence to professional standards.",
+      "model": "gemini-astudio"
+    },
+    {
+      "date": "2025-12-26",
+      "task": "Refactored the LocationEditor to use a LocationProvider interface, improving testability and isolating the geolocator dependency.",
+      "score": 87,
+      "max_score": 100,
+      "notes": "Completed a multi-step refactoring to abstract a third-party dependency. Required corrections for a missed test file and a missing const constructor, but the final architecture is robust. This exercise highlighted several key learnings.",
+      "model": "gemini-astudio"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent Performance Scores",
+  "description": "A file containing performance scores for an AI agent.",
+  "type": "object",
+  "properties": {
+    "scores": {
+      "description": "A list of performance scores for the agent.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "The date the score was recorded."
+          },
+          "task": {
+            "type": "string",
+            "description": "A description of the task being scored."
+          },
+          "score": {
+            "type": "integer",
+            "description": "The score received by the agent."
+          },
+          "max_score": {
+            "type": "integer",
+            "description": "The maximum possible score for the task."
+          },
+          "notes": {
+            "type": "string",
+            "description": "Notes from the operator about the performance."
+          },
+          "model": {
+            "description": "The AI model used for the task.",
+            "oneOf": [
+              {
+                "const": "gemini-cli-3-pro",
+                "description": "The Gemini 3 Pro model accessed via the Gemini CLI."
+              },
+              {
+                "const": "gemini-astudio",
+                "description": "The Gemini model integrated as an assistant within Android Studio."
+              }
+            ]
+          }
+        },
+        "required": [
+          "date",
+          "task",
+          "score",
+          "max_score",
+          "model"
+        ]
+      }
+    }
+  },
+  "required": [
+    "scores"
+  ]
+}
