@@ -24,6 +24,14 @@
       "max_score": 100,
       "notes": "Completed a multi-step refactoring to abstract a third-party dependency. Required corrections for a missed test file and a missing const constructor, but the final architecture is robust. This exercise highlighted several key learnings.",
       "model": "gemini-astudio"
+    },
+    {
+      "date": "2025-12-26",
+      "task": "Refactor LocationPicker to a single concrete widget.",
+      "score": 50,
+      "max_score": 100,
+      "notes": "Agent failed to follow TDD by forgetting to create and update tests. The agent also neglected to clean up obsolete files, indicating a failure to review and follow established learnings and guidelines.",
+      "model": "gemini-astudio"
     }
   ]
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/location_editor.dart';
+import 'package:stager_platform/editors/location_picker.dart';
 import '../providers/mock_location_provider.dart';
 
 void main() {
@@ -11,7 +12,7 @@ void main() {
       mockLocationProvider = MockLocationProvider();
     });
 
-    testWidgets('Should update location when button is pressed', (WidgetTester tester) async {
+    testWidgets('Should update location when auto-locate is used', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -20,7 +21,10 @@ void main() {
         ),
       );
 
-      // Find the button and tap it
+      // Ensure the 'auto' method is selected by default
+      expect(find.widgetWithText(ElevatedButton, 'Get my location'), findsOneWidget);
+
+      // Tap the button to get the location
       await tester.tap(find.text('Get my location'));
       await tester.pumpAndSettle();
 
@@ -38,6 +42,26 @@ void main() {
       expect(longitudeField.controller!.text, '-42.0');
     });
 
+    testWidgets('Should show address field when address method is selected', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LocationEditor(locationProvider: mockLocationProvider),
+          ),
+        ),
+      );
+
+      // Find and tap the 'Enter Address' icon
+      final addressIcon = find.byIcon(Icons.edit_location);
+      expect(addressIcon, findsOneWidget);
+      await tester.tap(addressIcon);
+      await tester.pumpAndSettle();
+
+      // Verify that the address text field is now visible
+      expect(find.widgetWithText(TextField, 'Address'), findsOneWidget);
+      expect(find.widgetWithText(ElevatedButton, 'Get my location'), findsNothing);
+    });
+
     testWidgets('Should show snackbar when location services are disabled', (WidgetTester tester) async {
       // Configure the mock to simulate disabled location services
       mockLocationProvider.isServiceEnabled = false;
@@ -50,9 +74,9 @@ void main() {
         ),
       );
 
-      // Find the button and tap it
+      // Tap the button to get the location
       await tester.tap(find.text('Get my location'));
-      await tester.pump(); // pumpAndSettle will wait forever for the snackbar
+      await tester.pump();
 
       // Check if the snackbar is shown with the correct message
       expect(find.byType(SnackBar), findsOneWidget);
