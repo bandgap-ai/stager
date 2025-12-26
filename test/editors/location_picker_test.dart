@@ -5,14 +5,13 @@ import 'package:stager_platform/editors/location_picker.dart';
 void main() {
   group('LocationPicker', () {
     testWidgets('Should build with the correct default selection', (WidgetTester tester) async {
-      LocationPickerMethod? selectedMethod;
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: LocationPicker(
               onSelectionChanged: (LocationPickerMethod method) {
-                selectedMethod = method;
+                // Nothing to do.
               },
             ),
           ),
