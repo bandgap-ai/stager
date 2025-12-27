@@ -41,6 +41,54 @@ class _LocationPickerState extends State<LocationPicker> {
     _selection = {widget.initialSelection};
   }
 
+  /// This function builds the 3-piece segmented button that is displayed to the
+  /// user to allow them to automatically measure their position, pick one from
+  /// a map, or enter an address. Note this doesn't have to be limited to
+  /// real-world locations.
+  SegmentedButton<LocationPickerMethod> _buildSegmentedButton(BuildContext context) {
+
+    // Define the three button segments. The first is the hardware location
+    // option.
+    const locateMeButtonSegment = ButtonSegment<LocationPickerMethod>(
+      value: LocationPickerMethod.auto,
+      icon: Tooltip(message: 'Locate Me', child: Icon(Icons.my_location)),
+    );
+    // The second allows the user to pick from a map.
+    const pickFromMapButtonSegment = ButtonSegment<LocationPickerMethod>(
+      value: LocationPickerMethod.map,
+      icon: Tooltip(message: 'Pick from Map', child: Icon(Icons.pin_drop)),
+    );
+    // The third allows the user to manually specify an address. Note this isn't
+    // restricted here to a physical address.
+    const enterAddressButtonSegment = ButtonSegment<LocationPickerMethod>(
+      value: LocationPickerMethod.address,
+      icon: Tooltip(message: 'Enter Address', child: Icon(Icons.edit_location)),
+    );
+
+    // Assemble the segments into the parent button and configure the callback.
+    final segmentedButton = SegmentedButton<LocationPickerMethod>(
+      segments: const <ButtonSegment<LocationPickerMethod>>[
+        locateMeButtonSegment,
+        pickFromMapButtonSegment,
+        enterAddressButtonSegment,
+      ],
+      selected: _selection,
+      onSelectionChanged: (Set<LocationPickerMethod> newSelection) {
+        // Only process the selection if it is not empty
+        if (newSelection.isNotEmpty) {
+          setState(() {
+            _selection = newSelection;
+          });
+          // SegementedButtons support multiple selections, but we only
+          // want the first.
+          widget.onSelectionChanged(newSelection.first);
+        }
+      },
+    );
+
+    return segmentedButton;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -48,35 +96,10 @@ class _LocationPickerState extends State<LocationPicker> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SegmentedButton<LocationPickerMethod>(
-            segments: const <ButtonSegment<LocationPickerMethod>>[
-              ButtonSegment<LocationPickerMethod>(
-                value: LocationPickerMethod.auto,
-                icon: Tooltip(message: 'Locate Me', child: Icon(Icons.my_location)),
-              ),
-              ButtonSegment<LocationPickerMethod>(
-                value: LocationPickerMethod.map,
-                icon: Tooltip(message: 'Pick from Map', child: Icon(Icons.pin_drop)),
-              ),
-              ButtonSegment<LocationPickerMethod>(
-                value: LocationPickerMethod.address,
-                icon: Tooltip(message: 'Enter Address', child: Icon(Icons.edit_location)),
-              ),
-            ],
-            selected: _selection,
-            onSelectionChanged: (Set<LocationPickerMethod> newSelection) {
-              // A SegmentedButton can be configured to allow multiple or empty
-              // selections. This implementation enforces a single selection.
-              if (newSelection.isNotEmpty) {
-                setState(() {
-                  _selection = newSelection;
-                });
-                widget.onSelectionChanged(newSelection.first);
-              }
-            },
-          ),
+          _buildSegmentedButton(context),
         ],
       ),
     );
   }
+
 }

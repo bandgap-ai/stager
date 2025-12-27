@@ -4,6 +4,7 @@ import 'package:stager_platform/editors/standard_widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:stager_platform/providers/geolocator_location_provider.dart';
 import 'package:stager_platform/providers/location_provider.dart';
+import 'package:logger/logger.dart';
 
 /// An editor widget for selecting a location.
 ///
@@ -12,17 +13,24 @@ import 'package:stager_platform/providers/location_provider.dart';
 /// - Fetching the device's current location.
 /// - Manually entering an address.
 class LocationEditor extends StatefulWidget {
+
   /// The provider used to fetch location data.
   final LocationProvider locationProvider;
+
+  /// The logger for capturing events and errors.
+  final Logger? logger;
 
   /// Creates a [LocationEditor] widget.
   ///
   /// An optional [locationProvider] can be supplied for testing or to customize
   /// location data fetching. If not provided, it defaults to an instance of
   /// [GeolocatorLocationProvider].
+  ///
+  /// An optional [logger] can be supplied for testing.
   const LocationEditor({
     super.key,
     this.locationProvider = const GeolocatorLocationProvider(),
+    this.logger,
   });
 
   @override
@@ -30,8 +38,19 @@ class LocationEditor extends StatefulWidget {
 }
 
 class _LocationEditorState extends State<LocationEditor> {
+
+  late final Logger log;
+
+  @override
+  void initState() {
+    super.initState();
+    log = widget.logger ?? Logger();
+  }
+
   /// The currently selected method for picking a location.
   LocationPickerMethod _selectedMethod = LocationPickerMethod.auto;
+
+  //---- Update defaults to Sky Meadows coordinates
 
   /// Controls the text field for latitude.
   final TextEditingController latitudeController = TextEditingController(text: '38.926241');
@@ -40,24 +59,23 @@ class _LocationEditorState extends State<LocationEditor> {
   final TextEditingController longitudeController = TextEditingController(text: '-77.932909');
 
   /// Controls the text field for the address.
-  final TextEditingController addressController = TextEditingController();
+  final TextEditingController addressController = TextEditingController(
+    text: '221B Baker Street, London'
+  );
 
   /// Fetches the current location and updates the UI.
   ///
-  /// On failure, it displays an error message in a [SnackBar].
+  /// On failure, it logs the error.
   Future<void> _handleGetLocation() async {
     try {
-      final position = await _determinePosition();
+      final position = await _samplePosition();
       setState(() {
         latitudeController.text = position.latitude.toString();
         longitudeController.text = position.longitude.toString();
       });
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
-      }
+      // Log the error for now, but might need to do more to help the user.
+      log.log(Level.error,e.toString());
     }
   }
 
@@ -68,7 +86,7 @@ class _LocationEditorState extends State<LocationEditor> {
   ///
   /// When the location services are not enabled or permissions
   /// are denied the `Future` will return an error.
-  Future<Position> _determinePosition() async {
+  Future<Position> _samplePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -111,6 +129,9 @@ class _LocationEditorState extends State<LocationEditor> {
 
   @override
   Widget build(BuildContext context) {
+    // This creates a column widget with the base coordinates at the top,
+    // followed by a selector widget, and an action panel where picker widgets
+    // can be drawn for the selected method.
     return Column(
       children: [
         buildGeoCoordEditor(context, latitudeController, longitudeController),

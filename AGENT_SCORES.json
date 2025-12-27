@@ -32,6 +32,14 @@
       "max_score": 100,
       "notes": "Agent failed to follow TDD by forgetting to create and update tests. The agent also neglected to clean up obsolete files, indicating a failure to review and follow established learnings and guidelines.",
       "model": "gemini-astudio"
+    },
+    {
+      "date": "2025-12-27",
+      "task": "Refactored the LocationEditor to make logging testable and updated the corresponding unit test.",
+      "score": 100,
+      "max_score": 100,
+      "notes": "Correctly identified that the Logger needed to be injectable to test logging behavior. Proposed and implemented a solution using dependency injection and a `MemoryOutput` in the unit test, following best practices for testability.",
+      "model": "gemini-astudio"
     }
   ]
 }

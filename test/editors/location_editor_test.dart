@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/location_editor.dart';
 import '../providers/mock_location_provider.dart';
+import 'package:logger/logger.dart';
 
 void main() {
   group('LocationEditor', () {
@@ -61,25 +62,33 @@ void main() {
       expect(find.widgetWithText(ElevatedButton, 'Get my location'), findsNothing);
     });
 
-    testWidgets('Should show snackbar when location services are disabled', (WidgetTester tester) async {
-      // Configure the mock to simulate disabled location services
+    testWidgets('Should log an error when location services are disabled', (WidgetTester tester) async {
+      //
+      final memoryOutput = MemoryOutput();
+      final testLogger = Logger(output: memoryOutput);
+
+      // Arrange: Configure the mock to simulate disabled location services.
       mockLocationProvider.isServiceEnabled = false;
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: LocationEditor(locationProvider: mockLocationProvider),
+            body: LocationEditor(
+              locationProvider: mockLocationProvider,
+              logger: testLogger,
+            ),
           ),
         ),
       );
 
-      // Tap the button to get the location
+      // Act: Tap the button to trigger the location fetch.
       await tester.tap(find.text('Get my location'));
       await tester.pump();
 
-      // Check if the snackbar is shown with the correct message
-      expect(find.byType(SnackBar), findsOneWidget);
-      expect(find.text('Location services are disabled.'), findsOneWidget);
+      // Assert: Verify that the correct error message was logged.
+      expect(memoryOutput.buffer.length, 1);
+      expect(memoryOutput.buffer.first.level, Level.error);
+      expect(memoryOutput.buffer.first.lines[4].contains('Location services are disabled.'), isTrue);
     });
   });
 }
