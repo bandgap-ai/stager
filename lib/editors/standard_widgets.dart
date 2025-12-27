@@ -271,10 +271,10 @@ Widget buildGeoCoordEditor(BuildContext context,
             child: Column(
                 children: [
                   buildTextFieldEditor(context, latitudeController,
-                      'Latitude:', 'e.g., 40.7128'),
+                      'Latitude:', 'e.g., 40.8624'),
                   const SizedBox(height: 8),
                   buildTextFieldEditor(context, longitudeController,
-                      'Longitude:', 'e.g., -74.0060'),
+                      'Longitude:', 'e.g., -73.8774'),
                 ]
             )
         )

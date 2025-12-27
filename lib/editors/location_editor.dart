@@ -50,17 +50,15 @@ class _LocationEditorState extends State<LocationEditor> {
   /// The currently selected method for picking a location.
   LocationPickerMethod _selectedMethod = LocationPickerMethod.auto;
 
-  //---- Update defaults to Sky Meadows coordinates
-
   /// Controls the text field for latitude.
-  final TextEditingController latitudeController = TextEditingController(text: '38.926241');
+  final TextEditingController latitudeController = TextEditingController(text: '40.8624');
 
   /// Controls the text field for longitude.
-  final TextEditingController longitudeController = TextEditingController(text: '-77.932909');
+  final TextEditingController longitudeController = TextEditingController(text: '-73.8774');
 
   /// Controls the text field for the address.
   final TextEditingController addressController = TextEditingController(
-    text: '221B Baker Street, London'
+    text: 'New York Botanical Garden'
   );
 
   /// Fetches the current location and updates the UI.

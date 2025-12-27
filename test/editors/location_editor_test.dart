@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/location_editor.dart';
-import '../providers/mock_location_provider.dart';
 import 'package:logger/logger.dart';
+// Test dependency
+import 'mock_location_provider.dart';
 
 void main() {
   group('LocationEditor', () {
