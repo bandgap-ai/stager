@@ -87,36 +87,60 @@ class _LocationEditorState extends State<LocationEditor> {
   Future<Position> _samplePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
+    late Future<Position> position;
 
     serviceEnabled = await widget.locationProvider.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await widget.locationProvider.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await widget.locationProvider.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
+    if (serviceEnabled) {
+      // Check permissions.
+      permission = await widget.locationProvider.checkPermission();
+      // This strikes me as a less than optimal way to handle a request for
+      // permissions, but it is in the official example from BaseFlow. So, I'm
+      // going with it.
+      if (permission != LocationPermission.denied) {
+        position = widget.locationProvider.getCurrentPosition();
+      } else if (permission == LocationPermission.denied) {
+        permission = await widget.locationProvider.requestPermission();
+        if (permission != LocationPermission.denied) {
+          position = widget.locationProvider.getCurrentPosition();
+        } else {
+          position = Future.error('The user declined to grant permission to use '
+              'location services.');
+        }
+      } else if (permission == LocationPermission.deniedForever) {
+        // Complain if the user has blocked the services forever.
+        position = Future.error(
+            'The user has permanently denied access to location services for '
+                'this application, and we cannot request access to or use the '
+                'services.');
       }
+    } else {
+      position = Future.error('Location services are disabled.');
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
+    // At the "expense" of a second future, this will automatically return the
+    // disabled error message without branching.
+    return position;
+  }
 
-    return await widget.locationProvider.getCurrentPosition();
+  /// This function builds the panel of widgets used for auto-detecting the
+  /// user's location.
+  Widget _buildAutoLocatorPanel(BuildContext context) {
+    return Column(
+      children: [const Text('We respect your privacy. Please press the button '
+          'below to determine your location automatically with location '
+          'services. You may be asked by your device to grant permission.'),
+        ElevatedButton(
+        onPressed: _handleGetLocation,
+        child: const Text('Get my location'),
+      )]
+    );
   }
 
   /// Builds the panel with the action widgets based on the selected method.
   Widget _buildActionPanel() {
     switch (_selectedMethod) {
       case LocationPickerMethod.auto:
-        return ElevatedButton(
-          onPressed: _handleGetLocation,
-          child: const Text('Get my location'),
-        );
+        return _buildAutoLocatorPanel(context);
       case LocationPickerMethod.map:
         // Placeholder for map picker functionality
         return const Center(child: Text('Map picker not implemented.'));

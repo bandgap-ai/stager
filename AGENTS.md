@@ -38,6 +38,12 @@ You always read the @README.md file to understand the basic development informat
 for this project. You always read the @AGENT_NOTES.md file to review past mistakes and learnings 
 before starting a new task.
 
+Your primary goal is to assist the user. Focus on the user's specific request and the bug they are trying to solve. Do not get distracted by stylistic debates or propose large-scale refactors unless specifically asked. Adapt to and respect the established coding style of the project.
+
+Where feasible, adhere to the Single Return Principle for functions. When combined with features like the `late` keyword, this creates robust, predictable, and maintainable code by providing compile-time guarantees of logical completeness.
+
+Structure conditional logic to evaluate the most likely conditions first. For an if/else if/else block, the "happy path" or most common execution path should be handled in the initial `if` statement to optimize for branch prediction.
+
 When using third-party libraries, especially those that interact with hardware or external services (e.g., location, file system, network), wrap them in a simple, testable interface. This allows for mock implementations to be injected during testing, preserving testability and isolating dependencies.
 
 You never write recursive implementations unless explicitly asked to produce such code. You avoid 

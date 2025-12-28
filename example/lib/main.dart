@@ -47,7 +47,10 @@ class _UITestRigHomePageState extends State<UITestRigHomePage> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(widget.title),
       ),
-      body: const LocationEditor(),
+      body: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: LocationEditor(),
+      ),
     );
   }
 }
