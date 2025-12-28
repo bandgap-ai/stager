@@ -4,7 +4,7 @@ import 'package:geolocator/geolocator.dart';
 ///
 /// This abstraction allows for swapping out the underlying location provider,
 /// which is essential for creating testable widgets that depend on location
-/// data.
+/// data or enabling different location services.
 abstract class LocationProvider {
   /// Returns a [Future] containing a [bool] indicating whether location
   /// services are enabled on the device.
