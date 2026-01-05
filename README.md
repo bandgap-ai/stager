@@ -1,6 +1,6 @@
 # The Stager Platform
-[![pipeline status](https://gitlab.com/bandgap/stager/badges/main/pipeline.svg)](https://gitlab.com/bandgap/stager/-/commits/main)
-[![coverage report](https://gitlab.com/bandgap/stager/badges/main/coverage.svg)](https://gitlab.com/bandgap/stager/-/commits/main)
+[![pipeline status](https://gitlab.com/bandgap/stager-platform/stager/badges/main/pipeline.svg)](https://gitlab.com/bandgap/stager-platform/stager/-/commits/main)
+[![coverage report](https://gitlab.com/bandgap/stager-platform/stager/badges/main/coverage.svg)](https://gitlab.com/bandgap/stager-platform/stager/-/commits/main)
 
 ## Stager Widgets vs Editors
 
