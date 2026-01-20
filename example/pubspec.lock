@@ -724,6 +724,30 @@ packages:
       relative: true
     source: path
     version: "0.0.2"
+  stager_platform_native_plugins:
+    dependency: transitive
+    description:
+      name: stager_platform_native_plugins
+      sha256: "74571a20467bcbb89d038422152d3f46f6c5b31d55b69505daa50486f64718e2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
+  stager_platform_native_plugins_linux:
+    dependency: transitive
+    description:
+      name: stager_platform_native_plugins_linux
+      sha256: "1374589b0db5de88cb1b0c76d23bee72fe72ce35e9234e8a4b41bd3538cfb82f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
+  stager_platform_native_plugins_platform_interface:
+    dependency: transitive
+    description:
+      name: stager_platform_native_plugins_platform_interface
+      sha256: "21d399f88532b129601bfb97c5426de11665626f38d12d535f6bd8c447a9447b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   stream_channel:
     dependency: transitive
     description:

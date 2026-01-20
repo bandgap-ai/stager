@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_linux
+  stager_platform_native_plugins_linux
   url_launcher_linux
 )
 

@@ -12,7 +12,7 @@ import 'package:latlong2/latlong.dart';
 const int _kOrangePrimaryARGBValue = 0xFFFF9800; // Value of Colors.orange (shade 500)
 const int _kRedPrimaryARGBValue = 0xFFF44336;     // Value of Colors.red (shade 500)
 
-// These are now true compile-time constants, declared at the top level
+// These are now true compile-time system, declared at the top level
 const Color orangeWithOpacity = Color.fromRGBO(
     (_kOrangePrimaryARGBValue >> 16) & 0xFF, // Extract Red from ARGB
     (_kOrangePrimaryARGBValue >> 8) & 0xFF,  // Extract Green from ARGB

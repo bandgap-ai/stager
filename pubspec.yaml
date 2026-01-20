@@ -11,6 +11,11 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Stager's Native Plugins
+  stager_platform_native_plugins_platform_interface: ^0.0.1
+  stager_platform_native_plugins_linux: ^0.0.1
+  stager_platform_native_plugins: ^0.0.1
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -45,6 +50,10 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+
+  # Grab the assets directory to include all the files Stager needs.
+  assets:
+    - assets/schemas/kml/2.2.0/
 
   uses-material-design: true
   # To add assets to your package, add an assets section, like this:
