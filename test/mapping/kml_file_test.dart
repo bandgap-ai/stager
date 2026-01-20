@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/mapping/kml_file.dart';
 import '../helpers/kml_mock.dart';
