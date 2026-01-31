@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/mapping/kml_file.dart';
+import 'package:stager_platform/mapping/nodes/kml_tree_root_node.dart';
 import '../helpers/kml_mock.dart';
 
 void main() {
@@ -53,13 +54,13 @@ void main() {
     /// This test validates that the KML schema can be loaded into a temporary
     /// directory. Note that the KMLFile classes uses a separate temporary
     /// directory than the test class.
-    test('Confirm KML Schema Loaded', () {
+    test('Confirm KML Schema Loaded', () async {
       File kmlFile = File('${tmpDir.path}/$tmpKMLFile');
       String kmlPath = kmlFile.path;
       // Probably could create a second constructor to handle this very likely
       // scenario.
       KMLFile kml = KMLFile(kmlXMLLocation: kmlPath);
-      kml.load();
+      await kml.load();
       expect(kml.schemaExists, true);
     });
 
@@ -69,7 +70,7 @@ void main() {
       File kmlFile = File('${tmpDir.path}/$tmpKMLFile');
       String kmlPath = kmlFile.path;
       KMLFile kml = KMLFile(kmlXMLLocation: kmlPath);
-      kml.load();
+      await kml.load();
       expect(await kml.validate(), 0);
     });
 
@@ -78,8 +79,46 @@ void main() {
       File kmlFile = File('');
       String kmlPath = kmlFile.path;
       KMLFile kml = KMLFile(kmlXMLLocation: kmlPath);
-      kml.load();
+      await kml.load();
       expect(await kml.validate(), 1);
+    });
+  });
+
+  group('Parsing', () {
+    test('Integration: KMLFile.parse() handles full KML document structure', () async {
+      final tempDir = Directory.systemTemp.createTempSync('kml_parse_test_');
+      final kmlFileObj = File('${tempDir.path}/test.kml');
+      
+      const kmlContent = '''
+        <kml xmlns="http://www.opengis.net/kml/2.2">
+          <Document>
+             <name>Integration Doc</name>
+             <Style id="redLine">
+               <LineStyle><color>ff0000ff</color></LineStyle>
+             </Style>
+             <Placemark>
+               <name>P1</name>
+               <styleUrl>#redLine</styleUrl>
+               <Point><coordinates>10,10</coordinates></Point>
+             </Placemark>
+          </Document>
+        </kml>
+      ''';
+      
+      await kmlFileObj.writeAsString(kmlContent);
+
+      final kmlFile = KMLFile(kmlXMLLocation: kmlFileObj.path);
+      
+      final root = await kmlFile.parse();
+      
+      expect(root, isA<KmlTreeRootNode>());
+      expect(root.properties.getProperty('name'), 'Integration Doc');
+      expect(root.children.length, 1); // 1 Placemark
+      
+      // Cleanup
+      if (tempDir.existsSync()) {
+        tempDir.deleteSync(recursive: true);
+      }
     });
   });
 }

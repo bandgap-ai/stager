@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:stager_platform_native_plugins/stager_platform_native_plugins.dart';
 import 'package:stager_platform/system/stager_constants.dart';
+import 'package:stager_platform/mapping/kml_parser.dart';
+import 'package:stager_platform/mapping/nodes/kml_tree_root_node.dart';
 
 /// Represents a KML (Keyhole Markup Language) file and its associated
 /// XML schema files. This class is responsible for:
@@ -65,16 +67,16 @@ class KMLFile {
   /// Copies all required XSD schema files from the Flutter asset bundle
   /// into a temporary directory. After calling this method the `schemaExists`
   /// getter will return `true`.
-  void load() {
+  Future<void> load() async {
     // Setup the temporary storage location.
     String sep = Platform.pathSeparator;
     tmpDirectory = StagerConstants.temporaryDirectory;
     tmpDirectory.createSync(recursive: true);
     // Copy the schema files so they can be accessible outside the assets
     // bundle.
-    _copyToTmp('$kmlXSDRoot$sep$atomAuthorLinkXSD', atomAuthorLinkXSD);
-    _copyToTmp('$kmlXSDRoot$sep$xALXSD', xALXSD);
-    _copyToTmp('$kmlXSDRoot$sep$kmlXSD', kmlXSD);
+    await _copyToTmp('$kmlXSDRoot$sep$atomAuthorLinkXSD', atomAuthorLinkXSD);
+    await _copyToTmp('$kmlXSDRoot$sep$xALXSD', xALXSD);
+    await _copyToTmp('$kmlXSDRoot$sep$kmlXSD', kmlXSD);
 
     // Mark the schema as existing since it has been externalized.
     _schemaExists = true;
@@ -91,5 +93,18 @@ class KMLFile {
     );
     return validityFlag;
     // TODO: Add Dart-side enum to native plugins
+  }
+
+  /// Parses the KML file into a [KmlTreeRootNode].
+  ///
+  /// Throws an exception if the file cannot be read or parsed.
+  Future<KmlTreeRootNode> parse() async {
+    final file = File(kmlXMLLocation);
+    if (!file.existsSync()) {
+      throw FileSystemException('KML file not found', kmlXMLLocation);
+    }
+    final content = await file.readAsString();
+    final parser = KmlParser();
+    return parser.parse(content);
   }
 }

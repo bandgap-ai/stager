@@ -1,7 +1,7 @@
 # [Title] - [Date]
 
 ## Status
-(Draft / In Review / Approved / Implemented)
+(Draft / In Review / Approved / Under Revision / Implemented)
 
 ## Context & Background
 Describe the problem being solved and the motivation for this design. Reference any relevant issues or previous discussions.

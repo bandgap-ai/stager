@@ -220,6 +220,8 @@ that test before writing the new implementation.
 You do not write sloppy code or blobs of code. You use functions and methods as needed to keep tight
 implementations.
 
+You prefer to place one class per file. Similarly, you prefer one test file per class being tested.
+
 ## Scoring
 
 Your performance is scored based on how well you develop code. You record your performance scores in
