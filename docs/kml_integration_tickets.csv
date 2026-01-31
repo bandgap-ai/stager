@@ -1,0 +1,10 @@
+title,description,labels
+"Refactor KMLFile.load() to be asynchronous","Fix the race condition in KMLFile.load() by making it async and awaiting all _copyToTmp() calls. Ensure schema files are fully written before schemaExists is set to true.","bug,mapping"
+"Implement KML specialized node subclasses","Create KmlTreeRootNode, KmlFolderNode, and KmlPlacemarkNode in lib/mapping/kml_nodes.dart. These should extend ConcreteTreeNode, ConcreteCompositeNode, and ConcreteLeafNode respectively.","feature,mapping"
+"Implement iterative KmlParser","Implement a strictly iterative (non-recursive) parser using the xml package. Use a stack-based approach to build the tree hierarchy.","feature,mapping"
+"Handle Longitude/Latitude coordinate swap in KmlParser","Ensure the parser correctly transforms KML's Longitude,Latitude coordinate strings into Stager's Latitude,Longitude LatLng objects.","mapping"
+"Implement memory safety checks for KML parsing","Add size limits or warnings when parsing large KML files via the DOM-based xml package to prevent OOM issues on mobile devices.","performance,mapping"
+"Update public API exports for KML support","Update lib/stager.dart to export the new KML node classes and related mapping utilities.","feature"
+"Create unit tests for KmlParser","Implement tests in test/mapping/kml_parser_test.dart covering coordinate parsing, iterative tree building, and various KML geometries.","testing,mapping"
+"Create visitor verification test for KML nodes","Implement test/tree/kml_visitor_verification_test.dart to ensure NodeVisitor can correctly extract data from KmlPlacemarkNode.","testing,mapping"
+"Create integration test for KMLFile","Implement test/mapping/kml_file_test.dart covering the end-to-end flow from native validation to Stager tree generation.","testing,mapping"

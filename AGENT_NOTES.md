@@ -44,6 +44,11 @@ This document contains a running list of lessons learned to ensure continuous im
     *   **Mistake:** `GeolocatorLocationProvider` was missing a `const` constructor, causing a compile error in `LocationEditor`.
     *   **Correction:** Added the `const` keyword to the constructor.
 
+9.  **Terminology Restriction ('Non-Goal'):**
+    *   **Rule:** Never use the word 'Non-Goal' again unless describing how it is not a word, is erroneously used somewhere else, or making jokes about it. Use 'Exclusion' in design documents instead.
+    *   **Mistake:** Used the erroneous term 'Non-Goal' in design plans and templates.
+    *   **Correction:** Replaced 'Non-Goal' with 'Exclusion' in all design documents.
+
 ## Pre-Task Checklist
 
 Before writing any code, confirm you have reviewed and understood:
@@ -52,6 +57,10 @@ Before writing any code, confirm you have reviewed and understood:
 3.  `AGENT_NOTES.md` (These learnings to avoid repeating mistakes)
 
 ## Changelog
+
+*   **2026-01-31:** Refactored KML documents.
+    *   Banned the use of the term 'Non-Goal'.
+    *   Updated `design_plan_template.md` and `kml_integration_plan.md` to use 'Exclusions'.
 
 *   **2025-12-27:** Major failure in debugging exercise.
     *   Learned to prioritize user feedback over stylistic preference.
