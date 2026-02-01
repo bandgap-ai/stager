@@ -1,5 +1,7 @@
-// External packages
+// Flutter packages
 import 'package:flutter_test/flutter_test.dart';
+
+// External packages
 import 'package:xml/xml.dart';
 
 // Project files
@@ -7,9 +9,15 @@ import 'package:stager_platform/mapping/kml_parser_utils.dart';
 import 'package:stager_platform/mapping/nodes/kml_placemark_node.dart';
 import 'package:stager_platform/mapping/style/kml_style_manager.dart';
 
+/// Unit tests for the [KMLParserUtils] class.
+///
+/// These tests verify the granular transformation logic from KML XML fragments 
+/// to strongly-typed style components, Stager nodes, and geographic data.
 void main() {
   group('KMLParserUtils', () {
+    /// Tests for parsing individual style components from XML elements.
     group('Style Parsing', () {
+      /// Verifies that <LineStyle> attributes (color, width) are correctly extracted.
       test('parseLineStyle extracts color and width', () {
         final xml = XmlDocument.parse(
             '<Style><LineStyle><color>ff0000ff</color><width>2.5</width></LineStyle></Style>');
@@ -18,6 +26,7 @@ void main() {
         expect(style.width, 2.5);
       });
 
+      /// Verifies that <PolyStyle> attributes (fill, outline) are correctly extracted.
       test('parsePolyStyle extracts fill and outline', () {
         final xml = XmlDocument.parse(
             '<Style><PolyStyle><fill>0</fill><outline>1</outline></PolyStyle></Style>');
@@ -26,6 +35,7 @@ void main() {
         expect(style.outline, isTrue);
       });
 
+      /// Verifies that <IconStyle> attributes (href, scale) are correctly extracted.
       test('parseIconStyle extracts href and scale', () {
         final xml = XmlDocument.parse(
             '<Style><IconStyle><scale>1.5</scale><Icon><href>test.png</href></Icon></IconStyle></Style>');
@@ -35,6 +45,7 @@ void main() {
       });
     });
 
+    /// Tests for creating specialized KML nodes from XML elements.
     group('Node Creation', () {
       late KMLStyleManager manager;
 
@@ -42,6 +53,7 @@ void main() {
         manager = KMLStyleManager();
       });
 
+      /// Verifies that a folder node is correctly instantiated with metadata.
       test('createFolderNode sets basic properties', () {
         final xml = XmlDocument.parse(
             '<Folder id="f1"><name>My Folder</name></Folder>');
@@ -51,6 +63,7 @@ void main() {
         expect(node.properties.getProperty('name'), 'My Folder');
       });
 
+      /// Verifies that a placemark node extracts its name, description, and geometry.
       test('createPlacemarkNode extracts description and geometry', () {
         final xml = XmlDocument.parse('''
           <Placemark id="pm1">
@@ -70,6 +83,7 @@ void main() {
       });
     });
 
+    /// Tests for parsing different KML geometry types.
     group('Geometry Parsing', () {
       late KMLStyleManager manager;
       late KMLPlacemarkNode node;
@@ -79,6 +93,7 @@ void main() {
         node = KMLPlacemarkNode(id: 'test', name: 'test', styleManager: manager);
       });
 
+      /// Verifies extraction of valid point coordinates.
       test('parsePointGeometry extracts valid coordinates', () {
         final xml =
             XmlDocument.parse('<Placemark><Point><coordinates>10,20</coordinates></Point></Placemark>');
@@ -87,12 +102,14 @@ void main() {
         expect(node.properties.getProperty('longitude'), 10.0);
       });
 
+      /// Verifies graceful handling of point elements with missing coordinates.
       test('parsePointGeometry handles missing coordinates', () {
         final xml = XmlDocument.parse('<Placemark><Point></Point></Placemark>');
         KMLParserUtils.parsePointGeometry(xml.rootElement, node);
         expect(node.properties.getProperty('latitude'), isNull);
       });
 
+      /// Verifies extraction of a valid line string path.
       test('parseLineStringGeometry extracts valid outline', () {
         final xml = XmlDocument.parse(
             '<Placemark><LineString><coordinates>10,20 30,40</coordinates></LineString></Placemark>');
@@ -103,6 +120,7 @@ void main() {
         expect(outline[1]['latitude'], 40.0);
       });
 
+      /// Verifies graceful handling of empty coordinate lists in line strings.
       test('parseLineStringGeometry handles empty coordinates', () {
         final xml = XmlDocument.parse(
             '<Placemark><LineString><coordinates></coordinates></LineString></Placemark>');
@@ -110,6 +128,7 @@ void main() {
         expect(node.properties.getProperty('outline'), isNull);
       });
 
+      /// Verifies extraction of a polygon's outer boundary.
       test('parsePolygonGeometry extracts valid outer boundary', () {
         final xml = XmlDocument.parse('''
           <Placemark>
@@ -128,6 +147,7 @@ void main() {
         expect(outline[0]['latitude'], 20.0);
       });
 
+      /// Verifies graceful handling of malformed polygon structures.
       test('parsePolygonGeometry handles missing nested elements', () {
         final xml = XmlDocument.parse('<Placemark><Polygon></Polygon></Placemark>');
         KMLParserUtils.parsePolygonGeometry(xml.rootElement, node);
@@ -135,13 +155,16 @@ void main() {
       });
     });
 
+    /// Tests for low-level coordinate string parsing.
     group('Coordinate Utilities', () {
+      /// Verifies that Lon,Lat strings are correctly swapped to Lat,Lon LatLng objects.
       test('parseCoordinate swaps lon/lat', () {
         final point = KMLParserUtils.parseCoordinate('-122.0,37.0');
         expect(point?.latitude, 37.0);
         expect(point?.longitude, -122.0);
       });
 
+      /// Verifies parsing of space-separated coordinate lists.
       test('parseCoordinateList handles multiple tuples', () {
         final points = KMLParserUtils.parseCoordinateList('10,20 30,40');
         expect(points.length, 2);
