@@ -20,7 +20,7 @@ The Stager Platform requires a mechanism to import and manage hierarchical GIS d
 
 ## Proposed Design
 The integration uses a multi-layered approach:
-1.  **Validation Layer**: Uses `KMLFile` to invoke native plugins for XSD validation.
+1.  **Validation Layer**: Uses `KMLFile` to invoke native plugins for XSD validation. Refactored to throw `KMLValidationException` instead of returning error codes.
 2.  **Node Layer**: Specialized subclasses of the Stager concrete hierarchy:
     *   `KmlTreeRootNode` extends `ConcreteTreeNode`.
     *   `KmlFolderNode` extends `ConcreteCompositeNode`.
@@ -57,14 +57,21 @@ An initial audit identified the following risks and required corrections:
 *   **Null-Safety and Default Styles**: The current reliance on nullable fields for style attributes increases the risk of runtime errors in rendering logic. The architecture should move to non-nullable types with spec-compliant defaults (e.g., color `0xffffffff`, width `1.0`).
 *   **Composition Over Inheritance for Styles**: While `IconStyle`, `LineStyle`, and `PolyStyle` could be subclasses, they are better modeled as components of a `KmlStyle` container. KML `<Style>` elements can contain one of each simultaneously, making composition more idiomatic and type-safe.
 
+### Sixth Audit - 2026-01-31
+*   **Primitive Return Codes**: `KMLFile.validate()` currently returns an `int`. This is a low-level implementation detail that should be abstracted. The API should move to a `Future<void>` that throws specific exceptions.
+*   **API Ergonomics**: Requiring the user to call `validate()` before `parse()` is error-prone. `parse()` should automatically trigger validation.
+*   **Method Naming**: `load()` is ambiguous. It should be renamed to `prepareSchemas()` to clearly indicate it is setting up the environment for native validation.
+
 ## Implementation Details
 
 The implementation is largely contained in the following files:
-*   **`lib/mapping/kml_file.dart`**: Refactor `load()` to be asynchronous and ensure schema copying is completed before validation.
+*   **`lib/mapping/kml_file.dart`**: 
+    *   Rename `load()` to `prepareSchemas()`.
+    *   Refactor `validate()` to return `Future<void>` and throw `KMLValidationException` on failure.
+    *   Enhance `parse()` to automatically call `validate()`.
+    *   Ensure all errors are logged using the `Logger` package.
 *   **`lib/mapping/nodes/`**: Create the specialized KML node subclasses. Each node type must be implemented in its own file.
-*   **`lib/mapping/style/`**: 
-    *   Create standalone, non-nullable component classes: `KmlIconStyle`, `KmlLineStyle`, and `KmlPolyStyle`, each providing spec-compliant default values.
-    *   Refactor `KmlStyle` to use composition, holding exactly one instance of each component class.
+*   **`lib/mapping/style/kml_style.dart`**: Create a data class to strongly type KML style attributes.
 *   **`lib/mapping/style/kml_style_manager.dart`**: Create a manager to register styles and handle lookup.
 *   **`lib/mapping/kml_parser.dart`**: Implement iterative parser. usage:
     *   Register all `<Style>` elements with `KMLStyleManager` as they are encountered.
@@ -89,23 +96,22 @@ KMLParser (kml_parser.dart) does not return null on failure. Instead, it throws 
 final kmlFile = KMLFile(kmlXMLLocation: 'path/to/map_data.kml');
 
 try {
-  // Load schemas and await completion
-  await kmlFile.load();
+  // Setup native environment (only needs to be done once per app session)
+  await kmlFile.prepareSchemas();
 
-  // Parse into a Stager tree root
-  final KmlTreeRootNode root = await kmlFile.parse();
+  // Parse into a Stager tree root. Automatic validation occurs here.
+  final KMLTreeRootNode root = await kmlFile.parse();
 
   // Traverse the GIS data using standard visitors
   root.accept(myMapRenderingVisitor);
-  
-  // Use ConcreteTreeNode's built-in summarization
-  final summary = root.summarize();
-  print('Map center: ${summary.centerPoint}');
+} on KMLValidationException catch (e) {
+  print('Invalid KML: ${e.message}');
 } catch (e) {
-  // Handle parsing errors
   print('Failed to parse KML file: $e');
 }
 ```
+
+This example is encoded in [the KML integration test](../test/mapping/kml_integration_test.dart).
 
 ## Open Questions
 

@@ -1,24 +1,41 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 import 'package:stager_platform_native_plugins/stager_platform_native_plugins.dart';
 import '../system/stager_constants.dart';
 import 'kml_parser.dart';
 import 'nodes/kml_tree_root_node.dart';
 
+/// Exception thrown when KML validation fails.
+class KMLValidationException implements Exception {
+  /// A descriptive message explaining the validation failure.
+  final String message;
+
+  /// Creates a [KMLValidationException] with the given [message].
+  KMLValidationException(this.message);
+
+  @override
+  String toString() => 'KMLValidationException: $message';
+}
+
 /// Represents a KML (Keyhole Markup Language) file and its associated
 /// XML schema files. This class is responsible for:
-///   * Copying the required XSD schema files from the Flutter asset bundle
-///     to a temporary directory that native code can access.
-///   * Providing a method to validate the KML file against the copied schema
-///     via the native `checkXMLFile` plugin.
+///   * Externalizing the required XSD schema files from the Flutter asset 
+///     bundle to a temporary directory that native code can access.
+///   * Providing a method to validate the KML file against the copied schema 
+///     via native plugins.
+///   * Orchestrating the transformation of KML content into a Stager tree.
 ///
 /// Usage example:
 /// ```dart
 /// final kml = KMLFile(kmlXMLLocation: '/path/to/file.kml');
-/// await kml.load();               // Copies schemas to a temp dir
-/// final result = await kml.validate(); // 0 == valid
+/// await kml.prepareSchemas();     // Environment setup
+/// final root = await kml.parse(); // Automatic validation and parsing
 /// ```
 class KMLFile {
+  /// Logger for capturing validation and I/O errors.
+  final Logger _logger = Logger();
+
   /// Relative path within the Flutter asset bundle where the KML XSD schema
   /// files are stored.
   final String kmlXSDRoot = 'assets/schemas/kml/2.2.0';
@@ -43,11 +60,12 @@ class KMLFile {
   late bool _schemaExists;
 
   /// Checks if the schema file exists. Note that the schema isn't considered
-  /// available and in existence until load() is called.
-  /// Returns `true` once `load()` has successfully copied the schema
+  /// available and in existence until prepareSchemas() is called.
+  /// Returns `true` once `prepareSchemas()` has successfully copied the schema
   /// files to the temporary directory.
   bool get schemaExists => _schemaExists;
 
+  /// Creates a [KMLFile] instance for the given [kmlXMLLocation].
   KMLFile({required this.kmlXMLLocation}) : _schemaExists = false;
 
   /// Copies a single XSD asset file from the Flutter bundle to the temporary
@@ -63,11 +81,11 @@ class KMLFile {
     await tmpFile.writeAsBytes(bytes, flush: true);
   }
 
-  /// This function loads the KML file and its schema.
-  /// Copies all required XSD schema files from the Flutter asset bundle
-  /// into a temporary directory. After calling this method the `schemaExists`
-  /// getter will return `true`.
-  Future<void> load() async {
+  /// Prepares the KML schema files by copying them from the app assets into 
+  /// a temporary file system location accessible by native code.
+  /// 
+  /// This setup must be performed once before any validation can occur.
+  Future<void> prepareSchemas() async {
     // Setup the temporary storage location.
     String sep = Platform.pathSeparator;
     tmpDirectory = StagerConstants.temporaryDirectory;
@@ -87,32 +105,63 @@ class KMLFile {
     _schemaExists = true;
   }
 
-  /// This function validates an XML file against the KML schema.
+  /// Validates the XML file at [kmlXMLLocation] against the KML schema.
   ///
-  /// Returns 0 if the file is valid, non-zero otherwise.
-  Future<int> validate() async {
-    if (!_schemaExists) {
-      throw StateError('KML schemas must be loaded via load() before validation.');
+  /// Throws [KMLValidationException] if the file is invalid.
+  /// Throws [StateError] if [prepareSchemas] has not been called first.
+  Future<void> validate() async {
+    // Optimized Branch Order: The most likely scenario is that the schema 
+    // has already been prepared.
+    if (_schemaExists) {
+      String sep = Platform.pathSeparator;
+      final result = await checkXMLFile(
+        xsdPath: '${tmpDirectory.path}$sep$kmlXSD',
+        xmlPath: kmlXMLLocation,
+      );
+
+      // checkXMLFile() is a native method (technically wrapped in dart) in the
+      // stager_platform_native_plugins. 0 indicates success. Any other value
+      // indicates a failure detected by the native plugin.
+      if (result != 0) {
+        final message = 'KML validation failed for file: $kmlXMLLocation';
+        _logger.e(message);
+        throw KMLValidationException(message);
+      }
+    } else {
+      const message = 'KML schemas must be prepared via prepareSchemas() before validation.';
+      _logger.e(message);
+      throw StateError(message);
     }
-    
-    String sep = Platform.pathSeparator;
-    return checkXMLFile(
-      xsdPath: '${tmpDirectory.path}$sep$kmlXSD',
-      xmlPath: kmlXMLLocation,
-    );
-    // TODO: Add Dart-side enum to native plugins for error results.
   }
 
   /// Parses the KML file into a [KMLTreeRootNode].
   ///
-  /// Throws an exception if the file cannot be read or parsed.
+  /// This method automatically calls [validate] before proceeding with the 
+  /// transformation.
+  ///
+  /// Returns the root of the constructed Stager tree.
+  ///
+  /// Throws [FileSystemException] if the file is missing.
+  /// Throws [KMLValidationException] if the file fails schema validation.
+  /// Throws [FormatException] if the KML structure is logically invalid.
   Future<KMLTreeRootNode> parse() async {
+    // Automatically validate before parsing. Throws an exception if it fails.
+    await validate();
+
     final file = File(kmlXMLLocation);
-    if (!file.existsSync()) {
-      throw FileSystemException('KML file not found', kmlXMLLocation);
+    late KMLTreeRootNode root;
+
+    // Prioritize the happy path where the file exists.
+    if (file.existsSync()) {
+      final content = await file.readAsString();
+      final parser = KMLParser();
+      root = parser.parse(content);
+    } else {
+      final message = 'KML file not found: $kmlXMLLocation';
+      _logger.e(message);
+      throw FileSystemException(message, kmlXMLLocation);
     }
-    final content = await file.readAsString();
-    final parser = KMLParser();
-    return parser.parse(content);
+
+    return root;
   }
 }

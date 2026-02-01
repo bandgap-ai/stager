@@ -64,6 +64,14 @@
       "max_score": 100,
       "notes": "Successfully refactored KMLStyle to use composition and non-nullable components. Split classes and tests into individual files. Optimized KMLParser by extracting utilities and helper functions. Adhered to all project standards including Single Return Principle and Optimized Branch Order.",
       "model": "gemini-astudio"
+    },
+    {
+      "date": "2025-02-01",
+      "task": "Refactor KMLFile and finalize KML integration tests.",
+      "score": 65,
+      "max_score": 100,
+      "notes": "While able to edit the code, the agent ignored rules in @AGENTS.md and repeatedly got stuck in reasoning loops, requiring multiple corrections and re-prompts.",
+      "model": "gemini-astudio"
     }
   ]
 }

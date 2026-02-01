@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 // Project files
 import 'package:stager_platform/mapping/kml_file.dart';
 import 'package:stager_platform/mapping/nodes/kml_tree_root_node.dart';
-import '../helpers/kml_mock.dart';
+import 'kml_mock.dart';
 
 /// Integration tests for the [KMLFile] class.
 ///
@@ -51,60 +51,65 @@ void main() {
     </Document>
 </kml>
 ''');
-      return;
     });
 
     // Cleanup: Ensure temporary test files are removed after the group finishes.
     tearDownAll(() async {
       if (await tmpDir.exists()) {
-        tmpDir.delete(recursive: true);
+        await tmpDir.delete(recursive: true);
       }
     });
 
-    /// Verifies that the KMLFile class correctly copies XSD schema assets 
-    /// from the Flutter bundle to a temporary directory accessible by 
-    /// native code.
-    test('Confirm KML Schema Loaded', () async {
-      File kmlFile = File('${tmpDir.path}/$tmpKMLFile');
-      String kmlPath = kmlFile.path;
+    /// Verifies that prepareSchemas() correctly copies XSD schema assets 
+    /// from the Flutter bundle to a temporary directory.
+    test('Confirm KML Schema Prepared', () async {
+      final File kmlFile = File('${tmpDir.path}/$tmpKMLFile');
       
-      KMLFile kml = KMLFile(kmlXMLLocation: kmlPath);
-      // load() must be awaited to ensure the copy operation completes.
-      await kml.load();
+      final KMLFile kml = KMLFile(kmlXMLLocation: kmlFile.path);
+      // prepareSchemas() must be awaited to ensure the copy operation completes.
+      await kml.prepareSchemas();
       
       expect(kml.schemaExists, true);
     });
 
-    /// Verifies that a structurally correct KML file is successfully 
-    /// validated (result 0) against the official schema.
-    test('Validate Correct KML File', () async {
-      File kmlFile = File('${tmpDir.path}/$tmpKMLFile');
-      String kmlPath = kmlFile.path;
+    /// Verifies that validate() throws a StateError if it is called before 
+    /// prepareSchemas().
+    test('Validate throws StateError if schemas not prepared', () async {
+      final kml = KMLFile(kmlXMLLocation: 'some_path.kml');
       
-      KMLFile kml = KMLFile(kmlXMLLocation: kmlPath);
-      await kml.load();
-      
-      // Act & Assert: result 0 indicates success.
-      expect(await kml.validate(), 0);
+      // Act & Assert
+      expect(() => kml.validate(), throwsStateError);
     });
 
-    /// Verifies that the validation mechanism correctly identifies and 
-    /// rejects non-KML or malformed files.
-    test('Validate Incorrect KML File', () async {
-      // Use an empty path to trigger a validation failure.
-      KMLFile kml = KMLFile(kmlXMLLocation: '');
-      await kml.load();
+    /// Verifies that a structurally correct KML file passes validation 
+    /// without throwing an exception.
+    test('Validate Correct KML File', () async {
+      final File kmlFile = File('${tmpDir.path}/$tmpKMLFile');
       
-      // Act & Assert: non-zero result indicates failure.
-      expect(await kml.validate(), 1);
+      final KMLFile kml = KMLFile(kmlXMLLocation: kmlFile.path);
+      await kml.prepareSchemas();
+      
+      // Act & Assert: Completing without throwing indicates success.
+      await expectLater(kml.validate(), completes);
+    });
+
+    /// Verifies that validate() throws a KMLValidationException when the 
+    /// native plugin reports a failure.
+    test('Validate Incorrect KML File throws KMLValidationException', () async {
+      // Use an empty path to trigger a validation failure in the mock.
+      final KMLFile kml = KMLFile(kmlXMLLocation: '');
+      await kml.prepareSchemas();
+      
+      // Act & Assert: result != 0 in mock triggers the exception.
+      expect(() => kml.validate(), throwsA(isA<KMLValidationException>()));
     });
   });
 
   group('Parsing', () {
-    /// Verifies that KMLFile.parse() correctly coordinates the full 
-    /// transformation from a file on disk to a functional Stager node tree.
+    /// Verifies that KMLFile.parse() correctly coordinates validation and 
+    /// transformation into a functional Stager node tree.
     test('Integration: KMLFile.parse() handles full KML document structure', () async {
-      // Arrange: Create a KML file with a shared style and a point feature.
+      // Arrange: Create a temporary KML file with a shared style.
       final tempDir = Directory.systemTemp.createTempSync('kml_parse_test_');
       final kmlFileObj = File('${tempDir.path}/test.kml');
       
@@ -126,8 +131,9 @@ void main() {
       
       await kmlFileObj.writeAsString(kmlContent);
 
-      // Act: Load and parse the file.
+      // Act: Prepare, then parse (which triggers automatic validation).
       final kmlFile = KMLFile(kmlXMLLocation: kmlFileObj.path);
+      await kmlFile.prepareSchemas();
       final root = await kmlFile.parse();
       
       // Assert: Verify the root node and its hierarchical children.
