@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:stager_platform_native_plugins/stager_platform_native_plugins.dart';
-import 'package:stager_platform/system/stager_constants.dart';
-import 'package:stager_platform/mapping/kml_parser.dart';
-import 'package:stager_platform/mapping/nodes/kml_tree_root_node.dart';
+import '../system/stager_constants.dart';
+import 'kml_parser.dart';
+import 'nodes/kml_tree_root_node.dart';
 
 /// Represents a KML (Keyhole Markup Language) file and its associated
 /// XML schema files. This class is responsible for:
@@ -15,7 +15,7 @@ import 'package:stager_platform/mapping/nodes/kml_tree_root_node.dart';
 /// Usage example:
 /// ```dart
 /// final kml = KMLFile(kmlXMLLocation: '/path/to/file.kml');
-/// kml.load();               // Copies schemas to a temp dir
+/// await kml.load();               // Copies schemas to a temp dir
 /// final result = await kml.validate(); // 0 == valid
 /// ```
 class KMLFile {
@@ -71,40 +71,48 @@ class KMLFile {
     // Setup the temporary storage location.
     String sep = Platform.pathSeparator;
     tmpDirectory = StagerConstants.temporaryDirectory;
-    tmpDirectory.createSync(recursive: true);
-    // Copy the schema files so they can be accessible outside the assets
-    // bundle.
-    await _copyToTmp('$kmlXSDRoot$sep$atomAuthorLinkXSD', atomAuthorLinkXSD);
-    await _copyToTmp('$kmlXSDRoot$sep$xALXSD', xALXSD);
-    await _copyToTmp('$kmlXSDRoot$sep$kmlXSD', kmlXSD);
+    
+    // Ensure the directory exists asynchronously.
+    await tmpDirectory.create(recursive: true);
+    
+    // Copy the schema files in parallel and await their completion.
+    // This prevents a race condition in validate().
+    await Future.wait([
+      _copyToTmp('$kmlXSDRoot$sep$atomAuthorLinkXSD', atomAuthorLinkXSD),
+      _copyToTmp('$kmlXSDRoot$sep$xALXSD', xALXSD),
+      _copyToTmp('$kmlXSDRoot$sep$kmlXSD', kmlXSD),
+    ]);
 
     // Mark the schema as existing since it has been externalized.
     _schemaExists = true;
   }
 
-  /// This function validates and XML file
+  /// This function validates an XML file against the KML schema.
   ///
-  /// Returns 0 if the file is valid, false otherwise.
+  /// Returns 0 if the file is valid, non-zero otherwise.
   Future<int> validate() async {
+    if (!_schemaExists) {
+      throw StateError('KML schemas must be loaded via load() before validation.');
+    }
+    
     String sep = Platform.pathSeparator;
-    Future<int> validityFlag = checkXMLFile(
+    return checkXMLFile(
       xsdPath: '${tmpDirectory.path}$sep$kmlXSD',
       xmlPath: kmlXMLLocation,
     );
-    return validityFlag;
-    // TODO: Add Dart-side enum to native plugins
+    // TODO: Add Dart-side enum to native plugins for error results.
   }
 
-  /// Parses the KML file into a [KmlTreeRootNode].
+  /// Parses the KML file into a [KMLTreeRootNode].
   ///
   /// Throws an exception if the file cannot be read or parsed.
-  Future<KmlTreeRootNode> parse() async {
+  Future<KMLTreeRootNode> parse() async {
     final file = File(kmlXMLLocation);
     if (!file.existsSync()) {
       throw FileSystemException('KML file not found', kmlXMLLocation);
     }
     final content = await file.readAsString();
-    final parser = KmlParser();
+    final parser = KMLParser();
     return parser.parse(content);
   }
 }

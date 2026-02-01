@@ -9,7 +9,7 @@ class MockVisitor implements NodeVisitor {
 
   @override
   void visit(Object node) {
-    if (node is KmlPlacemarkNode) {
+    if (node is KMLPlacemarkNode) {
       visitedIds.add(node.properties.getProperty("id").toString());
     }
   }
@@ -17,8 +17,8 @@ class MockVisitor implements NodeVisitor {
 
 void main() {
   test('KmlPlacemarkNode accepts NodeVisitor', () {
-    final manager = KmlStyleManager();
-    final placemark = KmlPlacemarkNode(
+    final manager = KMLStyleManager();
+    final placemark = KMLPlacemarkNode(
       id: 'pm1',
       name: 'Test',
       styleManager: manager,

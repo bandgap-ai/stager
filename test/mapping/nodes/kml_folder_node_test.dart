@@ -4,15 +4,33 @@ import 'package:stager_platform/mapping/style/kml_style.dart';
 import 'package:stager_platform/mapping/style/kml_style_manager.dart';
 
 void main() {
-  group('KmlFolderNode Tests', () {
-    test('Resolves style from manager', () {
-      final manager = KmlStyleManager();
-      const style = KmlStyle(id: 'folderStyle', iconScale: 2.0);
+  group('KMLFolderNode', () {
+    late KMLStyleManager manager;
+
+    setUp(() {
+      manager = KMLStyleManager();
+    });
+
+    test('Constructor correctly initializes with default styleUrl', () {
+      final folder = KMLFolderNode(
+        id: 'f1',
+        name: 'Default Folder',
+        styleManager: manager,
+      );
+
+      expect(folder.styleUrl, 'default');
+      // Mixin should return a default KMLStyle when ID is 'default' 
+      // and not in manager.
+      expect(folder.kmlStyle.id, 'default');
+    });
+
+    test('Resolves registered style from manager', () {
+      const style = KMLStyle(id: 'folderStyle');
       manager.registerStyle(style);
 
-      final folder = KmlFolderNode(
-        id: '1',
-        name: 'Test Folder',
+      final folder = KMLFolderNode(
+        id: 'f2',
+        name: 'Styled Folder',
         styleManager: manager,
         styleUrl: '#folderStyle',
       );
@@ -20,16 +38,30 @@ void main() {
       expect(folder.kmlStyle, equals(style));
     });
 
-    test('Returns null for missing style', () {
-      final manager = KmlStyleManager();
-      final folder = KmlFolderNode(
-        id: '1',
-        name: 'Test Folder',
+    test('Throws ArgumentError for missing non-default style', () {
+      final folder = KMLFolderNode(
+        id: 'f3',
+        name: 'Missing Style Folder',
         styleManager: manager,
-        styleUrl: '#missing',
+        styleUrl: 'missing-id',
       );
 
-      expect(folder.kmlStyle, isNull);
+      // The mixin delegates to the manager, which throws on missing IDs.
+      expect(() => folder.kmlStyle, throwsArgumentError);
+    });
+
+    test('Handles styleUrl starting with #', () {
+      const style = KMLStyle(id: 'hashStyle');
+      manager.registerStyle(style);
+
+      final folder = KMLFolderNode(
+        id: 'f4',
+        name: 'Hash Style Folder',
+        styleManager: manager,
+        styleUrl: '#hashStyle',
+      );
+
+      expect(folder.kmlStyle.id, 'hashStyle');
     });
   });
 }

@@ -53,12 +53,18 @@ An initial audit identified the following risks and required corrections:
 *   **Style Management Architecture**: To avoid two-pass parsing while supporting forward references (style URLs pointing to styles defined later in the file), a `KMLStyleManager` is required.
 *   **Deferred Resolution**: The parser must store the style ID string during tree construction and resolve it to a `KMLStyle` object from the manager only when the property is requested. This enables a single-pass parse without strict definition order.
 
+### Fifth Audit - 2026-01-31
+*   **Null-Safety and Default Styles**: The current reliance on nullable fields for style attributes increases the risk of runtime errors in rendering logic. The architecture should move to non-nullable types with spec-compliant defaults (e.g., color `0xffffffff`, width `1.0`).
+*   **Composition Over Inheritance for Styles**: While `IconStyle`, `LineStyle`, and `PolyStyle` could be subclasses, they are better modeled as components of a `KmlStyle` container. KML `<Style>` elements can contain one of each simultaneously, making composition more idiomatic and type-safe.
+
 ## Implementation Details
 
 The implementation is largely contained in the following files:
 *   **`lib/mapping/kml_file.dart`**: Refactor `load()` to be asynchronous and ensure schema copying is completed before validation.
 *   **`lib/mapping/nodes/`**: Create the specialized KML node subclasses. Each node type must be implemented in its own file.
-*   **`lib/mapping/style/kml_style.dart`**: Create a data class to strongly type KML style attributes.
+*   **`lib/mapping/style/`**: 
+    *   Create standalone, non-nullable component classes: `KmlIconStyle`, `KmlLineStyle`, and `KmlPolyStyle`, each providing spec-compliant default values.
+    *   Refactor `KmlStyle` to use composition, holding exactly one instance of each component class.
 *   **`lib/mapping/style/kml_style_manager.dart`**: Create a manager to register styles and handle lookup.
 *   **`lib/mapping/kml_parser.dart`**: Implement iterative parser. usage:
     *   Register all `<Style>` elements with `KMLStyleManager` as they are encountered.
@@ -118,4 +124,3 @@ All questions were resolved in the audits.
 - [Create visitor verification test for KML nodes](https://gitlab.com/bandgap/stager-platform/stager/-/issues/12)
 - [Create integration test for KMLFile](https://gitlab.com/bandgap/stager-platform/stager/-/issues/13)
 - [Add KMLStyle and KMLStyleManager classes for handling KML styles](https://gitlab.com/bandgap/stager-platform/stager/-/issues/14)
-

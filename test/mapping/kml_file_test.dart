@@ -111,7 +111,7 @@ void main() {
       
       final root = await kmlFile.parse();
       
-      expect(root, isA<KmlTreeRootNode>());
+      expect(root, isA<KMLTreeRootNode>());
       expect(root.properties.getProperty('name'), 'Integration Doc');
       expect(root.children.length, 1); // 1 Placemark
       

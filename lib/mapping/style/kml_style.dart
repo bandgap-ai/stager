@@ -1,48 +1,38 @@
-/// A data class representing a KML Style.
+import 'kml_icon_style.dart';
+import 'kml_line_style.dart';
+import 'kml_poly_style.dart';
+
+/// A container class representing a complete KML Style.
 ///
-/// This class encapsulates the style attributes defined in KML, such as
-/// IconStyle, LineStyle, and PolyStyle. It serves as a strongly-typed
-/// intermediate representation before mapping to Stager [NodeProperties].
-class KmlStyle {
+/// This class uses composition to hold specialized style components for 
+/// icons, lines, and polygons. It ensures that every style property has a 
+/// valid, non-nullable default value according to the KML specification.
+class KMLStyle {
   /// The unique identifier for this style.
   final String id;
 
-  /// Hex color string for lines (aabbggrr).
-  final String? lineColor;
+  /// The style configuration for icons.
+  final KMLIconStyle iconStyle;
 
-  /// Width of the line in pixels.
-  final double? lineWidth;
+  /// The style configuration for lines.
+  final KMLLineStyle lineStyle;
 
-  /// Hex color string for polygons (aabbggrr).
-  final String? polyColor;
+  /// The style configuration for polygons.
+  final KMLPolyStyle polyStyle;
 
-  /// Boolean indicating whether to fill the polygon.
-  final bool? polyFill;
-
-  /// Boolean indicating whether to outline the polygon.
-  final bool? polyOutline;
-
-  /// Scale of the icon.
-  final double? iconScale;
-
-  /// HTTP address or local path to the icon image.
-  final String? iconHref;
-
-  const KmlStyle({
+  /// Creates a [KMLStyle]. 
+  /// 
+  /// If components are not provided, they default to their respective spec-
+  /// compliant default instances.
+  const KMLStyle({
     required this.id,
-    this.lineColor,
-    this.lineWidth,
-    this.polyColor,
-    this.polyFill,
-    this.polyOutline,
-    this.iconScale,
-    this.iconHref,
+    this.iconStyle = const KMLIconStyle(),
+    this.lineStyle = const KMLLineStyle(),
+    this.polyStyle = const KMLPolyStyle(),
   });
 
   @override
   String toString() {
-    return 'KmlStyle(id: $id, lineColor: $lineColor, lineWidth: $lineWidth, '
-        'polyColor: $polyColor, polyFill: $polyFill, polyOutline: $polyOutline, '
-        'iconScale: $iconScale, iconHref: $iconHref)';
+    return 'KMLStyle(id: $id, $iconStyle, $lineStyle, $polyStyle)';
   }
 }

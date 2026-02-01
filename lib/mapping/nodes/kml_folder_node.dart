@@ -1,35 +1,33 @@
 import 'package:stager_platform/tree/concrete_composite_node.dart';
 import 'package:stager_platform/mapping/style/kml_style_manager.dart';
-import 'package:stager_platform/mapping/style/kml_style.dart';
+import 'package:stager_platform/mapping/style/kml_stylable.dart';
 
 /// A [ConcreteCompositeNode] specialized for representing KML Folders.
-class KmlFolderNode extends ConcreteCompositeNode {
-  /// The manager for resolving styles referenced by this node.
-  final KmlStyleManager styleManager;
+///
+/// In the KML specification, a `<Folder>` is a container used to organize 
+/// other features (Folders or Placemarks) into a hierarchy. This class 
+/// maps that concept to the Stager [CompositeNode], allowing for nested 
+/// geographic data structures and providing robust, non-nullable style 
+/// resolution via the [KMLStylable] mixin.
+class KMLFolderNode extends ConcreteCompositeNode with KMLStylable {
+  @override
+  final KMLStyleManager styleManager;
 
-  /// The raw style URL/ID referenced by this node, if any.
-  final String? styleUrl;
+  @override
+  final String styleUrl;
 
-  /// Creates a [KmlFolderNode].
+  /// Creates a [KMLFolderNode].
   ///
-  /// [id]: The unique identifier for the node.
-  /// [name]: The display name of the node.
-  /// [styleManager]: The manager used to resolve styles.
-  /// [styleUrl]: Optional style ID referenced by this node.
-  /// [initialProperties]: Optional initial properties.
-  KmlFolderNode({
+  /// [id]: A unique identifier for this node within the Stager tree.
+  /// [name]: The display name of the folder, typically from the KML `<name>` tag.
+  /// [styleManager]: The registry where shared styles are stored.
+  /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
+  /// [initialProperties]: Optional map of initial metadata for the node.
+  KMLFolderNode({
     required super.id,
     required super.name,
     required this.styleManager,
-    this.styleUrl,
+    this.styleUrl = 'default',
     super.initialProperties,
   });
-
-  /// lazily resolves the [KmlStyle] from the [styleManager].
-  KmlStyle? get kmlStyle {
-    if (styleUrl != null) {
-      return styleManager.getStyle(styleUrl!);
-    }
-    return null;
-  }
 }

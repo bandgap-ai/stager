@@ -5,14 +5,15 @@ import 'package:stager_platform/mapping/nodes/kml_folder_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_placemark_node.dart';
 
 void main() {
-  group('KmlParser Tests', () {
-    late KmlParser parser;
+  group('KMLParser Tests', () {
+    late KMLParser parser;
 
     setUp(() {
-      parser = KmlParser();
+      parser = KMLParser();
     });
 
     test('Parses minimal KML with default settings', () {
+      // Arrange
       const kml = '''
         <kml xmlns="http://www.opengis.net/kml/2.2">
           <Document>
@@ -21,13 +22,17 @@ void main() {
         </kml>
       ''';
 
+      // Act
       final root = parser.parse(kml);
-      expect(root, isA<KmlTreeRootNode>());
+
+      // Assert
+      expect(root, isA<KMLTreeRootNode>());
       expect(root.properties.getProperty("name"), 'Test Document');
       expect(root.children, isEmpty);
     });
 
     test('Parses nested Folders and Placemarks', () {
+      // Arrange
       const kml = '''
         <kml>
           <Document>
@@ -41,18 +46,22 @@ void main() {
         </kml>
       ''';
 
+      // Act
       final root = parser.parse(kml);
+
+      // Assert
       expect(root.children.length, 1);
       
-      final folder = root.children.first as KmlFolderNode;
+      final folder = root.children.first as KMLFolderNode;
       expect(folder.properties.getProperty("name"), 'Folder 1');
       expect(folder.children.length, 1);
 
-      final placemark = folder.children.first as KmlPlacemarkNode;
+      final placemark = folder.children.first as KMLPlacemarkNode;
       expect(placemark.properties.getProperty("name"), 'Placemark 1');
     });
 
     test('Parses Point Geometry and swaps coordinates', () {
+      // Arrange
       const kml = '''
         <kml>
           <Placemark>
@@ -63,18 +72,22 @@ void main() {
         </kml>
       ''';
 
+      // Act
       final root = parser.parse(kml);
-      // Since no <Document>, root adds children directly
-      final placemark = root.children.first as KmlPlacemarkNode;
+      
+      // Assert: Since no <Document>, root adds children directly
+      final placemark = root.children.first as KMLPlacemarkNode;
       
       final lat = placemark.properties.getProperty('latitude') as double;
       final lon = placemark.properties.getProperty('longitude') as double;
 
+      // KML is Lon,Lat. Stager is Lat,Lon. Verify the swap.
       expect(lat, closeTo(37.0, 0.0001));
       expect(lon, closeTo(-122.0, 0.0001));
     });
 
     test('Resolves forward-referenced styles', () {
+      // Arrange
       const kml = '''
         <kml>
           <Document>
@@ -90,13 +103,15 @@ void main() {
         </kml>
       ''';
 
+      // Act
       final root = parser.parse(kml);
-      final placemark = root.children.first as KmlPlacemarkNode;
+      final placemark = root.children.first as KMLPlacemarkNode;
       
+      // Assert
       final style = placemark.kmlStyle;
-      expect(style, isNotNull);
-      expect(style?.id, 'myStyle');
-      expect(style?.iconScale, 1.5);
+      expect(style.id, 'myStyle');
+      // Fix: Access the .scale property of the component class.
+      expect(style.iconStyle.scale, 1.5);
     });
   });
 }

@@ -4,33 +4,61 @@ import 'package:stager_platform/mapping/style/kml_style.dart';
 import 'package:stager_platform/mapping/style/kml_style_manager.dart';
 
 void main() {
-  group('KmlPlacemarkNode Tests', () {
-    test('Resolves style from manager', () {
-      final manager = KmlStyleManager();
-      const style = KmlStyle(id: 'pmStyle', lineColor: 'ff0000ff');
+  group('KMLPlacemarkNode', () {
+    late KMLStyleManager manager;
+
+    setUp(() {
+      manager = KMLStyleManager();
+    });
+
+    test('Constructor correctly initializes with default styleUrl', () {
+      final placemark = KMLPlacemarkNode(
+        id: 'pm1',
+        name: 'Default Placemark',
+        styleManager: manager,
+      );
+
+      expect(placemark.styleUrl, 'default');
+      expect(placemark.kmlStyle.id, 'default');
+    });
+
+    test('Resolves registered style from manager', () {
+      const style = KMLStyle(id: 'pmStyle');
       manager.registerStyle(style);
 
-      final placemark = KmlPlacemarkNode(
-        id: '1',
-        name: 'Test Placemark',
+      final placemark = KMLPlacemarkNode(
+        id: 'pm2',
+        name: 'Styled Placemark',
         styleManager: manager,
         styleUrl: '#pmStyle',
       );
 
       expect(placemark.kmlStyle, equals(style));
-      expect(placemark.kmlStyle?.lineColor, 'ff0000ff');
     });
 
-    test('Properties are stored correctly', () {
-      final manager = KmlStyleManager();
-      final placemark = KmlPlacemarkNode(
-        id: '1',
-        name: 'Test',
+    test('Throws ArgumentError for missing non-default style', () {
+      final placemark = KMLPlacemarkNode(
+        id: 'pm3',
+        name: 'Missing Style Placemark',
         styleManager: manager,
-        initialProperties: {'desc': 'A description'},
+        styleUrl: 'invalid-id',
       );
 
-      expect(placemark.properties.getProperty('desc'), 'A description');
+      expect(() => placemark.kmlStyle, throwsArgumentError);
+    });
+
+    test('Can store and retrieve geographic properties', () {
+      final placemark = KMLPlacemarkNode(
+        id: 'pm4',
+        name: 'Geo Placemark',
+        styleManager: manager,
+      );
+
+      placemark.properties.setProperty('latitude', 45.0);
+      placemark.properties.setProperty('longitude', -90.0);
+
+      expect(placemark.properties.getProperty('latitude'), 45.0);
+      expect(placemark.properties.getProperty('longitude'), -90.0);
     });
   });
 }
