@@ -1,27 +1,27 @@
-import 'package:stager_platform/tree/concrete_leaf_node.dart';
-import 'package:stager_platform/mapping/style/kml_style_manager.dart';
-import 'package:stager_platform/mapping/style/kml_stylable.dart';
+// Project files
+import '../style/kml_style_manager.dart';
+import 'kml_feature_node.dart';
+import 'kml_geometry_node.dart';
 
-/// A [ConcreteLeafNode] specialized for representing KML Placemarks.
+/// A concrete [KMLFeatureNode] representing a KML Placemark.
 ///
 /// In the KML specification, a `<Placemark>` is a feature that represents a 
-/// specific geographic object on the map. This class maps that concept to the 
-/// Stager [LeafNode]. It typically contains geometry data (latitude, 
-/// longitude, or an outline) and other descriptive metadata stored in its 
-/// [properties]. Robust, non-nullable style resolution is provided via the 
-/// [KMLStylable] mixin.
-class KMLPlacemarkNode extends ConcreteLeafNode with KMLStylable {
+/// specific object on the map. This implementation treats the Placemark as 
+/// a composite container that aggregates one or more [KMLGeometryNode] 
+/// children. This structure naturally supports KML's `<MultiGeometry>` and 
+/// ensures that features are clearly separated from their geographic data.
+class KMLPlacemarkNode extends KMLFeatureNode {
   @override
   final KMLStyleManager styleManager;
 
   @override
   final String styleUrl;
 
-  /// Creates a [KMLPlacemarkNode].
+  /// Creates a [KMLPlacemarkNode] instance.
   ///
-  /// [id]: A unique identifier for this node within the Stager tree.
-  /// [name]: The display name of the placemark, typically from the KML `<name>` tag.
-  /// [styleManager]: The registry where shared styles are stored.
+  /// [id]: The unique identifier for the node.
+  /// [name]: The display name of the placemark.
+  /// [styleManager]: The manager used to resolve shared styles.
   /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
   /// [initialProperties]: Optional map of initial metadata for the node.
   KMLPlacemarkNode({
@@ -31,4 +31,19 @@ class KMLPlacemarkNode extends ConcreteLeafNode with KMLStylable {
     this.styleUrl = 'default',
     super.initialProperties,
   });
+
+  /// Indicates whether this placemark contains multiple geographic geometries.
+  ///
+  /// Maps to the `<MultiGeometry>` concept in the KML specification.
+  /// 
+  /// Returns `true` if the node has more than one [KMLGeometryNode] child, 
+  /// `false` otherwise.
+  bool get isMultiGeometry {
+    late bool result;
+    // Adhering to the Single Return Principle.
+    // We only count children that are specialized KMLGeometryNodes.
+    final geometryCount = children.whereType<KMLGeometryNode>().length;
+    result = geometryCount > 1;
+    return result;
+  }
 }
