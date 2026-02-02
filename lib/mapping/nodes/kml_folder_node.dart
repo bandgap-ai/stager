@@ -1,15 +1,15 @@
-import 'package:stager_platform/tree/concrete_composite_node.dart';
-import 'package:stager_platform/mapping/style/kml_style_manager.dart';
-import 'package:stager_platform/mapping/style/kml_stylable.dart';
+// Project files
+import '../style/kml_style_manager.dart';
+import 'kml_feature_node.dart';
 
-/// A [ConcreteCompositeNode] specialized for representing KML Folders.
+/// A concrete [KMLFeatureNode] specialized for representing KML Folders.
 ///
 /// In the KML specification, a `<Folder>` is a container used to organize 
 /// other features (Folders or Placemarks) into a hierarchy. This class 
-/// maps that concept to the Stager [CompositeNode], allowing for nested 
-/// geographic data structures and providing robust, non-nullable style 
-/// resolution via the [KMLStylable] mixin.
-class KMLFolderNode extends ConcreteCompositeNode with KMLStylable {
+/// maps that concept to the Stager tree, allowing for nested geographic 
+/// data structures and providing robust, non-nullable style resolution 
+/// inherited from [KMLFeatureNode].
+class KMLFolderNode extends KMLFeatureNode {
   @override
   final KMLStyleManager styleManager;
 
