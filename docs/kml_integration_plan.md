@@ -1,7 +1,12 @@
 # KML Integration Design Plan - 2026-01-31
 
 ## Status
-Under Revision
+Implemented
+
+All features were initially implemented on 20260201. A revision was opened on 20260202 to extend the
+implementation to include a reach feature set for the KML nodes. That revision was closed after the
+review of the 7th audit determined that the complexity of rebuilding the KML node architecture
+warranted a new design plan.
 
 ## Context & Background
 The Stager Platform requires a mechanism to import and manage hierarchical GIS data. KML (Keyhole Markup Language) is an industry-standard format whose folder-based structure aligns naturally with Stager's Composite tree architecture. This plan leverages native validation and a custom parser to bridge KML files into the Stager tree.
@@ -62,6 +67,14 @@ An initial audit identified the following risks and required corrections:
 *   **API Ergonomics**: Requiring the user to call `validate()` before `parse()` is error-prone. `parse()` should automatically trigger validation.
 *   **Method Naming**: `load()` is ambiguous. It should be renamed to `prepareSchemas()` to clearly indicate it is setting up the environment for native validation.
 
+### Seventh Audit - 2026-02-02
+*   **Baseline Feature Support**: An audit of the initial implementation reveals the following support status for key KML elements:
+    *   **KML Documents & Folders**: Fully supported and mapped to `KMLTreeRootNode` and `KMLFolderNode`.
+    *   **Placemarks**: Fully supported and mapped to `KMLPlacemarkNode`.
+    *   **Paths (LineStrings)**: Supported with correct `Lon,Lat -> Lat,Lon` coordinate swapping and stored in the `outline` property.
+    *   **Polygons**: Partially supported; only the outer boundary (`outerBoundaryIs`) is captured. Inner holes (`innerBoundaryIs`) are currently ignored.
+    *   **Ground Overlays**: Not supported in the current implementation.
+
 ## Implementation Details
 
 The implementation is largely contained in the following files:
@@ -119,7 +132,6 @@ All questions were resolved in the audits.
 
 ## Tickets
 
-- [Add a log reader](https://gitlab.com/bandgap/stager-platform/stager/-/issues/4)
 - [Refactor KMLFile.load() to be asynchronous](https://gitlab.com/bandgap/stager-platform/stager/-/issues/5)
 - [Implement KML specialized node subclasses (1 class per file & test)](https://gitlab.com/bandgap/stager-platform/stager/-/issues/6)
 - [Implement iterative KmlParser](https://gitlab.com/bandgap/stager-platform/stager/-/issues/7)
