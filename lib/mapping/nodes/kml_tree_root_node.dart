@@ -4,8 +4,6 @@ import 'dart:math' as math;
 // External packages
 import 'package:latlong2/latlong.dart';
 
-// Project files
-import '../../tree/concrete_tree_node.dart';
 import '../../tree/node_summary.dart';
 import '../../tree/tree.dart';
 import '../style/kml_style_manager.dart';

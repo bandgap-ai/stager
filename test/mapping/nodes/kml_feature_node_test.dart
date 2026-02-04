@@ -1,9 +1,7 @@
 // Flutter packages
 import 'package:flutter_test/flutter_test.dart';
 
-// Project files
 import 'package:stager_platform/mapping/nodes/kml_feature_node.dart';
-import 'package:stager_platform/mapping/style/kml_style_manager.dart';
 
 /// A concrete implementation of [KMLFeatureNode] for testing purposes.
 class TestFeatureNode extends KMLFeatureNode {

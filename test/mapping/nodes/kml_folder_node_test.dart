@@ -9,11 +9,6 @@ import 'package:stager_platform/mapping/style/kml_style_manager.dart';
 /// Unit tests for the [KMLFolderNode] class.
 void main() {
   group('KMLFolderNode', () {
-    late KMLStyleManager manager;
-
-    setUp(() {
-      manager = KMLStyleManager();
-    });
 
     test('should correctly instantiate and inherit from KMLFeatureNode', () {
       // Arrange & Act

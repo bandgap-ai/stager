@@ -1,7 +1,7 @@
 # KML Node Redesign Plan - 20260202
 
 ## Status
-Approved
+Implemented
 
 ## Context & Background
 
@@ -54,6 +54,11 @@ KMLGeometryNode children.
 To ensure compatibility with future overrides of summarize(), the specialized accessors must use 
 standardized property keys (e.g., 'kml_visibility', 'kml_holes').
 
+The the leaf node layer (`KMLPointNode`, `KMLPathNode`, `KMLPolygonNode`, and 
+`KMLGroundOverlayNode`) behaves as immutable Records. Geographic data is now required at 
+instantiation and stored directly in the `NodeProperties` map, eliminating the need for `has*` 
+boolean checks and ensuring a hardened, non-nullable API for consumers of the Stager tree.
+
 ## Alternatives Considered
 The original design was considered and, obviously, found wanting. Alternatives of the new class
 hierarchy were also considered, such as having Ground Overlays subclass features, but that led to
@@ -67,10 +72,15 @@ and `KMLFolderNode`, but that is not presently needed and, therefore, omitted.
 ## Reviews & Audits
 
 ### First Audit - 20260202
-* **Naming Collision Prevention**: Renamed the base `Icon` class to `StagerIcon` to avoid conflicts with `package:flutter/widgets.dart`.
-* **Polygon Plurality**: Updated the specification for `KMLPolygonNode` to support a `List<KMLHole>` instead of a single hole, accurately reflecting the KML schema.
-* **Stylable Ground Overlays**: Explicitly included the `KMLStylable` mixin for `KMLGroundOverlayNode` to support visual properties despite its placement in the geometry branch of the hierarchy.
-* **Consolidated Placemark Container**: Removed `KMLMultiGeometryNode`. `KMLPlacemarkNode` now handles multiple geometry children directly and provides an `isMultiGeometry` getter.
+* **Naming Collision Prevention**: Renamed the base `Icon` class to `StagerIcon` to avoid conflicts 
+* with `package:flutter/widgets.dart`.
+* **Polygon Plurality**: Updated the specification for `KMLPolygonNode` to support a `List<KMLHole>`
+* instead of a single hole, accurately reflecting the KML schema.
+* **Stylable Ground Overlays**: Explicitly included the `KMLStylable` mixin for 
+* `KMLGroundOverlayNode` to support visual properties despite its placement in the geometry branch 
+* of the hierarchy.
+* **Consolidated Placemark Container**: Removed `KMLMultiGeometryNode`. `KMLPlacemarkNode` now 
+* handles multiple geometry children directly and provides an `isMultiGeometry` getter.
 
 ### Second Audit - 20260203
 * **Improper Styling of Folders**: The initial redesign allowed `KMLFolderNode` to use the `KMLStylable` mixin. This is forbidden by the KML spec. The mixin should be moved from the base `KMLFeatureNode` to specific subclasses.
@@ -140,26 +150,24 @@ final polygon = KMLPolygonNode(
   id: 'poly1',
   name: 'Park Boundary',
   styleManager: styleManager,
-);
-
-// Using strongly-typed accessors instead of raw property maps
-polygon.outline = [
-  LatLng(40.764, -73.973),
-  LatLng(40.800, -73.958),
-  LatLng(40.796, -73.949),
-  LatLng(40.761, -73.964),
-  LatLng(40.764, -73.973),
-];
-
-// Support for complex geometry with multiple holes
-polygon.addHole(KMLHole(
-  points: [
-    LatLng(40.771, -73.970),
-    LatLng(40.775, -73.968),
-    LatLng(40.771, -73.965),
-    LatLng(40.771, -73.970),
+  outline: [
+    LatLng(40.764, -73.973),
+    LatLng(40.800, -73.958),
+    LatLng(40.796, -73.949),
+    LatLng(40.761, -73.964),
+    LatLng(40.764, -73.973),
   ],
-));
+  holes: [
+    KMLHole(
+      points: [
+        LatLng(40.771, -73.970),
+        LatLng(40.775, -73.968),
+        LatLng(40.771, -73.965),
+        LatLng(40.771, -73.970),
+      ],
+    )
+  ],
+);
 
 placemark.addChild(polygon);
 
@@ -168,14 +176,13 @@ final overlay = KMLGroundOverlayNode(
   id: 'overlay1',
   name: 'Historical Overlay',
   styleManager: styleManager,
-);
-
-overlay.icon = KMLIcon(href: 'assets/historical_map.png');
-overlay.latLonBox = LatLonBox(
-  north: 40.8,
-  south: 40.7,
-  east: -73.9,
-  west: -74.0,
+  icon: const KMLIcon(href: 'assets/historical_map.png'),
+  latLonBox: const LatLonBox(
+    north: 40.8,
+    south: 40.7,
+    east: -73.9,
+    west: -74.0,
+  ),
 );
 
 placemark.addChild(overlay);

@@ -1,6 +1,4 @@
 import '../../tree/concrete_composite_node.dart';
-import '../style/kml_style_manager.dart';
-import '../style/kml_stylable.dart';
 
 /// An abstract base class for all KML feature nodes in the Stager tree.
 ///

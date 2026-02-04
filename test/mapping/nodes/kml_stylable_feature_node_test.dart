@@ -30,7 +30,7 @@ void main() {
       // Assert: Verify retrieval from the underlying NodeProperties.
       expect(node.visibility, isFalse);
       expect(node.snippet, 'A brief snippet');
-      expect(node.extendedData?['key'], 'value');
+      expect(node.extendedData['key'], 'value');
       
       expect(node.properties.getProperty('kml_visibility'), isFalse);
       expect(node.properties.getProperty('kml_snippet'), 'A brief snippet');

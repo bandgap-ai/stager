@@ -1,5 +1,3 @@
-// Project files
-import '../style/kml_style_manager.dart';
 import 'kml_stylable_feature_node.dart';
 import 'kml_geometry_node.dart';
 

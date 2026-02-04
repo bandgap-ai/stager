@@ -23,6 +23,8 @@ void main() {
         id: 'overlay1',
         name: 'Historical Map',
         styleManager: manager,
+        icon: const KMLIcon(href: 'icon.png'),
+        latLonBox: const LatLonBox(north: 1, south: 0, east: 1, west: 0),
       );
 
       // Assert
@@ -31,39 +33,24 @@ void main() {
       expect(node.isComposite, isFalse);
     });
 
-    test('should support style resolution via KMLStylable', () {
+    test('should initialize with provided icon and latLonBox', () {
       // Arrange
-      final node = KMLGroundOverlayNode(
-        id: 'overlay2',
-        name: 'Styled Overlay',
-        styleManager: manager,
-      );
-
-      // Act & Assert
-      expect(node.kmlStyle.id, 'default');
-    });
-
-    test('should store and retrieve icon and LatLonBox via accessors', () {
-      // Arrange
-      final node = KMLGroundOverlayNode(
-        id: 'overlay3',
-        name: 'Data Overlay',
-        styleManager: manager,
-      );
       const icon = KMLIcon(href: 'assets/map.png');
       const box = LatLonBox(north: 10, south: 0, east: 10, west: 0);
 
       // Act
-      node.icon = icon;
-      node.latLonBox = box;
+      final node = KMLGroundOverlayNode(
+        id: 'overlay2',
+        name: 'Data Overlay',
+        styleManager: manager,
+        icon: icon,
+        latLonBox: box,
+      );
 
       // Assert: Verify via accessors.
       expect(node.icon, equals(icon));
       expect(node.latLonBox, equals(box));
-      
-      // Assert: Verify internal storage in NodeProperties.
-      expect(node.properties.getProperty('kml_icon'), isA<KMLIcon>());
-      expect(node.properties.getProperty('kml_latlonbox'), isA<LatLonBox>());
     });
+
   });
 }

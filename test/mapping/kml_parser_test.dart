@@ -1,10 +1,6 @@
 // Flutter packages
 import 'package:flutter_test/flutter_test.dart';
 
-// External packages
-import 'package:latlong2/latlong.dart';
-
-// Project files
 import 'package:stager_platform/mapping/kml_parser.dart';
 import 'package:stager_platform/mapping/nodes/kml_tree_root_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_folder_node.dart';
