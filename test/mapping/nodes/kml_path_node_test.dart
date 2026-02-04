@@ -24,6 +24,7 @@ void main() {
         id: 'path1',
         name: 'My Path',
         styleManager: manager,
+        outline: [],
       );
 
       // Assert
@@ -32,29 +33,49 @@ void main() {
       expect(node.isComposite, isFalse);
     });
 
-    test('should store and retrieve outline via strongly-typed accessors', () {
+    test('should initialize with the provided outline', () {
       // Arrange
-      final node = KMLPathNode(
-        id: 'path2',
-        name: 'River Path',
-        styleManager: manager,
-      );
       final points = [
         LatLng(40.0, -70.0),
         LatLng(41.0, -71.0),
       ];
 
       // Act
-      node.outline = points;
+      final node = KMLPathNode(
+        id: 'path_init',
+        name: 'Initial Path',
+        styleManager: manager,
+        outline: points,
+      );
+
+      // Assert
+      expect(node.outline, equals(points));
+    });
+
+    test('should retrieve outline via strongly-typed accessor', () {
+      // Arrange
+      final points = [
+        LatLng(40.0, -70.0),
+        LatLng(41.0, -71.0),
+      ];
+      final node = KMLPathNode(
+        id: 'path2',
+        name: 'River Path',
+        styleManager: manager,
+        outline: points,
+      );
+
+      // Act
+      final retrievedOutline = node.outline;
 
       // Assert: Verify via accessor.
-      expect(node.outline, equals(points));
+      expect(retrievedOutline, equals(points));
       
-      // Assert: Verify internal storage format (List of Maps) for Stager compatibility.
+      // Assert: Verify internal storage in NodeProperties.
       final rawOutline = node.properties.getProperty('outline') as List;
       expect(rawOutline.length, 2);
-      expect(rawOutline[0]['latitude'], 40.0);
-      expect(rawOutline[1]['longitude'], -71.0);
+      expect(rawOutline[0], equals(points[0]));
     });
+
   });
 }

@@ -7,17 +7,11 @@ import 'package:stager_platform/mapping/style/kml_style_manager.dart';
 
 /// A concrete implementation of [KMLGeometryNode] for testing purposes.
 class TestGeometryNode extends KMLGeometryNode {
-  @override
-  final KMLStyleManager styleManager;
-
-  @override
-  final String styleUrl;
-
   TestGeometryNode({
     required super.id,
     required super.name,
-    required this.styleManager,
-    this.styleUrl = 'default',
+    required super.styleManager,
+    super.styleUrl = 'default',
   });
 }
 
@@ -41,6 +35,18 @@ void main() {
       expect(node.properties.getProperty('id'), 'geo1');
       expect(node.properties.getProperty('name'), 'Geometry 1');
       expect(node.isComposite, isFalse);
+    });
+
+    test('should support style resolution via KMLStylable', () {
+      // Arrange
+      final node = TestGeometryNode(
+        id: 'geo2',
+        name: 'Styled Geometry',
+        styleManager: manager,
+      );
+
+      // Act & Assert
+      expect(node.kmlStyle.id, 'default');
     });
   });
 }

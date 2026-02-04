@@ -1,19 +1,12 @@
 // Project files
-import 'kml_feature_node.dart';
-import '../style/kml_style_manager.dart';
+import 'kml_stylable_feature_node.dart';
 
 /// A concrete [KMLFeatureNode] representing a KML Document.
 ///
 /// In the KML specification, a `<Document>` is a container for other features 
 /// (Folders, Placemarks, or other Documents). It serves as a root or a 
 /// high-level organizational element within a KML tree.
-class KMLDocumentNode extends KMLFeatureNode {
-  @override
-  final KMLStyleManager styleManager;
-
-  @override
-  final String styleUrl;
-
+class KMLDocumentNode extends KmlStylableFeatureNode {
   /// Creates a [KMLDocumentNode] instance.
   ///
   /// [id]: The unique identifier for the node.
@@ -24,8 +17,8 @@ class KMLDocumentNode extends KMLFeatureNode {
   KMLDocumentNode({
     required super.id,
     required super.name,
-    required this.styleManager,
-    this.styleUrl = 'default',
+    required super.styleManager,
+    super.styleUrl = 'default',
     super.initialProperties,
   });
 }

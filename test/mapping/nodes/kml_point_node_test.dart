@@ -1,6 +1,9 @@
 // Flutter packages
 import 'package:flutter_test/flutter_test.dart';
 
+// External packages
+import 'package:latlong2/latlong.dart';
+
 // Project files
 import 'package:stager_platform/mapping/nodes/kml_point_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_geometry_node.dart';
@@ -29,23 +32,34 @@ void main() {
       expect(node.isComposite, isFalse);
     });
 
+    test('should initialize with a default position of (0, 0)', () {
+      // Arrange & Act
+      final node = KMLPointNode(
+        id: 'pt_default',
+        name: 'Default Point',
+        styleManager: manager,
+      );
+
+      // Assert
+      expect(node.location, equals(const LatLng(0, 0)));
+    });
+
     test('should store and retrieve coordinates via strongly-typed accessors', () {
       // Arrange
+      final testLocation = LatLng(45.0, -90.0);
+      
+      // Act
       final node = KMLPointNode(
         id: 'pt2',
         name: 'Geo Point',
         styleManager: manager,
+        location: testLocation,
       );
 
-      // Act
-      node.latitude = 45.0;
-      node.longitude = -90.0;
-
       // Assert: Verify via accessors and underlying properties.
-      expect(node.latitude, 45.0);
-      expect(node.longitude, -90.0);
-      expect(node.properties.getProperty('latitude'), 45.0);
-      expect(node.properties.getProperty('longitude'), -90.0);
+      expect(node.location, equals(testLocation));
+      expect(node.properties.getProperty('position'), equals(testLocation));
     });
+
   });
 }

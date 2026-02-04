@@ -21,6 +21,12 @@ abstract class NodeProperties implements ObservableSubject {
   /// should handle the storage and retrieval of various types appropriately.
   void setProperty(String key, Object? value);
 
+  /// Checks if a property exists for a given [key].
+  ///
+  /// [key]: The string identifier for the property.
+  /// Returns `true` if the property exists, `false` otherwise.
+  bool containsProperty(String key);
+
   /// Retrieves the internal map of properties.
   ///
   /// This getter provides direct access to the underlying map storing the properties.

@@ -1,6 +1,6 @@
 // Project files
 import '../style/kml_style_manager.dart';
-import 'kml_feature_node.dart';
+import 'kml_stylable_feature_node.dart';
 import 'kml_geometry_node.dart';
 
 /// A concrete [KMLFeatureNode] representing a KML Placemark.
@@ -10,13 +10,7 @@ import 'kml_geometry_node.dart';
 /// a composite container that aggregates one or more [KMLGeometryNode] 
 /// children. This structure naturally supports KML's `<MultiGeometry>` and 
 /// ensures that features are clearly separated from their geographic data.
-class KMLPlacemarkNode extends KMLFeatureNode {
-  @override
-  final KMLStyleManager styleManager;
-
-  @override
-  final String styleUrl;
-
+class KMLPlacemarkNode extends KmlStylableFeatureNode {
   /// Creates a [KMLPlacemarkNode] instance.
   ///
   /// [id]: The unique identifier for the node.
@@ -27,8 +21,8 @@ class KMLPlacemarkNode extends KMLFeatureNode {
   KMLPlacemarkNode({
     required super.id,
     required super.name,
-    required this.styleManager,
-    this.styleUrl = 'default',
+    required super.styleManager,
+    super.styleUrl,
     super.initialProperties,
   });
 

@@ -11,7 +11,7 @@ import 'package:stager_platform/mapping/kml_hole.dart';
 ///
 /// These tests verify that the KMLHole correctly stores a list of geographic 
 /// coordinates representing an inner boundary and provides a descriptive 
-/// string representation.
+/// string representation including those coordinates.
 void main() {
   group('KMLHole', () {
     test('should store and retrieve coordinate points', () {
@@ -31,18 +31,17 @@ void main() {
       expect(hole.points.length, 4);
     });
 
-    test('toString should contain the number of points', () {
+    test('toString should contain the coordinate values', () {
       // Arrange
       final points = [
-        LatLng(0.0, 0.0),
-        LatLng(1.0, 1.0),
-        LatLng(0.0, 1.0),
-        LatLng(0.0, 0.0),
+        LatLng(12.34, 56.78),
       ];
       final hole = KMLHole(points: points);
 
-      // Act & Assert
-      expect(hole.toString(), contains('points: 4'));
+      // Act & Assert: Verify that LatLng's own toString output is nested.
+      final output = hole.toString();
+      expect(output, contains('12.34'));
+      expect(output, contains('56.78'));
     });
   });
 }

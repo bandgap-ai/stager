@@ -1,19 +1,14 @@
-// Project files
 import '../../tree/concrete_leaf_node.dart';
 import '../style/kml_style_manager.dart';
+import '../style/kml_stylable.dart';
 
 /// An abstract base class for all terminal KML geometry nodes in the Stager tree.
 ///
 /// This class serves as the foundation for geographic data nodes such as 
 /// Points, Paths, and Polygons. It extends [ConcreteLeafNode] and defines 
-/// the required style management capabilities for terminal KML nodes.
-abstract class KMLGeometryNode extends ConcreteLeafNode {
-  /// The manager used to resolve shared styles.
-  final KMLStyleManager styleManager;
-
-  /// The ID or URL of the style to apply to this geometry.
-  final String styleUrl;
-
+/// the required style management capabilities for terminal KML nodes via the 
+/// [KMLStylable] mixin.
+abstract class KMLGeometryNode extends ConcreteLeafNode with KMLStylable {
   /// Creates a [KMLGeometryNode] instance.
   ///
   /// [id]: The unique identifier for the node.
@@ -24,8 +19,12 @@ abstract class KMLGeometryNode extends ConcreteLeafNode {
   KMLGeometryNode({
     required super.id,
     required super.name,
-    required this.styleManager,
-    this.styleUrl = 'default',
+    required KMLStyleManager styleManager,
+    String styleUrl = 'default',
     super.initialProperties,
-  });
+  }) {
+    // Initializing the late final fields from the KMLStylable mixin.
+    this.styleManager = styleManager;
+    this.styleUrl = styleUrl;
+  }
 }

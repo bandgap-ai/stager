@@ -30,10 +30,10 @@ other tasks.
 
 The new architecture will have the following type hierarchy:
 - KMLTreeRootNode (extends ConcreteTreeNode)
-- KMLFeatureNode (abstract, extends ConcreteCompositeNode with KMLStylable mixin) with accessors for visibility, snippet, extended data, etc., which are stored as node properties.
--- KMLDocumentNode (extends KMLFeatureNode)
+- KMLFeatureNode (abstract, extends ConcreteCompositeNode) with accessors for visibility, snippet, extended data, etc., which are stored as node properties.
+-- KMLDocumentNode (extends KMLFeatureNode with KMLStylable mixin)
 -- KMLFolderNode (extends KMLFeatureNode)
--- KMLPlacemarkNode (extends KMLFeatureNode) with a property/getter to indicate if it contains a MultiGeometry (multiple geometry children).
+-- KMLPlacemarkNode (extends KMLFeatureNode with KMLStylable mixin) with a property/getter to indicate if it contains a MultiGeometry (multiple geometry children).
 - KMLGeometryNode (abstract, extends ConcreteLeafNode)
 -- KMLPointNode (extends KMLGeometryNode)
 -- KMLPathNode (LineString) (extends KMLGeometryNode)
@@ -72,6 +72,10 @@ and `KMLFolderNode`, but that is not presently needed and, therefore, omitted.
 * **Stylable Ground Overlays**: Explicitly included the `KMLStylable` mixin for `KMLGroundOverlayNode` to support visual properties despite its placement in the geometry branch of the hierarchy.
 * **Consolidated Placemark Container**: Removed `KMLMultiGeometryNode`. `KMLPlacemarkNode` now handles multiple geometry children directly and provides an `isMultiGeometry` getter.
 
+### Second Audit - 20260203
+* **Improper Styling of Folders**: The initial redesign allowed `KMLFolderNode` to use the `KMLStylable` mixin. This is forbidden by the KML spec. The mixin should be moved from the base `KMLFeatureNode` to specific subclasses.
+* **Invalid Nesting (Documents in Folders)**: The design allowed `KMLFolderNode` to contain `KMLDocumentNode`s. This is also forbidden. Runtime enforcement in `addChild` is required to maintain tree integrity.
+
 ## Implementation Details
 
 Icon support is provided in lib/data/icon.dart at the full library level since there is more than
@@ -81,6 +85,10 @@ lib/mapping/kml_hole.dart, respectively.
 
 Node layers are implemented in lib/mapping/nodes following the hierarchy above an adhering to a
 one class per file rule. Tests are in tests/mapping.
+
+`KMLFeatureNode` serves as the base for containers but no longer implements `KMLStylable`. Styling is instead applied to `KMLDocumentNode`, `KMLPlacemarkNode`, and `KMLGroundOverlayNode`. 
+
+`KMLFolderNode` overrides the `addChild` method to explicitly reject `KMLDocumentNode` children, throwing an `ArgumentError` to ensure KML spec compliance.
 
 KMLParser and its utilities have been refactored to detect and instantiate the new node types. This
 is effectively a complete rewrite of the parser, its utilities, and its tests since the structure of
@@ -107,6 +115,7 @@ to Placemark.
     * Verify the `StagerIcon`, `KMLIcon`, `LatLonBox`, and `KMLHole` data models for correct property storage and serialization.
     * Test each node class in `lib/mapping/nodes/` to ensure constructors correctly initialize properties and that accessors map to the correct internal keys in `NodeProperties`.
     * Verify `KMLPlacemarkNode` correctly manages multiple `KMLGeometryNode` children and reports `isMultiGeometry` accurately.
+    * Verify `KMLFolderNode` correctly rejects `KMLDocumentNode` children.
 * **Widget Tests**:
     * Although UI components are not part of this redesign, ensure that existing `LocationEditor` components can still interact with nodes containing geographic properties.
 * **Integration Tests**:
@@ -200,4 +209,3 @@ None.
 - [Update public API exports for new KML hierarchy](https://gitlab.com/bandgap/stager-platform/stager/-/issues/31)
 - [Update Visitor Verification tests for new KML hierarchy](https://gitlab.com/bandgap/stager-platform/stager/-/issues/32)
 - [Update KML Integration tests for new KML hierarchy](https://gitlab.com/bandgap/stager-platform/stager/-/issues/33)
-

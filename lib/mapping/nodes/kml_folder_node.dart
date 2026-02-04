@@ -1,21 +1,18 @@
 // Project files
-import '../style/kml_style_manager.dart';
+import 'kml_document_node.dart';
 import 'kml_feature_node.dart';
+import '../../tree/tree.dart';
 
 /// A concrete [KMLFeatureNode] specialized for representing KML Folders.
 ///
 /// In the KML specification, a `<Folder>` is a container used to organize 
 /// other features (Folders or Placemarks) into a hierarchy. This class 
 /// maps that concept to the Stager tree, allowing for nested geographic 
-/// data structures and providing robust, non-nullable style resolution 
-/// inherited from [KMLFeatureNode].
+/// data structures.
+/// 
+/// Note: According to the KML specification, a Folder cannot contain a 
+/// Document feature. This implementation enforces that rule in [addChild].
 class KMLFolderNode extends KMLFeatureNode {
-  @override
-  final KMLStyleManager styleManager;
-
-  @override
-  final String styleUrl;
-
   /// Creates a [KMLFolderNode].
   ///
   /// [id]: A unique identifier for this node within the Stager tree.
@@ -26,8 +23,20 @@ class KMLFolderNode extends KMLFeatureNode {
   KMLFolderNode({
     required super.id,
     required super.name,
-    required this.styleManager,
-    this.styleUrl = 'default',
     super.initialProperties,
   });
+
+  /// Adds a [child] to this folder.
+  /// 
+  /// This method overrides the standard composite behavior to enforce KML 
+  /// nesting rules. Specifically, it rejects [KMLDocumentNode]s.
+  /// 
+  /// Throws an [ArgumentError] if the [child] is a [KMLDocumentNode].
+  @override
+  void addChild(LeafNode child) {
+    if (child is KMLDocumentNode) {
+      throw ArgumentError('KML specification violation: A Folder cannot contain a Document.');
+    }
+    super.addChild(child);
+  }
 }

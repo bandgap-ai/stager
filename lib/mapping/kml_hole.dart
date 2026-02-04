@@ -15,5 +15,5 @@ class KMLHole {
   KMLHole({required this.points});
 
   @override
-  String toString() => 'KMLHole(points: ${points.length})';
+  String toString() => 'KMLHole(points: $points)';
 }

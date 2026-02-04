@@ -3,25 +3,22 @@ import 'package:latlong2/latlong.dart';
 import 'package:xml/xml.dart';
 
 // Project files
+import 'nodes/kml_document_node.dart';
 import 'nodes/kml_folder_node.dart';
 import 'nodes/kml_placemark_node.dart';
+import 'nodes/kml_point_node.dart';
+import 'nodes/kml_path_node.dart';
+import 'nodes/kml_polygon_node.dart';
+import 'kml_hole.dart';
 import 'style/kml_icon_style.dart';
 import 'style/kml_line_style.dart';
 import 'style/kml_poly_style.dart';
 import 'style/kml_style_manager.dart';
 
 /// A utility class containing static methods for parsing KML elements and 
-/// creating Stager nodes.
-///
-/// This class encapsulates the transformation logic from KML XML fragments to 
-/// strongly-typed style components and Stager tree nodes, enabling granular 
-/// unit testing.
+/// creating specialized Stager nodes following the redesigned hierarchy.
 class KMLParserUtils {
   /// Extracts LineStyle information from a `<Style>` element.
-  ///
-  /// [styleElement]: The XML element containing the style definition.
-  ///
-  /// Returns a non-nullable [KMLLineStyle].
   static KMLLineStyle parseLineStyle(XmlElement styleElement) {
     late KMLLineStyle style;
     final lineElem = styleElement.getElement('LineStyle');
@@ -38,10 +35,6 @@ class KMLParserUtils {
   }
 
   /// Extracts PolyStyle information from a `<Style>` element.
-  ///
-  /// [styleElement]: The XML element containing the style definition.
-  ///
-  /// Returns a non-nullable [KMLPolyStyle].
   static KMLPolyStyle parsePolyStyle(XmlElement styleElement) {
     late KMLPolyStyle style;
     final polyElem = styleElement.getElement('PolyStyle');
@@ -61,10 +54,6 @@ class KMLParserUtils {
   }
 
   /// Extracts IconStyle information from a `<Style>` element.
-  ///
-  /// [styleElement]: The XML element containing the style definition.
-  ///
-  /// Returns a non-nullable [KMLIconStyle].
   static KMLIconStyle parseIconStyle(XmlElement styleElement) {
     late KMLIconStyle style;
     final iconElem = styleElement.getElement('IconStyle');
@@ -80,21 +69,16 @@ class KMLParserUtils {
     return style;
   }
 
-  /// Creates a [KMLFolderNode] from a `<Folder>` or `<Document>` element.
-  ///
-  /// [element]: The XML element representing the folder.
-  /// [styleManager]: The manager used to resolve styles.
-  ///
-  /// Returns a [KMLFolderNode].
-  static KMLFolderNode createFolderNode(
+  /// Creates a [KMLDocumentNode] from a `<Document>` element.
+  static KMLDocumentNode createDocumentNode(
     XmlElement element, 
     KMLStyleManager styleManager,
   ) {
-    final id = element.getAttribute('id') ?? 'folder_${element.hashCode}';
-    final name = element.getElement('name')?.innerText ?? 'Unnamed Folder';
+    final id = element.getAttribute('id') ?? 'doc_${element.hashCode}';
+    final name = element.getElement('name')?.innerText ?? 'Unnamed Document';
     final styleUrl = element.getElement('styleUrl')?.innerText ?? 'default';
 
-    return KMLFolderNode(
+    return KMLDocumentNode(
       id: id,
       name: name,
       styleManager: styleManager,
@@ -102,12 +86,21 @@ class KMLParserUtils {
     );
   }
 
+  /// Creates a [KMLFolderNode] from a `<Folder>` element.
+  static KMLFolderNode createFolderNode(
+    XmlElement element, 
+    KMLStyleManager styleManager,
+  ) {
+    final id = element.getAttribute('id') ?? 'folder_${element.hashCode}';
+    final name = element.getElement('name')?.innerText ?? 'Unnamed Folder';
+
+    return KMLFolderNode(
+      id: id,
+      name: name
+    );
+  }
+
   /// Creates a [KMLPlacemarkNode] from a `<Placemark>` element.
-  ///
-  /// [element]: The XML element representing the placemark.
-  /// [styleManager]: The manager used to resolve styles.
-  ///
-  /// Returns a [KMLPlacemarkNode].
   static KMLPlacemarkNode createPlacemarkNode(
     XmlElement element, 
     KMLStyleManager styleManager,
@@ -123,10 +116,7 @@ class KMLParserUtils {
       styleUrl: styleUrl,
     );
 
-    // Extract geometry data (Point, Polygon, etc.) from the XML.
-    parseGeometry(element, node);
-    
-    // Capture descriptive attributes.
+    // Capture feature attributes.
     final desc = element.getElement('description')?.innerText;
     if (desc != null) {
       node.properties.setProperty('description', desc);
@@ -135,113 +125,180 @@ class KMLParserUtils {
     return node;
   }
 
-  /// Extracts geographic geometry data from a `<Placemark>` [element] and 
-  /// populates the [node]'s properties.
+  /// Extracts geometries from a `<Placemark>` or `<MultiGeometry>` element
+  /// and adds them as children to the [parentNode].
   ///
-  /// This method coordinates the extraction of Points, LineStrings, and 
-  /// Polygons by delegating to specialized helper functions.
+  /// This method iterates through Point, LineString, and Polygon elements,
+  /// instantiating specialized nodes and adding them to the hierarchy. It
+  /// throws a [FormatException] if any geometry is invalid.
+  static void parseGeometries(
+    XmlElement element,
+    KMLPlacemarkNode parentNode,
+    KMLStyleManager styleManager,
+  ) {
+    final multiGeo = element.getElement('MultiGeometry');
+    final target = multiGeo ?? element;
+
+    // Point
+    for (final el in target.findElements('Point')) {
+      parentNode.addChild(parsePointGeometry(el, styleManager));
+    }
+
+    // LineString
+    for (final el in target.findElements('LineString')) {
+      parentNode.addChild(parseLineStringGeometry(el, styleManager));
+    }
+
+    // Polygon
+    for (final el in target.findElements('Polygon')) {
+      parentNode.addChild(parsePolygonGeometry(el, styleManager));
+    }
+  }
+
+  /// Parses a `<Point>` element and returns a [KMLPointNode].
   ///
-  /// [element]: The XML element representing the Placemark.
-  /// [node]: The Stager node where the geometry will be stored.
-  static void parseGeometry(XmlElement element, KMLPlacemarkNode node) {
-    // Adhering to the optimized branch order by checking for the most 
-    // common geometry types first. Using an if-else chain to adhere to the 
-    // Single Return Principle (logical exit point).
-    if (element.getElement('Point') != null) {
-      parsePointGeometry(element, node);
-    } else if (element.getElement('LineString') != null) {
-      parseLineStringGeometry(element, node);
+  /// [element]: The `<Point>` XML element.
+  /// [styleManager]: The manager for resolving styles.
+  ///
+  /// Returns a new [KMLPointNode].
+  ///
+  /// Throws [FormatException] if coordinates are missing or invalid.
+  static KMLPointNode parsePointGeometry(
+    XmlElement element, 
+    KMLStyleManager styleManager,
+  ) {
+    late KMLPointNode node;
+    final coords = element.getElement('coordinates')?.innerText;
+    
+    if (coords != null) {
+      final latLng = parseCoordinate(coords);
+      node = KMLPointNode(
+        id: 'pt_${element.hashCode}',
+        name: 'Point',
+        location: latLng,
+        styleManager: styleManager,
+      );
     } else {
-      parsePolygonGeometry(element, node);
+      throw const FormatException('KML Point missing coordinates');
     }
+    
+    return node;
   }
 
-  /// Parses a `<Point>` geometry from the given [element] and updates the [node].
+  /// Parses a `<LineString>` element and returns a [KMLPathNode].
   ///
-  /// [element]: The XML element representing the Placemark.
-  /// [node]: The Stager node to update with Point coordinates.
-  static void parsePointGeometry(XmlElement element, KMLPlacemarkNode node) {
-    final point = element.getElement('Point');
-    if (point != null) {
-      final coords = point.getElement('coordinates')?.innerText;
-      if (coords != null) {
-        final latLng = parseCoordinate(coords);
-        if (latLng != null) {
-          node.properties.setProperty('latitude', latLng.latitude);
-          node.properties.setProperty('longitude', latLng.longitude);
-        }
+  /// [element]: The `<LineString>` XML element.
+  /// [styleManager]: The manager for resolving styles.
+  ///
+  /// Returns a new [KMLPathNode].
+  ///
+  /// Throws [FormatException] if coordinates are missing or empty.
+  static KMLPathNode parseLineStringGeometry(
+    XmlElement element, 
+    KMLStyleManager styleManager,
+  ) {
+    late KMLPathNode node;
+    final coords = element.getElement('coordinates')?.innerText;
+    
+    if (coords != null) {
+      final points = parseCoordinateList(coords);
+      if (points.isNotEmpty) {
+        node = KMLPathNode(
+          id: 'path_${element.hashCode}',
+          name: 'Path',
+          outline: points,
+          styleManager: styleManager
+        );
+      } else {
+        throw const FormatException('KML LineString has no valid coordinates');
       }
+    } else {
+      throw const FormatException('KML LineString missing coordinates');
     }
+    
+    return node;
   }
 
-  /// Parses a `<LineString>` geometry from the given [element] and updates 
-  /// the [node].
+  /// Parses a `<Polygon>` element and returns a [KMLPolygonNode].
   ///
-  /// [element]: The XML element representing the Placemark.
-  /// [node]: The Stager node to update with LineString coordinates.
-  static void parseLineStringGeometry(XmlElement element, KMLPlacemarkNode node) {
-    final lineString = element.getElement('LineString');
-    if (lineString != null) {
-      final coords = lineString.getElement('coordinates')?.innerText;
-      if (coords != null) {
-        final points = parseCoordinateList(coords);
-        if (points.isNotEmpty) {
-          final outline = points.map((p) => {
-            'latitude': p.latitude,
-            'longitude': p.longitude,
-          }).toList();
-          node.properties.setProperty('outline', outline);
-        }
-      }
-    }
-  }
+  /// [element]: The `<Polygon>` XML element.
+  /// [styleManager]: The manager for resolving styles.
+  ///
+  /// Returns a new [KMLPolygonNode].
+  ///
+  /// Throws [FormatException] if outer boundary coordinates are missing or empty.
+  static KMLPolygonNode parsePolygonGeometry(
+    XmlElement element, 
+    KMLStyleManager styleManager,
+  ) {
+    late KMLPolygonNode node;
+    final outer = element.getElement('outerBoundaryIs')
+                         ?.getElement('LinearRing')
+                         ?.getElement('coordinates')?.innerText;
+                         
+    if (outer != null) {
+      final points = parseCoordinateList(outer);
+      if (points.isNotEmpty) {
 
-  /// Parses a `<Polygon>` geometry from the given [element] and updates 
-  /// the [node].
-  ///
-  /// [element]: The XML element representing the Placemark.
-  /// [node]: The Stager node to update with Polygon coordinates.
-  static void parsePolygonGeometry(XmlElement element, KMLPlacemarkNode node) {
-    final polygon = element.getElement('Polygon');
-    if (polygon != null) {
-      final outer = polygon.getElement('outerBoundaryIs')
-                           ?.getElement('LinearRing')
-                           ?.getElement('coordinates')?.innerText;
-      if (outer != null) {
-        final points = parseCoordinateList(outer);
-        if (points.isNotEmpty) {
-          final outline = points.map((p) => {
-            'latitude': p.latitude,
-            'longitude': p.longitude,
-          }).toList();
-          node.properties.setProperty('outline', outline);
+        // Parse inner holes if they exist
+        final holes = List<KMLHole>.empty(growable: true);
+        for (final inner in element.findElements('innerBoundaryIs')) {
+          final ring = inner.getElement('LinearRing');
+          final ringCoords = ring?.getElement('coordinates')?.innerText;
+          if (ringCoords != null) {
+            final holePoints = parseCoordinateList(ringCoords);
+            if (holePoints.isNotEmpty) {
+              holes.add(KMLHole(points: holePoints));
+            }
+          }
         }
+
+        // Create the node
+        node = KMLPolygonNode(
+            id: 'poly_${element.hashCode}',
+            name: 'Polygon',
+            styleManager: styleManager,
+            outline: points,
+            holes: holes
+        );
+
+      } else {
+        throw const FormatException('KML Polygon outer boundary has no coordinates');
       }
+    } else {
+      throw const FormatException('KML Polygon missing outer boundary');
     }
+    
+    return node;
   }
 
   /// Parses a single KML coordinate string into a [LatLng] object.
   ///
   /// [raw]: A coordinate string in the format "longitude,latitude[,altitude]".
   ///
-  /// Returns a [LatLng] with the values correctly swapped to (latitude, 
-  /// longitude), or null if parsing fails.
-  static LatLng? parseCoordinate(String raw) {
-    late LatLng? result;
+  /// Returns a non-nullable [LatLng] with values correctly swapped to 
+  /// (latitude, longitude).
+  ///
+  /// Throws [FormatException] if the input string is invalid or malformed.
+  static LatLng parseCoordinate(String raw) {
+    late LatLng result;
     // KML standard is lon,lat,alt. We must trim and split.
     final parts = raw.trim().split(',');
+    
     if (parts.length >= 2) {
       final lon = double.tryParse(parts[0]);
       final lat = double.tryParse(parts[1]);
+      
       if (lon != null && lat != null) {
         // Crucial Swap: KML is Lon,Lat; Stager/Leaflet is Lat,Lon.
         result = LatLng(lat, lon);
       } else {
-        result = null;
+        throw FormatException('KML coordinate contains non-numeric values: $raw');
       }
     } else {
-      result = null;
+      throw FormatException('Malformed KML coordinate string: $raw');
     }
+    
     return result;
   }
   
@@ -255,9 +312,10 @@ class KMLParserUtils {
      final tuples = raw.trim().split(RegExp(r'\s+'));
      final points = <LatLng>[];
      for (final tuple in tuples) {
-       final pt = parseCoordinate(tuple);
-       if (pt != null) {
-         points.add(pt);
+       try {
+         points.add(parseCoordinate(tuple));
+       } catch (e) {
+         // Skip invalid individual coordinates in a list.
        }
      }
      return points;

@@ -20,13 +20,30 @@ export 'providers/geolocator_location_provider.dart';
 // Public interfaces for persistence and file handling.
 export 'editors/file_handler.dart';
 
+// Geographic Data Models.
+export 'data/stager_icon.dart';
+export 'mapping/lat_lon_box.dart';
+export 'mapping/kml_hole.dart';
+export 'mapping/kml_icon.dart';
+
 // KML Mapping and GIS support.
 export 'mapping/kml_file.dart';
 export 'mapping/kml_parser.dart';
 export 'mapping/kml_parser_utils.dart';
+
+// Specialized KML Nodes.
+export 'mapping/nodes/kml_feature_node.dart';
+export 'mapping/nodes/kml_geometry_node.dart';
 export 'mapping/nodes/kml_tree_root_node.dart';
+export 'mapping/nodes/kml_document_node.dart';
 export 'mapping/nodes/kml_folder_node.dart';
 export 'mapping/nodes/kml_placemark_node.dart';
+export 'mapping/nodes/kml_point_node.dart';
+export 'mapping/nodes/kml_path_node.dart';
+export 'mapping/nodes/kml_polygon_node.dart';
+export 'mapping/nodes/kml_ground_overlay_node.dart';
+
+// KML Style Subsystem.
 export 'mapping/style/kml_style.dart';
 export 'mapping/style/kml_icon_style.dart';
 export 'mapping/style/kml_line_style.dart';

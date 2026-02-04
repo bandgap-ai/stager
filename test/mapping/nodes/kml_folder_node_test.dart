@@ -19,8 +19,7 @@ void main() {
       // Arrange & Act
       final node = KMLFolderNode(
         id: 'folder1',
-        name: 'My Folder',
-        styleManager: manager,
+        name: 'My Folder'
       );
 
       // Assert
@@ -34,13 +33,11 @@ void main() {
       // Arrange
       final parent = KMLFolderNode(
         id: 'folder2',
-        name: 'Parent Folder',
-        styleManager: manager,
+        name: 'Parent Folder'
       );
       final child = KMLFolderNode(
         id: 'folder3',
-        name: 'Child Folder',
-        styleManager: manager,
+        name: 'Child Folder'
       );
 
       // Act

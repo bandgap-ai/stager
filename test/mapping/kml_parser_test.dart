@@ -1,17 +1,21 @@
 // Flutter packages
 import 'package:flutter_test/flutter_test.dart';
 
+// External packages
+import 'package:latlong2/latlong.dart';
+
 // Project files
 import 'package:stager_platform/mapping/kml_parser.dart';
 import 'package:stager_platform/mapping/nodes/kml_tree_root_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_folder_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_placemark_node.dart';
+import 'package:stager_platform/mapping/nodes/kml_point_node.dart';
 
 /// Integration tests for the [KMLParser] class.
 ///
 /// These tests verify that the parser can correctly transform full KML 
 /// documents into Stager node trees, handling nesting, coordinate systems, 
-/// and style resolution.
+/// and style resolution following the redesigned composite hierarchy.
 void main() {
   group('KMLParser Tests', () {
     late KMLParser parser;
@@ -73,8 +77,9 @@ void main() {
       expect(placemark.properties.getProperty("name"), 'Placemark 1');
     });
 
-    /// Verifies that <Point> geometries are correctly extracted and that 
-    /// Lon,Lat coordinates are swapped to Stager's Lat,Lon format.
+    /// Verifies that <Point> geometries are correctly extracted into 
+    /// specialized geometry nodes and that Lon,Lat coordinates are swapped 
+    /// to Stager's Lat,Lon format.
     test('Parses Point Geometry and swaps coordinates', () {
       // Arrange: A Placemark with a specific Lon,Lat coordinate.
       const kml = '''
@@ -90,19 +95,20 @@ void main() {
       // Act: Parse the point feature.
       final root = parser.parse(kml);
       
-      // Assert: Verify the coordinate swap logic.
+      // Assert: Placemark is a child of the root.
       final placemark = root.children.first as KMLPlacemarkNode;
       
-      final lat = placemark.properties.getProperty('latitude') as double;
-      final lon = placemark.properties.getProperty('longitude') as double;
+      // Assert: Geometry is a child of the placemark in the new hierarchy.
+      final pointNode = placemark.children.first as KMLPointNode;
+      final location = pointNode.location;
 
-      // KML spec uses Lon,Lat order. Stager uses Lat,Lon.
-      expect(lat, closeTo(37.0, 0.0001));
-      expect(lon, closeTo(-122.0, 0.0001));
+      // KML spec uses Lon,Lat order. Stager uses Lat,Lon. Verify the swap.
+      expect(location.latitude, closeTo(37.0, 0.0001));
+      expect(location.longitude, closeTo(-122.0, 0.0001));
     });
 
     /// Verifies that styles defined *after* their usage in the XML document 
-    /// are correctly resolved via the [KMLStyleManager].
+    /// are correctly resolved via the style management system.
     test('Resolves forward-referenced styles', () {
       // Arrange: Placemark references 'myStyle' before it is defined.
       const kml = '''
@@ -124,7 +130,7 @@ void main() {
       final root = parser.parse(kml);
       final placemark = root.children.first as KMLPlacemarkNode;
       
-      // Assert: Verify that the style component was correctly populated.
+      // Assert: Verify that the style component was correctly resolved.
       final style = placemark.kmlStyle;
       expect(style.id, 'myStyle');
       expect(style.iconStyle.scale, 1.5);

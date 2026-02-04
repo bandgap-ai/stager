@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/mapping/kml_file.dart';
 import 'package:stager_platform/mapping/nodes/kml_tree_root_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_placemark_node.dart';
+import 'package:stager_platform/mapping/nodes/kml_point_node.dart';
 import 'package:stager_platform/tree/node_visitor.dart';
 import 'kml_mock.dart';
 
@@ -26,6 +27,8 @@ class IntegrationTestVisitor extends NodeVisitor {
     if (node is KMLTreeRootNode) {
       nodeNames.add(node.properties.getProperty('name').toString());
     } else if (node is KMLPlacemarkNode) {
+      nodeNames.add(node.properties.getProperty('name').toString());
+    } else if (node is KMLPointNode) {
       nodeNames.add(node.properties.getProperty('name').toString());
     }
   }
@@ -88,30 +91,38 @@ void main() {
         // 3. Assert: Basic verification of the parsed root.
         expect(root, isA<KMLTreeRootNode>());
         expect(root.properties.getProperty('name'), 'KML Document');
+        
+        // Refactored: Root contains 1 child (Placemark).
         expect(root.children.length, 1);
 
         // 4. Act: Traverse the GIS data using a visitor.
         final visitor = IntegrationTestVisitor();
-        // Start traversal at the root.
-        root.accept(visitor);
         
-        // Note: Our pragmatic visitor doesn't automatically recurse, 
-        // so we manually visit children to verify they were correctly 
-        // parsed and are visitable.
-        for (final child in root.children) {
-          child.accept(visitor);
+        // Manual recursive traversal for verification since our simple visitor
+        // is non-recursive.
+        void traverse(dynamic node) {
+          node.accept(visitor);
+          if (node is KMLTreeRootNode || node is KMLPlacemarkNode) {
+            for (final child in node.children) {
+              traverse(child);
+            }
+          }
         }
+        
+        traverse(root);
 
-        // Assert: Visitor should have seen both the root and the placemark.
-        expect(visitor.visitCount, 2);
+        // Assert: Visitor should have seen 3 nodes: Root, Placemark, and Point.
+        expect(visitor.visitCount, 3);
         expect(visitor.nodeNames, contains('KML Document'));
         expect(visitor.nodeNames, contains('New York City'));
+        expect(visitor.nodeNames, contains('Point'));
 
         // 5. Act: Use ConcreteTreeNode's built-in summarization.
         final summary = root.summarize();
 
         // 6. Assert: Verify the summarization results.
-        expect(summary.totalNodes, 2);
+        // Total nodes: Root (1) + Placemark (1) + Point (1) = 3.
+        expect(summary.totalNodes, 3);
         expect(summary.centerPoint, isNotNull);
         
         // Verify that the coordinates (Lat, Lon) match the Wikipedia 

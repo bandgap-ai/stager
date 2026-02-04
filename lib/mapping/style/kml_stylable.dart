@@ -3,16 +3,22 @@ import 'kml_style_manager.dart';
 
 /// A mixin that provides KML style resolution capabilities to Stager nodes.
 ///
-/// This mixin centralizes the logic for lazily resolving [KMLStyle] objects 
-/// from a [KMLStyleManager] using a provided [styleUrl]. It ensures that 
-/// nodes always have access to a valid, non-nullable style, falling back 
-/// to spec-compliant defaults when necessary.
+/// This mixin centralizes both the storage and the logic for lazily resolving 
+/// [KMLStyle] objects from a [KMLStyleManager]. It ensures that nodes 
+/// always have access to a valid, non-nullable style, falling back to 
+/// spec-compliant defaults when necessary.
 mixin KMLStylable {
-  /// The manager used to resolve shared styles.
-  KMLStyleManager get styleManager;
+  /// The manager used to resolve shared styles. 
+  /// 
+  /// This must be initialized in the constructor body of the class using 
+  /// this mixin.
+  late final KMLStyleManager styleManager;
 
   /// The ID or URL of the style to apply to this node.
-  String get styleUrl;
+  /// 
+  /// This must be initialized in the constructor body of the class using 
+  /// this mixin.
+  late final String styleUrl;
 
   /// Lazily resolves and returns the [KMLStyle] for this node.
   ///
