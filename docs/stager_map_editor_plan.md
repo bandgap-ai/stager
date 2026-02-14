@@ -1,7 +1,7 @@
 # Stager Map Editor Development Plan - 20260205
 
 ## Status
-Draft
+Approved
 
 ## Context & Background
 The purpose of this plan is to develop a new map editor (or collection of map editors if needed) in
@@ -24,7 +24,7 @@ storing selection state with regular data.
 * Enable tile server configuration.
 * Enable multiple tile options/layers for sophisticated tile servers like ArcGIS.
 * Provide configurable graphical cues like parent-child relationships.
-* Utilize the new LocationEditor to allow users to configure their location or automatically detect 
+* Utilize the new `LocationEditor` to allow users to configure their location or automatically detect 
 it with GPS.
 * Configurable RichAttributionWidgets.
 
@@ -40,59 +40,124 @@ Tracee needs a rewrite (even though it functions very well).
 None.
 
 ## Reviews & Audits
-Document feedback from peers and stakeholders. Summarize audit findings for shortcomings and likely failures.
+
+### First Audit - 20260205
+* **Interaction Model**: The feedback loop between `flutter_map` and the Stager tree is resolved by 
+having `LayerAdapter`s wrap flattened widgets (Markers, Polygons) in `GestureDetector`s. Taps will 
+trigger updates to the specific `TreeNode` and the `SelectionService`.
+* **Centralized Synchronization**: `MapEditor` will observe the `SelectionService` to support 
+automated navigation (pan/zoom) when nodes are selected externally (e.g., in a Tree View).
+* **Operational Modes**: The editor follows a "viewer-first" philosophy, where editing capabilities 
+are enabled contextually based on specific user operations.
+* **Persistence Strategy**: User-selected configurations will use `shared_preferences`. Proprietary 
+or client-specific layers (like Tracee's ArcGIS layers) will be isolated in repository forks to 
+maintain core library purity.
+* **State Management**: The current separation between `MapState` and `_MapEditorState` is deemed 
+sufficient for now, with further hardening deferred until specific synchronization bugs are 
+identified.
+* **Performance**: Implementation will focus on eliminating repetitive linear searching. Performance
+will be measured rather than speculated upon, though thousands of features are expected to be 
+handled efficiently.
 
 ## Implementation Details
 This package uses the Flutter Map plugin. The base map is OpenStreetMap and there 
 [are specific rules around using the OpenStreetMap tile server](https://operations.osmfoundation.org/policies/tiles/).
 
-The [MapEditor](../lib/mapping/map_editor.dart) is small by design. It externalizes as much of its
+The [`MapEditor`](../lib/mapping/map_editor.dart) is small by design. It externalizes as much of its
 functionality as possible to remain reconfigurable and reusable. The Map Editor's Flutter Map Layers
-are implemented in separate files and loaded dynamically based on the configuration of the MapEditor
+are implemented in separate files and loaded dynamically based on the configuration of the `MapEditor`
 widget as it reloads.
 
-Marker and Polygon layers are constructed with specialized LayerAdapters. LayerAdapters can be
-specialized to data types without introducing those dependencies to MapEditor. LayerAdapters can
-adapt to any input, but their intended purpose is to adapt data in Stager TreeNodes to the flattened
-form (set of arrays) required by Flutter Map. LayerAdapters should observer the data they adapt and
+Marker and Polygon layers are constructed with specialized `LayerAdapter`s. `LayerAdapter`s can be
+specialized to data types without introducing those dependencies to `MapEditor`. `LayerAdapter`s can
+adapt to any input, but their intended purpose is to adapt data in Stager `TreeNode`s to the flattened
+form (set of arrays) required by Flutter Map. `LayerAdapter`s should observer the data they adapt and
 reload the layers when the data changes. [Tree Node Iterators](../lib/tree/iterators.dart) are used
-to iterate over the tree in the specialized LayerAdapters.
+to iterate over the tree in the specialized `LayerAdapter`s. Tile layers and 
+`RichAttributionWidget`s are handled as special `LayerAdapter` subclasses.
 
-The MapEditor widget is [a standard Stager editor](../lib/editors/stager_editor.dart), (and because
+To handle user interaction, the `LayerAdapter` will set Flutter `GestureDetector`s on the map 
+widgets' (like `Marker`) `onTap` callbacks. The callback will then dispatch updates to the target 
+`TreeNode` and the `SelectionService`. Editing nodes will be enabled accomplished by type and as 
+follows:
+* Markers will appear in the `NodePropertiesView` for detailed editing after an `onTap` event, which
+will set the selected Marker as the active node in `SelectionService`. Gross moves will be
+accomplished by enabling a "Move" action control in the `MapEditor` that allows for click and drag
+(i.e., `onLongPress` actions) changes. The changes will be committed to the node when the user 
+releases the drag.
+* Polygons will appear in the `NodePropertiesView` for review. Polygons will be editable via the 
+same gross action ("Move" mode) as markers, and detail editing will be accomplished by editing the
+position of a polygon marker directly.
+
+Creating nodes can happen in at least two ways. First, users can add nodes by editing the Tree
+directly via an editor. Second, users can activate a `Create` control in the `MapEditor` to add
+Markers and Polygons.
+
+The `MapEditor` widget is [a standard Stager editor](../lib/editors/stager_editor.dart), (and because
 of its highly specialized purpose it is stored in the mapping directory). Thus, it participates in
-both the Stager and the Flutter lifecycles. This means that some elements of the MapEditor can be
-reconfigured using [an Editor Factory](../lib/editors/editor_factory.dart) although this is
-practically not so useful. It uses other Editor utilities as needed, such as 
-[message dialogs](../lib/editors/message_dialog.dart). The view of the map and data (handled by 
-Flutter Map) is wrapped inside a standard Flutter Stateful Widget, and this provides some
-limited opportunity for customization of the utility bar and controls used to manipulate the map.
+both the Stager and the Flutter lifecycles. This means that some elements of the `MapEditor` can be
+reconfigured using [an Editor Factory](../lib/editors/editor_factory.dart). It uses other Editor 
+utilities as needed, such as [message dialogs](../lib/editors/message_dialog.dart). The view of the 
+map and data (handled by Flutter Map) is wrapped inside a standard Flutter Stateful Widget, and this 
+provides some limited opportunity for customization of the utility bar and controls used to 
+manipulate the map.
 
-The state of the MapEditor is stored in a [MapState](../lib/mapping/map_state.dart) object.
+The state of the `MapEditor` is stored in a [`MapState`](../lib/mapping/map_state.dart) object.
 It is a collection of tile, marker, and polygon layer adapters; configuration details; attribution
-widgets, and other data used by the MapEditor. The MapState class is distinct from the
-_MapEditorState class defined in the MapEditor because _MapEditorState is specifically focused on 
-the Flutter widget state of the MapEditor whereas MapState is focused on the data state. (Confusing,
-I know.)
+widgets, and other data used by the `MapEditor`. The `MapState` class is distinct from the
+`_MapEditorState` class defined in the `MapEditor` because `_MapEditorState` is specifically focused 
+on the Flutter widget state of the `MapEditor` whereas `MapState` is focused on the data state.
+Notably, it is the role of `_MapEditorState` to store options like the viewable list of layers and
+tiles and `MapState` to store the configuration of the layers and tile servers. Changes to the
+`MapState` result in notifications (via `SelectionService`) dispatched to `_MapEditorState` to
+execute a new render of the map. One way to think about this statement is that the map is an
+abstract thing defined by the data in `MapState` whereas the view of that map is the concrete thing
+rendered in the `MapEditor` with view options set in `_MapEditorState`.
 
-The MapEditor uses [the new LocationEditor](../lib/editors/location_editor.dart) to allow users to
+The `MapEditor` uses [the new `LocationEditor`](../lib/editors/location_editor.dart) to allow users to
 configure their location or automatically detect it with GPS.
 
-The MapEditor is the first StagerEditor to use [the new SelectionService](../lib/system/selection_service.dart). 
-The SelectionService replaces the `_selectedNode` variable in the original implementation. It is a 
+The `MapEditor` is the first `StagerEditor` to use [the new `SelectionService`](../lib/system/selection_service.dart). 
+The `SelectionService` replaces the `_selectedNode` variable in the original implementation. It is a 
 global registry of selections that includes the current global selection (i.e., a single point 
 picked on a map or a selected node in a TreeView) and local selections within a specific view (like 
-a local element selected in a NodePropertiesView). The SelectionService is an observer and can be 
-directed to register against subjects that provide global selection updates 
-(GlobalSelectionDispatcher) and local selection updates (LocalSelectionDispatcher).
+a local element selected in a `NodePropertiesView`). The `SelectionService` can both observe other
+objects and be observed. The `MapEditor` observes the `SelectionService` to automatically focus or 
+highlight nodes selected elsewhere in the platform.  The `SelectionService` interfaces for subjects
+are `GlobalSelectionDispatcher` for global selections and `LocalSelectionDispatcher` for local 
+selections.
+
+Graphical relationships between parent nodes and their children are indicated in the map editor by
+special polygons. These polygons are not explicitly or necessarily present in the Tree (or KML 
+Tree), but they are computed and injected by the `LayerAdapter`s.
 
 ## Testing Plan
 
-Flutter Map can be quite hard to test.
+Flutter Map can be quite hard to test directly due to its reliance on native canvas rendering and 
+third-party tile services. Therefore, the strategy for verification focuses on isolating business 
+logic and data transformation from the rendering layer.
 
-Describe the strategy for verification.
-* **Unit Tests**: Logic and data models.
-* **Widget Tests**: UI components and interaction.
-* **Integration Tests**: End-to-end functionality.
+* **Unit Tests**: 
+    * **`LayerAdapter` Verification**: Test each `LayerAdapter` subclass in isolation. Given a 
+    pre-configured `StagerTree`, verify that the adapter produces the correct collection of 
+    `flutter_map` data objects (Markers, Polygons, etc.) with the expected coordinates and 
+    properties.
+    * **`MapState` Logic**: Verify that `MapState` correctly manages the active tile servers and 
+    layer adapters, and that it dispatches notifications correctly when its configuration is 
+    mutated.
+* **Widget Tests**: 
+    * **UI Structure**: Verify that `MapEditor` correctly renders its structural components (utility 
+    bar, creation controls, attribution widgets) based on the provided `MapState`.
+    * **Interaction Feedback**: Use `tester.tap()` on mock markers and verify that the 
+    `SelectionService` receives the correct node selection update.
+    * **Mode Switching**: Verify that activating "Move" or "Create" modes correctly updates the UI 
+    state and enables the appropriate gesture recognizers.
+* **Integration Tests**: 
+    * **End-to-End Ingestion**: Load a KML file using `KMLFile`, pass the resulting tree to 
+    `MapEditor`, and verify that the count of rendered features matches the KML content.
+    * **Cross-Subsystem Synchronization**: Verify that selecting a node in a separate `TreeView` 
+    mock triggers the `MapEditor` to update its internal controller to "focus" on the selected 
+    coordinates.
 
 ## Short Example
 The following example show show to configure the Map Editor in a simple client application. A robust
@@ -103,27 +168,26 @@ To be added later
 ```
 
 ## Open Questions
-* **The Interaction Feedback Loop**: How exactly are interactions (like tapping a marker or dragging a polygon vertex) brokered from the `flutter_map` layer back to the specific `TreeNode`? Does the `LayerAdapter` handle these events and dispatch updates to the `SelectionService`?
-* **Navigation and Synchronization**: Should the `MapEditor` observe the `SelectionService` to automatically pan and zoom to a feature when it is selected in an external view (like a Tree View or Property Grid)?
-* **Performance with Large Trees**: For massive KML trees, will the adaptation process (visitation and array flattening) become a bottleneck? Is there a requirement for "dirty checking" or partial layer updates?
-* **Edit vs. View Modes**: Will the map support a "Read Only" mode for simple visualization, or is it strictly an interactive "Editor" first?
-* **Configuration Persistence**: How are user-selected tile servers, layer visibility, and attribution options persisted and eventually serialized?
-* **Graphical Cue Management**: Will cues like parent-child connection lines be handled by specialized `LayerAdapters` or as a built-in feature of the core editor?
-* **Pragmatic State Separation**: How can we further harden the boundary between `MapState` (data/config) and `_MapEditorState` (Flutter lifecycle) to avoid state synchronization bugs?
+None presently.
 
 ## Tickets
 
-Generate tickets from the above content, then place those tickets in a separate CSV file following
-the GitLab format. Finally, once a human creates those tickets in GitLab, they will place the URLs
-back in here with standard Markdown link formatting.
+- [Implement SelectionService and Dispatcher interfaces](https://gitlab.com/bandgap/stager-platform/stager/-/issues/34)
+- [Implement SelectionService unit tests](https://gitlab.com/bandgap/stager-platform/stager/-/issues/35)
+- [Implement MapState data model](https://gitlab.com/bandgap/stager-platform/stager/-/issues/36)
+- [Implement MapState unit tests](https://gitlab.com/bandgap/stager-platform/stager/-/issues/37)
+- [Implement abstract LayerAdapter base class](https://gitlab.com/bandgap/stager-platform/stager/-/issues/38)
+- [Implement KMLMarkerAdapter and unit tests](https://gitlab.com/bandgap/stager-platform/stager/-/issues/39)
+- [Implement KMLPolygonAdapter and unit tests](https://gitlab.com/bandgap/stager-platform/stager/-/issues/40)
+- [Implement OSMTileLayerAdapter and unit tests](https://gitlab.com/bandgap/stager-platform/stager/-/issues/41)
+- [Implement MapEditor widget scaffold](https://gitlab.com/bandgap/stager-platform/stager/-/issues/42)
+- [Implement _MapEditorState lifecycle and view logic](https://gitlab.com/bandgap/stager-platform/stager/-/issues/43)
+- [Implement SelectionService observation in MapEditor](https://gitlab.com/bandgap/stager-platform/stager/-/issues/44)
+- [Implement 'Move' interaction mode in LayerAdapters](https://gitlab.com/bandgap/stager-platform/stager/-/issues/45)
+- [Implement 'Create' interaction mode in MapEditor](https://gitlab.com/bandgap/stager-platform/stager/-/issues/46)
+- [Implement RichAttributionLayerAdapter and unit tests](https://gitlab.com/bandgap/stager-platform/stager/-/issues/47)
+- [Create KML ingestion integration tests](https://gitlab.com/bandgap/stager-platform/stager/-/issues/48)
+- [Create MapEditor cross-subsystem synchronization tests](https://gitlab.com/bandgap/stager-platform/stager/-/issues/49)
+- [Create MapEditor UI/Interaction widget tests](https://gitlab.com/bandgap/stager-platform/stager/-/issues/50)
+- [Update public API exports for GIS and Selection](https://gitlab.com/bandgap/stager-platform/stager/-/issues/51)
 
-The available ticket labels are currently:
-* Bug - Bugs are issues that describe unexpected and unintended behavior... like getting a bug in the vacuum tubes of your brand new Harvard Mark II.
-* Enhancement - These issues are intended to improve the functionality of the product.
-* Feature - This label indicates that this is a new feature for the project. A feature label is different than an enhancement label because enhancements may satisfy nonfunctional requirements whereas features always satisfy functional requirements.
-* Full AI - Any AI tools may be used on this task. This label usually indicates that the task is for new or simple code, or things that can be easily performed, such as test and documentation updates.
-* Limited AI - AI tools should be limited because the affected code is more mature and stable. AI code-completion, etc., are fine, but full Gemini CLI type editing that can rewrite the whole file is not.
-* Mapping - This label indicates the ticket supports the Mapping features in the Stager Platform.
-* No AI - This label indicates that, for some reason or other, no AI tools should be used on this task. Tasks with this label could include those that affect customer code with certain license restrictions, old or brittle code where AI will do more harm than good, and things that AI just can't do and, thus, shouldn't try.
-* Restricted AI - Tasks with this label have restrictions on how AI may be used on the project. This could be as simple as legal restrictions and managing IP risks, or as complicated as dealing with specific customer requirements on AI use.
-* Testing - This label indicates the activity improves or supports testing in the project.

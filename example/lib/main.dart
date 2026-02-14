@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stager_platform/editors/location_editor.dart';
+import 'package:stager_platform/mapping/map_editor.dart';
+import 'package:stager_platform/mapping/map_state.dart';
 
 /// This is a class for manually testing widgets in Stager. It is not used
 /// by clients or in any final products. Its sole purpose is to enable local
@@ -66,8 +68,8 @@ class _StagerPlatformExampleHomePageState extends
           indicatorColor: Theme.of(context).colorScheme.onPrimary,
           tabs: [
             // Start with the geographic information services tab
-            Tab(icon: Icon(Icons.map_rounded), text: 'GIS'),
-            Tab(icon: Icon(Icons.beach_access_sharp), text: 'Tab 2'),
+            Tab(icon: Icon(Icons.map_rounded), text: 'Location Editor Widget'),
+            Tab(icon: Icon(Icons.map_outlined), text: 'Stager Map Editor'),
             Tab(icon: Icon(Icons.brightness_5_sharp), text: 'Tab 3'),
           ],
         )
@@ -76,12 +78,31 @@ class _StagerPlatformExampleHomePageState extends
         padding: EdgeInsets.all(8.0),
         child: TabBarView(
           controller: _tabController,
-          children: const <Widget>[
+          children: <Widget>[
             // The content for each tab. Load the location and geo services
             // first.
             Center(child: LocationEditor()),
-            Center(child: Text("It's rainy here")),
-            Center(child: Text("It's sunny here")),
+            Center(child: MapEditor(state: MapState(),)),
+            Center(child: Opacity(
+              opacity: 1.0,
+              child:  Container(
+                color: Colors.red,
+                width: 200,
+                height: 200,
+                child: Center(
+                  child: Text(
+                    "Overlay Effect",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            )
           ],
         ),
       ),

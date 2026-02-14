@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/node_properties_view.dart';
-import 'package:stager_platform/editors/selection.dart';
+import 'package:stager_platform/system/selection.dart';
 import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';

@@ -1,0 +1,73 @@
+title,description,due_date,milestone
+"Implement SelectionService and Dispatcher interfaces","Create lib/system/selection_service.dart defining the SelectionService class and the GlobalSelectionDispatcher and LocalSelectionDispatcher interfaces for brokering cross-view node selection.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~""Full AI""",,
+"Implement SelectionService unit tests","Create test/system/selection_service_test.dart verifying observer registration, event dispatching, and state management for global and local selections.
+
+/assign @jayjaybillings_bg
+/label ~Testing ~""Full AI""",,
+"Implement MapState data model","Create lib/mapping/map_state.dart to manage the lifecycle of layer adapters, tile server configurations, and attribution widgets. Ensure it supports change notifications.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~Mapping ~""Full AI""",,
+"Implement MapState unit tests","Create test/mapping/map_state_test.dart to verify configuration persistence, adapter registry management, and state notification logic.
+
+/assign @jayjaybillings_bg
+/label ~Testing ~Mapping ~""Full AI""",,
+"Implement abstract LayerAdapter base class","Create lib/mapping/layer_adapter.dart defining the base contract for adapting Stager TreeNodes into flattened arrays for flutter_map.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~Mapping ~""Full AI""",,
+"Implement KMLMarkerAdapter and unit tests","Create lib/mapping/kml_marker_adapter.dart and corresponding unit tests. Verify transformation of KMLPointNode hierarchies into Marker arrays with GestureDetector support.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~Mapping ~Testing ~""Full AI""",,
+"Implement KMLPolygonAdapter and unit tests","Create lib/mapping/kml_polygon_adapter.dart and corresponding unit tests. Verify transformation of KMLPolygonNode hierarchies into Polygon arrays.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~Mapping ~Testing ~""Full AI""",,
+"Implement OSMTileLayerAdapter and unit tests","Create lib/mapping/osm_tile_layer_adapter.dart to provide standard OpenStreetMap tile configuration following foundation policies.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~Mapping ~Testing ~""Full AI""",,
+"Implement MapEditor widget scaffold","Create lib/mapping/map_editor.dart extending StagerEditor. Implement basic hosting of the FlutterMap widget and the utility bar structure.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~Mapping ~""Full AI""",,
+"Implement _MapEditorState lifecycle and view logic","Develop the private state class for MapEditor to handle the Flutter-specific widget lifecycle, layer visibility management, and UI-driven re-renders.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~Mapping ~""Full AI""",,
+"Implement SelectionService observation in MapEditor","Add logic to MapEditor to observe global selections and automatically navigate (pan/zoom) to the selected geographic node.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~Mapping ~""Full AI""",,
+"Implement 'Move' interaction mode in LayerAdapters","Update LayerAdapters to support gross node movement via onLongPress drag-and-drop feedback, committing changes to the source TreeNode.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~Mapping ~""Full AI""",,
+"Implement 'Create' interaction mode in MapEditor","Add MapEditor controls and gesture handlers to support interactive creation of new Markers and Polygons on the map background.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~Mapping ~""Full AI""",,
+"Implement RichAttributionLayerAdapter and unit tests","Create specialized adapter for managing and displaying configurable map attribution widgets.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~Mapping ~Testing ~""Full AI""",,
+"Create KML ingestion integration tests","Implement test/mapping/map_ingestion_test.dart verifying the end-to-end flow from KMLFile load to MapEditor feature rendering.
+
+/assign @jayjaybillings_bg
+/label ~Testing ~Mapping ~""Full AI""",,
+"Create MapEditor cross-subsystem synchronization tests","Verify that selections in separate TreeView or NodePropertiesView mocks correctly trigger MapEditor navigation.
+
+/assign @jayjaybillings_bg
+/label ~Testing ~Mapping ~""Full AI""",,
+"Create MapEditor UI/Interaction widget tests","Implement comprehensive widget tests for MapEditor mode switching, utility bar actions, and interaction feedback loops.
+
+/assign @jayjaybillings_bg
+/label ~Testing ~Mapping ~""Full AI""",,
+"Update public API exports for GIS and Selection","Update lib/stager.dart to export MapEditor, MapState, SelectionService, and the standard LayerAdapters.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~""Full AI""",,

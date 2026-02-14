@@ -1,7 +1,7 @@
 /// This file defines the observer interface for the [Selection] class.
 library;
 
-import 'package:stager_platform/editors/selection.dart';
+import 'package:stager_platform/system/selection.dart';
 
 /// An interface for observers that are interested in changes to a [Selection].
 ///

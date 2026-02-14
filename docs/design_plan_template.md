@@ -45,6 +45,21 @@ Generate tickets from the above content, then place those tickets in a separate 
 the GitLab format. Finally, once a human creates those tickets in GitLab, they will place the URLs
 back in here with standard Markdown link formatting.
 
+Sample CSV data from GitLab.com:
+```
+title,description,due_date,milestone
+My Issue Title,My Issue Description,2022-06-28
+Another Title,"A description, with a comma",
+"One More Title","One More Description",
+An Issue with Quick Actions,"Hey can we change the frontend?
+
+/assign @sjones
+/label ~frontend ~documentation",
+An issue with milestone,"My milestone is created",,v1.0
+```
+
+For now, all tickets should be assigned to @jayjaybillings_bg.
+
 The available ticket labels are currently:
 * Bug - Bugs are issues that describe unexpected and unintended behavior... like getting a bug in the vacuum tubes of your brand new Harvard Mark II.
 * Enhancement - These issues are intended to improve the functionality of the product.
@@ -55,3 +70,5 @@ The available ticket labels are currently:
 * No AI - This label indicates that, for some reason or other, no AI tools should be used on this task. Tasks with this label could include those that affect customer code with certain license restrictions, old or brittle code where AI will do more harm than good, and things that AI just can't do and, thus, shouldn't try.
 * Restricted AI - Tasks with this label have restrictions on how AI may be used on the project. This could be as simple as legal restrictions and managing IP risks, or as complicated as dealing with specific customer requirements on AI use.
 * Testing - This label indicates the activity improves or supports testing in the project.
+
+There are no milestones.

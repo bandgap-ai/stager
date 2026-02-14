@@ -1,1 +1,3 @@
-class MapState {}
+class MapState {
+  const MapState();
+}

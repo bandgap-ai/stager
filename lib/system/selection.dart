@@ -2,7 +2,8 @@
 /// state holder that uses the observer pattern to notify listeners of changes.
 library;
 
-import 'package:stager_platform/editors/selection_observer.dart';
+import 'package:stager_platform/system/selection_observer.dart';
+import 'package:stager_platform/system/selection_visitor_handler.dart';
 
 /// A generic class that wraps a selection and notifies observers when it changes.
 ///
@@ -75,5 +76,13 @@ class Selection<T> {
     for (final observer in _observers) {
       observer.update(_value);
     }
+  }
+
+  /// Accepts a [SelectionVisitorHandler] to process the selection.
+  ///
+  /// [handler] is an object that implements the [SelectionVisitorHandler]
+  /// interface.
+  void accept(SelectionVisitorHandler handler) {
+    handler.visit(this);
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stager_platform/editors/selection.dart';
+import 'package:stager_platform/system/selection.dart';
 import 'package:stager_platform/editors/site_controls.dart';
 import 'package:stager_platform/site_state.dart';
 import 'package:stager_platform/editors/file_handler.dart';
