@@ -112,21 +112,24 @@ dart-publish-dry-run:
 # SonarQube binaries
 get-binaries:
   stage: get-binaries
-  cache:
-    policy: push
-    key:  "${CI_COMMIT_SHORT_SHA}"
-    paths:
-      - sonar-scanner/
-
+  # Ensure this job runs in MRs and on main so sonarcloud-check can use it
+  only:
+    - merge_requests
+    - main
   script:
-    # Download sonar-scanner
     - curl -sSLo ./sonar-scanner.zip 'https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-8.0.1.6346-linux-x64.zip'
     - unzip -o sonar-scanner.zip
     - mv sonar-scanner-8.0.1.6346-linux-x64 sonar-scanner
+  artifacts:
+    paths:
+      - sonar-scanner/
+    expire_in: 1 hour
 
 # Actual SonarQube check
 sonarcloud-check:
   stage: sonarcloud-check
+  dependencies:
+    - get-binaries
   cache:
     policy: pull-push
     key: "${CI_COMMIT_SHORT_SHA}"
