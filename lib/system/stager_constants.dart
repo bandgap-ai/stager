@@ -8,13 +8,14 @@ class StagerConstants {
   /// root as '/tmp', then the full temporary directory would be '/tmp/stager'.
   ///
   /// Clients need to add their own file separator by calling the
-  /// Platform.separator function from dart:io.
+  /// Platform.separator function from dart:io to the beginning AND the end of
+  /// the path because this is a compile-time constant value.
   ///
-  /// Clients looking for the full path to the temporary directory should see
-  /// [temporaryDirectory] (below).
-  static final String tmpDirectoryRoot = '${Platform.pathSeparator}stager';
+  /// Clients looking for the full path to the temporary directory with proper
+  /// OS path separators should see the [temporaryDirectory] method.
+  static const String tmpDirectoryRoot = 'stager';
 
   /// This function returns the temporary directory for storing Stager files.
   static Directory get temporaryDirectory => Directory(Directory.systemTemp.path
-      + tmpDirectoryRoot);
+      + Platform.pathSeparator + tmpDirectoryRoot);
 }
