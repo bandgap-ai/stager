@@ -31,6 +31,8 @@ cache:
 stages:
   - setup
   - test
+  - get-binaries
+  - sonarcloud-check
   - secret-detection
   - analyze
   - build
@@ -44,20 +46,6 @@ variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
   # Tells git to fetch all the branches of the project, required by the analysis task
   GIT_DEPTH: "0"
-  sonarcloud-check:
-    image:
-      name: sonarsource/sonar-scanner-cli:latest
-      entrypoint: [ "" ]
-    cache:
-      key: "${CI_JOB_NAME}"
-      paths:
-        - .sonar/cache
-    script:
-      - sonar-scanner
-    only:
-      - merge_requests
-      - master
-      - develop
 
 # Setup dependencies stage
 setup_dependencies:
@@ -120,3 +108,32 @@ dart-publish-dry-run:
     - flutter pub get
     - echo "Running 'dart pub publish --dry-run'."
     - dart pub publish --dry-run
+
+# SonarQube binaries
+get-binaries:
+  stage: get-binaries
+  cache:
+    policy: push
+    key:  "${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - sonar-scanner/
+
+  script:
+    # Download sonar-scanner
+    - curl -sSLo ./sonar-scanner.zip 'https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-8.0.1.6346-linux-x64.zip'
+    - unzip -o sonar-scanner.zip
+    - mv sonar-scanner-8.0.1.6346-linux-x64 sonar-scanner
+
+# Actual SonarQube check
+sonarcloud-check:
+  stage: sonarcloud-check
+  cache:
+    policy: pull-push
+    key: "${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - sonar-scanner/
+  script:
+    - sonar-scanner/bin/sonar-scanner
+  only:
+    - merge_requests
+    - main
