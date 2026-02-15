@@ -30,11 +30,11 @@ cache:
 # Define pipeline stages
 stages:
   - setup
-  - test
   - get-binaries
   - sonarcloud-check
   - secret-detection
   - analyze
+  - test
   - build
 
 # Global variables for consistent configuration
