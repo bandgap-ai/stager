@@ -1,7 +1,11 @@
 import 'dart:io';
 
+import 'selection_service.dart';
+
 /// This class stores system used across Stager.
-class StagerConstants {
+class StagerSystem {
+
+  const StagerSystem();
 
   /// This is the root of the temporary data directory UNDER the cache/temp
   /// directory root of the OS. For example, if the OS sets the temp directory
@@ -18,4 +22,7 @@ class StagerConstants {
   /// This function returns the temporary directory for storing Stager files.
   static Directory get temporaryDirectory => Directory(Directory.systemTemp.path
       + Platform.pathSeparator + tmpDirectoryRoot);
+
+  /// This returns the current instance of the selection service.
+  SelectionService selectionService() => SelectionService();
 }

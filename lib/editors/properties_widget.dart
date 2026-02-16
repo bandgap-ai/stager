@@ -8,6 +8,8 @@ import 'package:stager_platform/tree/tree_node.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/editors/node_properties_view.dart';
 
+import '../system/selection_service.dart';
+
 /// A widget that displays the properties of the currently selected node in a
 /// bottom sheet.
 ///
@@ -15,8 +17,8 @@ import 'package:stager_platform/editors/node_properties_view.dart';
 /// [siteState.selectedNode]. It provides functionality to view node properties
 /// and to add images to the node.
 class PropertiesWidget extends StatefulWidget {
-  /// The state manager for the site data.
-  final Selection<LeafNode> selectedNode;
+  /// The selection service that manages global selections
+  final SelectionService selectionService;
 
   /// An optional StagerPin widget to pin the navigator.
   final StagerPin? pin;
@@ -25,7 +27,7 @@ class PropertiesWidget extends StatefulWidget {
   ///
   /// [selectedNode]: The currently selected node.
   /// [pin]: An optional StagerPin widget to pin the properties view.
-  const PropertiesWidget({super.key, required this.selectedNode, this.pin});
+  const PropertiesWidget({super.key, required this.selectionService, this.pin});
 
   @override
   State<StatefulWidget> createState() => _PropertiesWidgetState();
@@ -36,7 +38,6 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     implements SelectionObserver<LeafNode> {
   // TickerProviderStateMixin is used to create an animation controller.
 
-  late Selection<LeafNode> selectedNode;
   StagerPin? _pin;
 
   /// Animation controller for the bottom sheet
@@ -51,9 +52,8 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     _bottomSheetAnimationController = BottomSheet.createAnimationController(
       this,
     );
-    // Configure the selection and observe it.
-    selectedNode = widget.selectedNode;
-    selectedNode.attach(this);
+    // Observer the selection service for changes to the global selection
+    widget.selectionService.attach(this);
     // Configure the pin used to pin the window
     _pin = widget.pin;
   }
@@ -61,14 +61,14 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   @override
   void dispose() {
     // Detach as an observer of the selection
-    selectedNode.detach(this);
+    widget.selectionService.detach(this);
     // Dispose the animation controller
     _bottomSheetAnimationController?.dispose();
     super.dispose();
   }
 
   @override
-  void update(selection) {
+  void update() {
     // Redraw the widget when the selection changes
     setState(() {});
   }
@@ -80,15 +80,15 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      if (selectedNode.value != null) {
-        LeafNode node = selectedNode.value!;
-        final currentImagePaths =
-            (node.properties.getProperty('imagePaths') as List<String>?) ?? [];
-        node.properties.setProperty('imagePaths', [
-          ...currentImagePaths,
-          pickedFile.path,
-        ]);
-      }
+      // FIXME! Pretty sure this will break. The view needs to use visitation to
+      // get this value.
+      LeafNode node = widget.selectionService.selection.value;
+      final currentImagePaths =
+          (node.properties.getProperty('imagePaths') as List<String>?) ?? [];
+      node.properties.setProperty('imagePaths', [
+        ...currentImagePaths,
+        pickedFile.path,
+      ]);
     }
   }
 
@@ -218,6 +218,9 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   Stack _buildButtonHeader(BuildContext context) {
     bool pinnable = _pin != null;
 
+    // FIXME - This should be retrieved via visitation.
+    LeafNode selectedNode = widget.selectionService.selection.value;
+
     return Stack(
       children: [
         Center(
@@ -252,24 +255,30 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
 
   @override
   Widget build(BuildContext context) {
-    // If no node is selected, show nothing.
-    if (selectedNode.value == null) {
-      return const SizedBox.shrink();
-    }
 
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      height: 400, // Fixed height for better testing and UX
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildButtonHeader(context),
-          const SizedBox(height: 16.0),
-          // Content area based on selected view
-          Expanded(child: _buildSelectedView(selectedNode.value!)),
-        ],
-      ),
-    );
+    Widget propWidget;
+    // If no node is selected, show nothing.
+
+    if (!widget.selectionService.isSet()) {
+      propWidget = SizedBox.shrink();
+    } else {
+      // FIXME! - This should be set by visitation.
+      var selectedNode = widget.selectionService.selection;
+      propWidget = Container(
+        padding: const EdgeInsets.all(16.0),
+        height: 400, // Fixed height for better testing and UX
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildButtonHeader(context),
+            const SizedBox(height: 16.0),
+            // Content area based on selected view
+            Expanded(child: _buildSelectedView(selectedNode.value!)),
+          ],
+        ),
+      );
+    }
+    return propWidget;
   }
 }

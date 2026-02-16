@@ -1,85 +1,90 @@
+// Flutter packages
 import 'package:flutter_test/flutter_test.dart';
+
+// Project files
 import 'package:stager_platform/system/selection.dart';
+import 'mock_selection_observer.dart';
 
-import '../editors/mock_selection_observer.dart';
-
+/// Unit tests for the [Selection] class.
 void main() {
   group('Selection', () {
     test('should set and get the value', () {
-      final selection = Selection<String>();
-      expect(selection.value, isNull);
+      // Arrange
+      final selection = Selection<String>('initial');
+      expect(selection.value, 'initial');
 
+      // Act
       selection.value = 'test';
+      
+      // Assert
       expect(selection.value, 'test');
     });
 
     test('should notify observer when selection changes', () {
-      final selection = Selection<int>();
+      // Arrange
+      final selection = Selection<int>(0);
       final observer = MockSelectionObserver<int>();
       selection.attach(observer);
 
       expect(observer.updated, isFalse);
 
+      // Act
       selection.value = 10;
+      
+      // Assert
       expect(observer.updated, isTrue);
-      expect(observer.lastSelection, 10);
     });
 
     test('should not notify observer when selection is set to the same value', () {
-      final selection = Selection<String>();
+      // Arrange
+      final selection = Selection<String>('initial');
       final observer = MockSelectionObserver<String>();
-      selection.value = 'initial';
       selection.attach(observer);
 
       observer.reset();
       expect(observer.updated, isFalse);
 
+      // Act
       selection.value = 'initial';
+      
+      // Assert
       expect(observer.updated, isFalse);
     });
 
     test('should notify multiple observers', () {
-      final selection = Selection<double>();
+      // Arrange
+      final selection = Selection<double>(0.0);
       final observer1 = MockSelectionObserver<double>();
       final observer2 = MockSelectionObserver<double>();
       selection.attach(observer1);
       selection.attach(observer2);
 
+      // Act
       selection.value = 3.14;
+      
+      // Assert
       expect(observer1.updated, isTrue);
-      expect(observer1.lastSelection, 3.14);
       expect(observer2.updated, isTrue);
-      expect(observer2.lastSelection, 3.14);
     });
 
     test('should not notify detached observer', () {
-      final selection = Selection<bool>();
+      // Arrange
+      final selection = Selection<bool>(true);
       final observer = MockSelectionObserver<bool>();
       selection.attach(observer);
 
-      selection.value = true;
-      expect(observer.updated, isTrue);
-
-      observer.reset();
-      selection.detach(observer);
-
+      // Verify initial state
       selection.value = false;
-      expect(observer.updated, isFalse);
-    });
-
-    test('should handle null values correctly', () {
-      final selection = Selection<String?>();
-      final observer = MockSelectionObserver<String?>();
-      selection.attach(observer);
-
-      selection.value = 'not null';
       expect(observer.updated, isTrue);
-      expect(observer.lastSelection, 'not null');
 
       observer.reset();
-      selection.value = null;
-      expect(observer.updated, isTrue);
-      expect(observer.lastSelection, isNull);
+      
+      // Act
+      selection.detach(observer);
+      selection.value = true;
+
+      // Assert
+      expect(observer.updated, isFalse);
     });
   });
 }

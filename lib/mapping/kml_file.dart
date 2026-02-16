@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:stager_platform_native_plugins/stager_platform_native_plugins.dart';
-import '../system/stager_constants.dart';
+import '../system/stager_system.dart';
 import 'kml_parser.dart';
 import 'nodes/kml_tree_root_node.dart';
 
@@ -88,7 +88,7 @@ class KMLFile {
   Future<void> prepareSchemas() async {
     // Setup the temporary storage location.
     String sep = Platform.pathSeparator;
-    tmpDirectory = StagerConstants.temporaryDirectory;
+    tmpDirectory = StagerSystem.temporaryDirectory;
     
     // Ensure the directory exists asynchronously.
     await tmpDirectory.create(recursive: true);

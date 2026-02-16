@@ -9,6 +9,7 @@ import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/editors/standard_widgets.dart';
 import 'package:stager_platform/editors/single_point_map_editor.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:stager_platform/system/selection_service.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 
@@ -468,7 +469,7 @@ void main() {
 
     group('buildBottomSheet', () {
 
-      Selection<LeafNode> selectedNode = Selection<LeafNode>();
+      Selection<LeafNode> selectedNode = Selection<LeafNode>(ConcreteLeafNode(id: '1', name: 'Test Node'));
 
       WidgetBuilder _getPropertiesWidgetBuilder(PropertiesWidget widget) {
         return (BuildContext context) {
@@ -485,7 +486,7 @@ void main() {
                   builder: (BuildContext context) {
                     // Create the widget for the test
                     PropertiesWidget propertiesWidget = PropertiesWidget(
-                      selectedNode: selectedNode,
+                      selectionService: SelectionService(),
                       pin: pin,
                     );
                     // Build the bottom sheet that will actually be tested
@@ -505,7 +506,8 @@ void main() {
         // the PropertiesWidget directly returned a bottom sheet.
 
         // Arrange: Select a node
-        selectedNode.value = ConcreteLeafNode(id: '1', name: 'Test Node');
+        SelectionService selectionService = SelectionService();
+        selectionService.selection = Selection<ConcreteLeafNode>(ConcreteLeafNode(id: '1', name: 'Test Node'));
 
         // Act
         await pumpPropertiesWidget(tester);

@@ -39,12 +39,8 @@ void main() {
   group('Basic Selection Visitor Handler Tests', () {
     test('Check registration and visitation', () {
       BasicSelectionVisitorHandler handler = BasicSelectionVisitorHandler();
-      int testInt = 10000;
-      Selection<int> firstSelection = Selection<int>();
-      firstSelection.value = testInt;
-      String testString = 'Days';
-      Selection<String> secondSelection = Selection<String>();
-      secondSelection.value = testString;
+      Selection<int> firstSelection = Selection<int>(10000);
+      Selection<String> secondSelection = Selection<String>('Days');
 
       // Register the first fake
       FakeSelectionVisitor fakeVisitor = FakeSelectionVisitor();
@@ -81,7 +77,7 @@ void main() {
 
     test('Check exception handling', () {
       BasicSelectionVisitorHandler handler = BasicSelectionVisitorHandler();
-      Selection<double> firstSelection = Selection<double>();
+      Selection<double> firstSelection = Selection<double>(0.0);
 
       // Check the selection without registration
       expect(() => handler.visit(firstSelection), throwsException);

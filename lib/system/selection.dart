@@ -2,8 +2,8 @@
 /// state holder that uses the observer pattern to notify listeners of changes.
 library;
 
-import 'package:stager_platform/system/selection_observer.dart';
-import 'package:stager_platform/system/selection_visitor_handler.dart';
+import 'selection_observer.dart';
+import 'selection_visitor_handler.dart';
 
 /// A generic class that wraps a selection and notifies observers when it changes.
 ///
@@ -17,12 +17,12 @@ import 'package:stager_platform/system/selection_visitor_handler.dart';
 /// Example:
 /// ```dart
 /// // Create a selection object for a string.
-/// final selection = Selection<String>();
+/// final selection = Selection<String>('Initial');
 ///
 /// // Create an observer.
 /// class MyObserver implements SelectionObserver<String> {
 ///   @override
-///   void update(String? newSelection) {
+///   void update(String newSelection) {
 ///     print('Selection changed to: $newSelection');
 ///   }
 /// }
@@ -35,18 +35,25 @@ import 'package:stager_platform/system/selection_visitor_handler.dart';
 /// // Change the value, which will trigger the observer's update method.
 /// selection.value = 'Hello, World!'; // Prints: Selection changed to: Hello, World!
 /// ```
-class Selection<T> {
-  T? _value;
+class Selection<T extends Object> {
+
+  /// Reference to the currently selected value.
+  T _value;
+
+  /// The observers of this selection.
   final List<SelectionObserver<T>> _observers = [];
 
-  /// The currently selected value. Can be `null`.
-  T? get value => _value;
+  /// Creates a [Selection] with an initial [value].
+  Selection(this._value);
+
+  /// The currently selected value.
+  T get value => _value;
 
   /// Sets the selected value and notifies observers if the new value is
   /// different from the current one.
   ///
   /// If [newValue] is the same as the current [value], no notification is sent.
-  set value(T? newValue) {
+  set value(T newValue) {
     if (_value != newValue) {
       _value = newValue;
       notify();
@@ -74,7 +81,7 @@ class Selection<T> {
   /// value, but can also be called manually to force a notification.
   void notify() {
     for (final observer in _observers) {
-      observer.update(_value);
+      observer.update();
     }
   }
 

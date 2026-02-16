@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:stager_platform/system/selection.dart';
-import 'package:stager_platform/editors/site_controls.dart';
-import 'package:stager_platform/site_state.dart';
-import 'package:stager_platform/editors/file_handler.dart';
-import 'package:stager_platform/editors/stager_navigator_header.dart';
-import 'package:stager_platform/editors/tree_view.dart';
-import 'package:stager_platform/tree/leaf_node.dart';
-import 'package:stager_platform/editors/basic_site_controls.dart';
-import 'package:stager_platform/editors/stager_pin.dart';
+import 'package:stager_platform/stager.dart';
+import 'package:stager_platform/system/selection_visitor.dart';
+import '../system/basic_selection_visitor_handler.dart';
+import '../system/selection.dart';
+import '../editors/site_controls.dart';
+import '../site_state.dart';
+import '../editors/file_handler.dart';
+import '../editors/stager_navigator_header.dart';
+import '../editors/tree_view.dart';
+import '../system/selection_service.dart';
+import '../tree/leaf_node.dart';
+import '../editors/basic_site_controls.dart';
+import '../editors/stager_pin.dart';
+import '../system/stager_system.dart';
 
 /// A widget that provides a comprehensive editing interface for the entire site hierarchy.
 ///
@@ -21,8 +26,9 @@ class StagerNavigator extends StatefulWidget {
   /// The state manager for the site data.
   final SiteState siteState;
 
-  /// The Selection handler for the currently selected node
-  final Selection<LeafNode> selection;
+  /// The Stager System to use for tracking selections, constants, file paths,
+  /// etc.
+  final StagerSystem stagerSystem;
 
   /// The handler for file import/export operations.
   final FileHandler fileHandler;
@@ -43,10 +49,10 @@ class StagerNavigator extends StatefulWidget {
   const StagerNavigator({
     super.key,
     required this.siteState,
-    required this.selection,
     this.fileHandler = const BasicFileHandler(),
     this.siteControls = const BasicSiteControls(),
     this.pin,
+    this.stagerSystem = const StagerSystem(),
   });
 
   @override
@@ -56,19 +62,26 @@ class StagerNavigator extends StatefulWidget {
 /// The state for the [StagerNavigator] widget.
 class _StagerNavigatorState extends State<StagerNavigator> {
   late SiteState _siteState;
-  late Selection<LeafNode> _selection;
+  late SelectionService _selectionService;
   late FileHandler _fileHandler;
   StagerPin? _pin;
   late SiteControls _siteControls;
+  final BasicSelectionVisitorHandler handler = BasicSelectionVisitorHandler();
 
   @override
   void initState() {
     super.initState();
     _siteState = widget.siteState;
-    _selection = widget.selection;
+    _selectionService = widget.stagerSystem.selectionService();
     _fileHandler = widget.fileHandler;
     _pin = widget.pin;
     _siteControls = widget.siteControls;
+  }
+
+  /// This is a temporary convenience method until I finish the full migration
+  /// to the new selection service.
+  LeafNode? _getSelection() {
+    return (_selectionService.isSet()) ? _selectionService.selection.value : null;
   }
 
   @override
@@ -78,7 +91,7 @@ class _StagerNavigatorState extends State<StagerNavigator> {
     StagerNavigatorHeader header = StagerNavigatorHeader(
       siteState: _siteState,
       fileHandler: _fileHandler,
-      selectedNode: _selection.value,
+      selectedNode: _getSelection(),
       siteControls: _siteControls,
       pin: _pin,
     );
@@ -92,13 +105,15 @@ class _StagerNavigatorState extends State<StagerNavigator> {
         Expanded(
           child: TreeView(
             sites: _siteState.treeData,
-            selectedNode: _selection.value,
+            selectedNode: _getSelection(),
             onNodeTap: (node) {
               setState(() {
                 // Update the state to force a redraw and update the other
                 // widgets.
-                _selection.value = node;
                 _siteState.selectedNode = node;
+                // FIXME - This is a bit abusive of the API an it this whole
+                // class needs to fit the selection life cycle better.
+                widget.stagerSystem.selectionService().selection = Selection<LeafNode>(node);
               });
             },
           ),
@@ -106,4 +121,5 @@ class _StagerNavigatorState extends State<StagerNavigator> {
       ],
     );
   }
+
 }
