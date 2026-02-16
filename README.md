@@ -1,6 +1,7 @@
 # The Stager Platform
 [![pipeline status](https://gitlab.com/bandgap/stager-platform/stager/badges/main/pipeline.svg)](https://gitlab.com/bandgap/stager-platform/stager/-/commits/main)
 [![coverage report](https://gitlab.com/bandgap/stager-platform/stager/badges/main/coverage.svg)](https://gitlab.com/bandgap/stager-platform/stager/-/commits/main)
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-dark.svg)](https://sonarcloud.io/summary/new_code?id=bandgap_stager)
 
 ## Stager Widgets vs Editors
 

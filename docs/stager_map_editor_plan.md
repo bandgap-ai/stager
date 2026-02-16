@@ -59,6 +59,12 @@ identified.
 will be measured rather than speculated upon, though thousands of features are expected to be 
 handled efficiently.
 
+### Second Audit - 20260212
+* This plan did not previously consider the already existing Selection classes: 
+[Selection](../lib/system/selection.dart)] and 
+[SelectionObserver](../lib/system/selection_observer.dart). They are now discussed in the 
+implementation details. 
+
 ## Implementation Details
 This package uses the Flutter Map plugin. The base map is OpenStreetMap and there 
 [are specific rules around using the OpenStreetMap tile server](https://operations.osmfoundation.org/policies/tiles/).
@@ -117,15 +123,31 @@ rendered in the `MapEditor` with view options set in `_MapEditorState`.
 The `MapEditor` uses [the new `LocationEditor`](../lib/editors/location_editor.dart) to allow users to
 configure their location or automatically detect it with GPS.
 
-The `MapEditor` is the first `StagerEditor` to use [the new `SelectionService`](../lib/system/selection_service.dart). 
-The `SelectionService` replaces the `_selectedNode` variable in the original implementation. It is a 
-global registry of selections that includes the current global selection (i.e., a single point 
+The `MapEditor` is the first `StagerEditor` to use 
+[the new `SelectionService`](../lib/system/selection_service.dart). The `SelectionService` replaces 
+the `_selectedNode` variable in the original implementation with 
+[a `Selection<T>`](../lib/system/selection.dart) retrieved from the Service. The Service is a global
+registry of selections that includes the current global selection (i.e., a single point 
 picked on a map or a selected node in a TreeView) and local selections within a specific view (like 
 a local element selected in a `NodePropertiesView`). The `SelectionService` can both observe other
 objects and be observed. The `MapEditor` observes the `SelectionService` to automatically focus or 
-highlight nodes selected elsewhere in the platform.  The `SelectionService` interfaces for subjects
-are `GlobalSelectionDispatcher` for global selections and `LocalSelectionDispatcher` for local 
-selections.
+highlight nodes selected elsewhere in clients.  The `SelectionService` interfaces for subjects
+are `GlobalSelectionDispatcher` for global selections and 
+[`SelectionObserver`](../lib/system/selection_observer.dart) for local selections. In fact, it is
+not necessary to register with the `SelectionService` for local selections unless they need to be
+shared since `Selection` is observable with `SelectionObserver` too.
+
+The `SelectionService` also exposes a dynamic visitor interface for processing selections without
+guessing or explicit type casting. The [`SelectionVisitor`](../lib/system/selection_visitor.dart),
+['SelectionVisitorHandler'](../lib/system/selection_visitor_handler.dart], and
+['BasicSelectionVisitorHandler'](../lib/system/basic_selection_visitor_handler.dart) are the main
+classes providing this functionality and they are linked to `Selection` objects with its `accept()`
+method.
+
+The `SelectionService` does not store or return null selections. Clients should check 
+`SelectionService.isSet()` before retrieving the active selection, subscribe for updates, or catch
+the `NoSelectionException` from `SelectionService.selection()` instead. Clients that want to 
+explicitly clear a selection from the service should call `SelectionService.clear()`.
 
 Graphical relationships between parent nodes and their children are indicated in the map editor by
 special polygons. These polygons are not explicitly or necessarily present in the Tree (or KML 

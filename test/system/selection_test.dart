@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/system/selection.dart';
 
-import 'mock_selection_observer.dart';
+import '../editors/mock_selection_observer.dart';
 
 void main() {
   group('Selection', () {

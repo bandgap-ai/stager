@@ -81,7 +81,6 @@ void main() {
 
     test('Check exception handling', () {
       BasicSelectionVisitorHandler handler = BasicSelectionVisitorHandler();
-      double testDub = 1.0;
       Selection<double> firstSelection = Selection<double>();
 
       // Check the selection without registration
