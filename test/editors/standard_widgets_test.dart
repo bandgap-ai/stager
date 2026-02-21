@@ -11,7 +11,6 @@ import 'package:stager_platform/editors/single_point_map_editor.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:stager_platform/system/selection_service.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';
-import 'package:stager_platform/tree/leaf_node.dart';
 
 class MockTileProvider extends TileProvider {
   @override
