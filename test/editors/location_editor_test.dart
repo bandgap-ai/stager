@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/editors/location_editor.dart';
 import 'package:logger/logger.dart';
 // Test dependency
@@ -41,6 +42,29 @@ void main() {
         matching: find.byType(TextField),
       ));
       expect(longitudeField.controller!.text, '-42.0');
+    });
+
+    testWidgets('Should trigger onLocationChanged callback when auto-locate is used', (WidgetTester tester) async {
+      late LatLng receivedLocation;
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LocationEditor(
+              locationProvider: mockLocationProvider,
+              onLocationChanged: (loc) => receivedLocation = loc,
+            ),
+          ),
+        ),
+      );
+
+      // Tap the button to get the location
+      await tester.tap(find.text('Get my location'));
+      await tester.pumpAndSettle();
+
+      // Assert: Verify callback was called with mock data (42.0, -42.0)
+      expect(receivedLocation.latitude, 42.0);
+      expect(receivedLocation.longitude, -42.0);
     });
 
     testWidgets('Should show address field when address method is selected', (WidgetTester tester) async {

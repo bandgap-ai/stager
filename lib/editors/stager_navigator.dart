@@ -111,7 +111,7 @@ class _StagerNavigatorState extends State<StagerNavigator> {
                 // Update the state to force a redraw and update the other
                 // widgets.
                 _siteState.selectedNode = node;
-                // FIXME - This is a bit abusive of the API an it this whole
+                // FIXME - This is a bit abusive of the API and this whole
                 // class needs to fit the selection life cycle better.
                 widget.stagerSystem.selectionService().selection = Selection<LeafNode>(node);
               });

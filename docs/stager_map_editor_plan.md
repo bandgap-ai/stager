@@ -82,9 +82,9 @@ reload the layers when the data changes. [Tree Node Iterators](../lib/tree/itera
 to iterate over the tree in the specialized `LayerAdapter`s. Tile layers and 
 `RichAttributionWidget`s are handled as special `LayerAdapter` subclasses.
 
-To handle user interaction, the `LayerAdapter` will set Flutter `GestureDetector`s on the map 
+To handle user interactions, the `LayerAdapter` will set Flutter `GestureDetector`s on the map 
 widgets' (like `Marker`) `onTap` callbacks. The callback will then dispatch updates to the target 
-`TreeNode` and the `SelectionService`. Editing nodes will be enabled accomplished by type and as 
+`TreeNode` and the `SelectionService`. Editing nodes will be accomplished by type and as 
 follows:
 * Markers will appear in the `NodePropertiesView` for detailed editing after an `onTap` event, which
 will set the selected Marker as the active node in `SelectionService`. Gross moves will be
@@ -131,11 +131,12 @@ registry of selections that includes the current global selection (i.e., a singl
 picked on a map or a selected node in a TreeView) and local selections within a specific view (like 
 a local element selected in a `NodePropertiesView`). The `SelectionService` can both observe other
 objects and be observed. The `MapEditor` observes the `SelectionService` to automatically focus or 
-highlight nodes selected elsewhere in clients.  The `SelectionService` interfaces for subjects
-are `GlobalSelectionDispatcher` for global selections and 
-[`SelectionObserver`](../lib/system/selection_observer.dart) for local selections. In fact, it is
-not necessary to register with the `SelectionService` for local selections unless they need to be
-shared since `Selection` is observable with `SelectionObserver` too.
+highlight nodes selected elsewhere in clients.  The `SelectionService` exposes an API for   
+[`SelectionObserver`](../lib/system/selection_observer.dart) for both global and local selections. 
+`SelectionObserver` clients can register against the `SelectionService` without specifying a view to
+receive updates about global selections. Alternatively, they can register against specific view ids
+to receive updates about local selections. In cases where it makes more sense to avoid the service,
+for local selections, `Selection` is observable by `SelectionObserver` instances too.
 
 The `SelectionService` also exposes a dynamic visitor interface for processing selections without
 guessing or explicit type casting. The [`SelectionVisitor`](../lib/system/selection_visitor.dart),

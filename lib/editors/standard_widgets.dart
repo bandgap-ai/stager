@@ -26,15 +26,31 @@ void showNotification(BuildContext context, String message) {
   }
 }
 
+/// Builds a Stager-standard custom dialog with arbitrary [content].
+///
+/// [context] is the context for the dialog.
+/// [title] is the title of the dialog.
+/// [content] is the widget to be displayed in the body of the dialog.
+/// [actions] is an optional list of widgets to display at the bottom.
+Widget buildCustomDialog(BuildContext context, String title, Widget content,
+    {List<Widget>? actions}) {
+  return AlertDialog(
+    title: Text(title),
+    content: content,
+    actions: actions,
+  );
+}
+
 /// Builds a Stager-standard Message Dialog.
 ///
 /// [context] is the context for the dialog.
 /// [title] is the title of the dialog.
-/// [content] is the content of the dialog.
+/// [content] is the string content of the dialog.
 Widget buildMessageDialog(BuildContext context, String title, String content) {
-  return AlertDialog(
-    title: Text(title),
-    content: Text(content),
+  return buildCustomDialog(
+    context,
+    title,
+    Text(content),
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(false),
@@ -49,11 +65,9 @@ Widget buildMessageDialog(BuildContext context, String title, String content) {
 /// [context] is the context for the dialog.
 /// [title] is the title of the dialog.
 /// [content] is the content of the dialog.
-Function() buildErrorDialogCallback(BuildContext context, String title, String content) {
+Function() buildErrorDialogCallback(
+    BuildContext context, String title, String content) {
   return () async {
-    //  final String msgTitle = "Error";
-    //   final String errMsg = "Directory selection and exporting not available on "
-    //       "this platform.";
     if (context.mounted) {
       await showDialog<void>(
         context: context,
@@ -74,15 +88,17 @@ Function() buildErrorDialogCallback(BuildContext context, String title, String c
 /// [inputController] is the controller for the text field.
 /// [save] is the callback for when the user clicks the save button.
 /// [cancel] is the callback for when the user clicks the cancel button.
-Widget buildEditAndSubmitDialog(BuildContext context,
+Widget buildEditAndSubmitDialog(
+    BuildContext context,
     String title,
     String inputLabel,
     TextEditingController inputController,
     void Function() save,
     void Function() cancel) {
-  return AlertDialog(
-    title: Text(title),
-    content: TextField(
+  return buildCustomDialog(
+    context,
+    title,
+    TextField(
       controller: inputController,
       decoration: InputDecoration(labelText: inputLabel),
     ),
@@ -107,9 +123,10 @@ Widget buildEditAndSubmitDialog(BuildContext context,
 /// [title] is the title of the dialog.
 /// [content] is the content of the dialog.
 Widget buildConfirmDialog(BuildContext context, String title, String content) {
-  return AlertDialog(
-    title: Text(title),
-    content: Text(content),
+  return buildCustomDialog(
+    context,
+    title,
+    Text(content),
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(false),
@@ -130,8 +147,8 @@ Widget buildConfirmDialog(BuildContext context, String title, String content) {
 /// [context] is the context for the dialog.
 /// [labelText] is the label for the text field.
 /// [hintText] is the hint text for the text field.
-Widget buildTextFieldEditor(BuildContext context, TextEditingController controller,
-    final labelText, final hintText) {
+Widget buildTextFieldEditor(BuildContext context,
+    TextEditingController controller, final labelText, final hintText) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
     child: TextField(
@@ -163,22 +180,20 @@ Widget buildInfoLabel(BuildContext context, String info) {
 /// [context] is the context for the dialog.
 /// [childBuilder] a builder for the widget to be displayed in the bottom sheet.
 /// [vsync] is an optional TickerProvider for the animation controller.
-Widget buildBottomSheet(BuildContext context, WidgetBuilder childBuilder,
-    TickerProvider? vsync) {
+Widget buildBottomSheet(
+    BuildContext context, WidgetBuilder childBuilder, TickerProvider? vsync) {
   return BottomSheet(
-      // It might be worth externalizing the onClosing callback in the future.
-      onClosing: () {
-        Navigator.of(context).pop();
-      },
-      animationController: (vsync != null) ? BottomSheet.createAnimationController(vsync) : null,
-      enableDrag: true,
-      showDragHandle: true,
-      builder: childBuilder,
+    // It might be worth externalizing the onClosing callback in the future.
+    onClosing: () {
+      Navigator.of(context).pop();
+    },
+    animationController:
+        (vsync != null) ? BottomSheet.createAnimationController(vsync) : null,
+    enableDrag: true,
+    showDragHandle: true,
+    builder: childBuilder,
   );
-
 }
-
-// ----- These methods will be removed from Stager in a future release. -----
 
 /// Builds the position method widget for the dialog. The selectedOption
 /// parameter is updated in place.
@@ -186,9 +201,9 @@ Widget buildBottomSheet(BuildContext context, WidgetBuilder childBuilder,
 /// [context] is the context for the dialog.
 /// [initialSelection] is the initial selection.context
 /// [onChanged] is the callback for when the selection changes.
-Widget buildPositionMethodWidget(BuildContext context,
-    bool initialSelection,
-    void Function(bool) onChanged) {
+@Deprecated("To be removed after the new map editor is finished.")
+Widget buildPositionMethodWidget(
+    BuildContext context, bool initialSelection, void Function(bool) onChanged) {
   Widget selectorRow = Row(children: [
     const Text(
       'Position:',
@@ -223,17 +238,16 @@ Widget buildPositionMethodWidget(BuildContext context,
 /// [context] is the context for the dialog.
 /// [latitudeController] is the controller for the latitude field.
 /// [longitudeController] is the controller for the longitude field.
-Widget buildSinglePointMapEditor(BuildContext context,
-  LatLng initialPoint,
-  void Function(LatLng) onPointChanged,
-  {List<TileLayer>? tileLayers}) {
-
+@Deprecated("To be removed after the new map editor is finished.")
+Widget buildSinglePointMapEditor(
+    BuildContext context, LatLng initialPoint, void Function(LatLng) onPointChanged,
+    {List<TileLayer>? tileLayers}) {
   // Create the map editor widget
   Widget mapSelector = SinglePointMapEditor(
     initialPoint: initialPoint,
     centerPosition: initialPoint, // Initial map center
     onPointChanged: (LatLng? newPoint) {
-       onPointChanged(newPoint!);
+      onPointChanged(newPoint!);
     },
     tileLayers: tileLayers,
   );
@@ -247,6 +261,7 @@ Widget buildSinglePointMapEditor(BuildContext context,
 /// [context] is the context for the dialog.
 /// [latitudeController] is the controller for the latitude field.
 /// [longitudeController] is the controller for the longitude field.
+@Deprecated("To be removed after the new map editor is finished.")
 Widget buildGeoCoordEditor(BuildContext context,
     TextEditingController latitudeController, TextEditingController longitudeController) {
   // Pick the correct color for the border from the theme

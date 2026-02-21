@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Tracee Sample Sites</name>
+    <description>Sample data for tree tracking and GIS workflows.</description>
+
+    <!-- Meadowview Research Farm -->
+    <Folder>
+      <name>Meadowview Research Farm</name>
+      <Placemark>
+        <name>Farm Center</name>
+        <Point>
+          <coordinates>-81.86052,36.73444,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <!-- 2025 Planting -->
+      <Folder>
+        <name>2025 Planting</name>
+        <!-- Planting Area Boundary -->
+        <Placemark>
+          <name>Planting Area Boundary</name>
+          <Polygon>
+            <outerBoundaryIs>
+              <LinearRing>
+                <coordinates>
+                  -81.86050,36.73445,0
+                  -81.86060,36.73445,0
+                  -81.86060,36.73438,0
+                  -81.86050,36.73438,0
+                  -81.86050,36.73445,0
+                </coordinates>
+              </LinearRing>
+            </outerBoundaryIs>
+          </Polygon>
+        </Placemark>
+
+        <!-- Row 1 -->
+        <Folder>
+          <name>Row 1</name>
+          <Placemark>
+            <name>Tree 1</name>
+            <description>Species: American Chestnut, Health: Good</description>
+            <Point>
+              <coordinates>-81.86053,36.73441,0</coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>Tree 2</name>
+            <description>Species: American Chestnut, Health: Good</description>
+            <Point>
+              <coordinates>-81.86054,36.73441,0</coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>Tree 3</name>
+            <description>Species: American Chestnut, Health: Fair</description>
+            <Point>
+              <coordinates>-81.86055,36.73441,0</coordinates>
+            </Point>
+          </Placemark>
+        </Folder>
+
+        <!-- Row 2 -->
+        <Folder>
+          <name>Row 2</name>
+          <Placemark>
+            <name>Tree 4</name>
+            <description>Species: American Chestnut, Health: Good</description>
+            <Point>
+              <coordinates>-81.86056,36.73440,0</coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>Tree 5</name>
+            <description>Species: American Chestnut, Health: Poor</description>
+            <Point>
+              <coordinates>-81.86057,36.73440,0</coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>Tree 6</name>
+            <description>Species: American Chestnut, Health: Good</description>
+            <Point>
+              <coordinates>-81.86059,36.73440,0</coordinates>
+            </Point>
+          </Placemark>
+        </Folder>
+      </Folder>
+
+      <Placemark>
+        <name>Access Road</name>
+        <description>Type: gravel, Length: 500m</description>
+        <Point>
+          <coordinates>-81.86114,36.73408,0</coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+
+    <!-- Urban Chestnut Park -->
+    <Folder>
+      <name>Urban Chestnut Park</name>
+      <Placemark>
+        <name>Park Center</name>
+        <Point>
+          <coordinates>-75.16,39.95,0</coordinates>
+        </Point>
+      </Placemark>
+
+      <Folder>
+        <name>Section A</name>
+        <Placemark>
+          <name>Section A Boundary</name>
+          <Polygon>
+            <outerBoundaryIs>
+              <LinearRing>
+                <coordinates>
+                  -75.1608,39.9512,0
+                  -75.1615,39.9508,0
+                  -75.1605,39.9508,0
+                  -75.1608,39.9512,0
+                </coordinates>
+              </LinearRing>
+            </outerBoundaryIs>
+          </Polygon>
+        </Placemark>
+        <Placemark>
+          <name>Urban Tree 1</name>
+          <description>Species: Hybrid Chestnut, Planted: 2010</description>
+          <Point>
+            <coordinates>-75.161,39.951,0</coordinates>
+          </Point>
+        </Placemark>
+        <Placemark>
+          <name>Urban Tree 2</name>
+          <description>Species: American Chestnut, Planted: 2012</description>
+          <Point>
+            <coordinates>-75.1615,39.951,0</coordinates>
+          </Point>
+        </Placemark>
+      </Folder>
+
+      <Placemark>
+        <name>Playground Area</name>
+        <description>Amenity: playground, Surface: wood_chips</description>
+        <Point>
+          <coordinates>-75.162,39.949,0</coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>

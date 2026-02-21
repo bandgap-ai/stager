@@ -83,26 +83,39 @@ class _StagerPlatformExampleHomePageState extends
             // first.
             Center(child: LocationEditor()),
             Center(child: MapEditor(state: MapState(),)),
-            Center(child: Opacity(
-              opacity: 1.0,
-              child:  Container(
-                color: Colors.red,
-                width: 200,
-                height: 200,
-                child: Center(
-                  child: Text(
-                    "Overlay Effect",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+            Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // The "bottom" widget
+                  Container(
+                    color: Colors.blue,
+                    width: 300,
+                    height: 300,
+                    child: const Center(child: Text("Background Layer")),
+                  ),
+                  // The "top" widget (the overlay)
+                  Opacity(
+                    opacity: 0.8,
+                    child: Container(
+                      color: Colors.red,
+                      width: 200,
+                      height: 200,
+                      child: const Center(
+                        child: Text(
+                          "Overlay Effect",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
-
-            )
           ],
         ),
       ),

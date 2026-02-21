@@ -378,6 +378,40 @@ void main() {
           });
     });
 
+    group('buildCustomDialog', () {
+      testWidgets('builds an AlertDialog with correct title and custom content',
+              (WidgetTester tester) async {
+            const String dialogTitle = 'Custom Title';
+            const Widget customContent = Text('Custom Content Widget');
+
+            await pumpBaseWidget(tester, child: Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    showDialog<void>(
+                      context: context,
+                      builder: (BuildContext buildContext) {
+                        return buildCustomDialog(
+                            buildContext, dialogTitle, customContent);
+                      },
+                    );
+                  },
+                  child: const Text('Show Custom Dialog'),
+                );
+              },
+            ));
+
+            // Tap the button to show the dialog
+            await tester.tap(find.byType(ElevatedButton));
+            await tester.pumpAndSettle();
+
+            // Verify dialog is shown
+            expect(find.byType(AlertDialog), findsOneWidget);
+            expect(find.text(dialogTitle), findsOneWidget);
+            expect(find.text('Custom Content Widget'), findsOneWidget);
+          });
+    });
+
     group('buildMessageDialog', () {
       testWidgets('builds an AlertDialog with correct title, content, and OK button',
               (WidgetTester tester) async {

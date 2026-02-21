@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stager_platform/editors/location_picker.dart';
 import 'package:stager_platform/editors/standard_widgets.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/providers/geolocator_location_provider.dart';
 import 'package:stager_platform/providers/location_provider.dart';
 import 'package:logger/logger.dart';
@@ -13,12 +14,15 @@ import 'package:logger/logger.dart';
 /// - Fetching the device's current location.
 /// - Manually entering an address.
 class LocationEditor extends StatefulWidget {
-
   /// The provider used to fetch location data.
   final LocationProvider locationProvider;
 
   /// The logger for capturing events and errors.
   final Logger? logger;
+
+  /// Callback triggered whenever the coordinates are updated via location
+  /// services.
+  final void Function(LatLng) onLocationChanged;
 
   /// Creates a [LocationEditor] widget.
   ///
@@ -31,14 +35,19 @@ class LocationEditor extends StatefulWidget {
     super.key,
     this.locationProvider = const GeolocatorLocationProvider(),
     this.logger,
+    this.onLocationChanged = _defaultOnLocationChanged,
   });
+
+  /// Default callback that logs the location update.
+  static void _defaultOnLocationChanged(LatLng location) {
+    Logger().i('Location updated: $location');
+  }
 
   @override
   State<LocationEditor> createState() => _LocationEditorState();
 }
 
 class _LocationEditorState extends State<LocationEditor> {
-
   late final Logger log;
 
   @override
@@ -51,18 +60,20 @@ class _LocationEditorState extends State<LocationEditor> {
   LocationPickerMethod _selectedMethod = LocationPickerMethod.auto;
 
   /// Controls the text field for latitude.
-  final TextEditingController latitudeController = TextEditingController(text: '40.8624');
+  final TextEditingController latitudeController =
+      TextEditingController(text: '40.8624');
 
   /// Controls the text field for longitude.
-  final TextEditingController longitudeController = TextEditingController(text: '-73.8774');
+  final TextEditingController longitudeController =
+      TextEditingController(text: '-73.8774');
 
   /// Controls the text field for the address.
-  final TextEditingController addressController = TextEditingController(
-    text: 'New York Botanical Garden'
-  );
+  final TextEditingController addressController =
+      TextEditingController(text: 'New York Botanical Garden');
 
   /// Fetches the current location and updates the UI.
   ///
+  /// On success, it triggers the [widget.onLocationChanged] callback.
   /// On failure, it logs the error.
   Future<void> _handleGetLocation() async {
     try {
@@ -71,9 +82,11 @@ class _LocationEditorState extends State<LocationEditor> {
         latitudeController.text = position.latitude.toString();
         longitudeController.text = position.longitude.toString();
       });
+      // Trigger the callback.
+      widget.onLocationChanged(LatLng(position.latitude, position.longitude));
     } catch (e) {
       // Log the error for now, but might need to do more to help the user.
-      log.log(Level.error,e.toString());
+      log.log(Level.error, e.toString());
     }
   }
 
@@ -110,8 +123,8 @@ class _LocationEditorState extends State<LocationEditor> {
         // Complain if the user has blocked the services forever.
         position = Future.error(
             'The user has permanently denied access to location services for '
-                'this application, and we cannot request access to or use the '
-                'services.');
+            'this application, and we cannot request access to or use the '
+            'services.');
       }
     } else {
       position = Future.error('Location services are disabled.');
@@ -125,15 +138,15 @@ class _LocationEditorState extends State<LocationEditor> {
   /// This function builds the panel of widgets used for auto-detecting the
   /// user's location.
   Widget _buildAutoLocatorPanel(BuildContext context) {
-    return Column(
-      children: [const Text('We respect your privacy. Please press the button '
+    return Column(children: [
+      const Text('We respect your privacy. Please press the button '
           'below to determine your location automatically with location '
           'services. You may be asked by your device to grant permission.'),
-        ElevatedButton(
+      ElevatedButton(
         onPressed: _handleGetLocation,
         child: const Text('Get my location'),
-      )]
-    );
+      )
+    ]);
   }
 
   /// Builds the panel with the action widgets based on the selected method.
