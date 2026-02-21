@@ -1,18 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:stager_platform/stager.dart';
-import 'package:stager_platform/system/selection_visitor.dart';
-import '../system/basic_selection_visitor_handler.dart';
-import '../system/selection.dart';
 import '../editors/site_controls.dart';
 import '../site_state.dart';
-import '../editors/file_handler.dart';
 import '../editors/stager_navigator_header.dart';
 import '../editors/tree_view.dart';
-import '../system/selection_service.dart';
-import '../tree/leaf_node.dart';
 import '../editors/basic_site_controls.dart';
 import '../editors/stager_pin.dart';
-import '../system/stager_system.dart';
 
 /// A widget that provides a comprehensive editing interface for the entire site hierarchy.
 ///

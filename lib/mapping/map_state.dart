@@ -1,8 +1,4 @@
-// Flutter packages
-import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
-
 import 'adapters/stager_map_options.dart';
 import 'adapters/marker_layer_adapter.dart';
 import 'adapters/polygon_layer_adapter.dart';

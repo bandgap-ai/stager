@@ -503,8 +503,6 @@ void main() {
 
     group('buildBottomSheet', () {
 
-      Selection<LeafNode> selectedNode = Selection<LeafNode>(ConcreteLeafNode(id: '1', name: 'Test Node'));
-
       WidgetBuilder _getPropertiesWidgetBuilder(PropertiesWidget widget) {
         return (BuildContext context) {
           return widget;
