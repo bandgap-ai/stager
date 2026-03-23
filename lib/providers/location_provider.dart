@@ -1,4 +1,5 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 
 /// An interface for providing location services.
 ///
@@ -23,4 +24,17 @@ abstract class LocationProvider {
   ///
   /// Throws an exception if permissions are not granted.
   Future<Position> getCurrentPosition();
+
+  /// Converts a physical [address] string into geographic coordinates.
+  ///
+  /// This method performs an asynchronous geocoding lookup and returns the
+  /// most relevant [LatLng] for the provided address.
+  ///
+  /// [address] is the physical address string to resolve.
+  ///
+  /// Returns a [Future] containing the resulting [LatLng].
+  ///
+  /// Throws an exception if the address cannot be resolved or if the
+  /// underlying service fails.
+  Future<LatLng> locationFromAddress(String address);
 }

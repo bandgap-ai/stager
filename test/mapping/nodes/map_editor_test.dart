@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 // Project files
 import 'package:stager_platform/mapping/map_editor.dart';
 import 'package:stager_platform/mapping/map_state.dart';
+import 'package:stager_platform/site_state.dart';
 
 /// Unit tests for the [MapEditor] widget.
 ///
@@ -15,7 +16,7 @@ void main() {
   group('MapEditor Widget Tests', () {
     testWidgets('should load and contain a FlutterMap widget', (WidgetTester tester) async {
       // Arrange
-      final state = MapState();
+      final state = MapState(SiteState());
       
       // Act
       await tester.pumpWidget(
@@ -36,7 +37,7 @@ void main() {
 
     testWidgets('tapping search button should open the location dialog', (WidgetTester tester) async {
       // Arrange
-      final state = MapState();
+      final state = MapState(SiteState());
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

@@ -9,8 +9,8 @@ library;
 export 'tree/tree.dart';
 
 // Publicly available editor widgets
-export 'editors/location_editor.dart';
-export 'editors/location_picker.dart';
+export 'mapping/location_editor.dart';
+export 'mapping/location_picker.dart';
 export 'editors/standard_widgets.dart';
 
 // Abstractions for data providers and their concrete implementations

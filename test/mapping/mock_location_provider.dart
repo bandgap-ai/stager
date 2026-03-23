@@ -1,4 +1,5 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/providers/location_provider.dart';
 
 /// A mock implementation of the [LocationProvider] for testing purposes.
@@ -33,6 +34,17 @@ class MockLocationProvider implements LocationProvider {
   /// Defaults to [LocationPermission.always].
   LocationPermission permissionStatus = LocationPermission.always;
 
+  /// The mock coordinates to be returned by [locationFromAddress].
+  ///
+  /// Defaults to (10.0, 20.0).
+  LatLng mockAddressLocation = const LatLng(10.0, 20.0);
+
+  /// Captures the last address passed to [locationFromAddress] for verification.
+  String? lastAddressLookedUp;
+
+  /// Whether [locationFromAddress] should throw an error.
+  bool shouldThrowOnLookup = false;
+
   @override
   Future<Position> getCurrentPosition() async {
     // Return the canned position.
@@ -55,5 +67,14 @@ class MockLocationProvider implements LocationProvider {
   Future<LocationPermission> requestPermission() async {
     // Return the configured permission status.
     return permissionStatus;
+  }
+
+  @override
+  Future<LatLng> locationFromAddress(String address) async {
+    lastAddressLookedUp = address;
+    if (shouldThrowOnLookup) {
+      throw Exception('Mock lookup failure');
+    }
+    return mockAddressLocation;
   }
 }

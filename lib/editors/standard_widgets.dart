@@ -261,7 +261,6 @@ Widget buildSinglePointMapEditor(
 /// [context] is the context for the dialog.
 /// [latitudeController] is the controller for the latitude field.
 /// [longitudeController] is the controller for the longitude field.
-@Deprecated("To be removed after the new map editor is finished.")
 Widget buildGeoCoordEditor(BuildContext context,
     TextEditingController latitudeController, TextEditingController longitudeController) {
   // Pick the correct color for the border from the theme

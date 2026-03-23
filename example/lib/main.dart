@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:stager_platform/editors/location_editor.dart';
+import 'package:stager_platform/mapping/location_editor.dart';
 import 'package:stager_platform/mapping/map_editor.dart';
 import 'package:stager_platform/mapping/map_state.dart';
+import 'package:stager_platform/site_state.dart';
 
 /// This is a class for manually testing widgets in Stager. It is not used
 /// by clients or in any final products. Its sole purpose is to enable local
@@ -42,11 +43,13 @@ class StagerPlatformExampleHomePage extends StatefulWidget {
 class _StagerPlatformExampleHomePageState extends
   State<StagerPlatformExampleHomePage> with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  late final MapState _mapState;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _mapState = MapState(SiteState());
   }
 
   @override
@@ -82,7 +85,7 @@ class _StagerPlatformExampleHomePageState extends
             // The content for each tab. Load the location and geo services
             // first.
             Center(child: LocationEditor()),
-            Center(child: MapEditor(state: MapState(),)),
+            Center(child: MapEditor(state:_mapState)),
             Center(
               child: Stack(
                 alignment: Alignment.center,

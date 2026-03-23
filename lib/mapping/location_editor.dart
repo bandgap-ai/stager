@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stager_platform/editors/location_picker.dart';
+import 'package:stager_platform/mapping/location_picker.dart';
 import 'package:stager_platform/editors/standard_widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -90,6 +90,34 @@ class _LocationEditorState extends State<LocationEditor> {
     }
   }
 
+  /// Fetches coordinates for the entered address and updates the UI.
+  ///
+  /// On success, it triggers the [widget.onLocationChanged] callback.
+  /// On failure, it logs the error.
+  Future<void> _handleAddressLookup() async {
+    final String address = addressController.text;
+
+    // Happy path first: only proceed if the address is not empty.
+    if (address.isNotEmpty) {
+      try {
+        final LatLng location =
+            await widget.locationProvider.locationFromAddress(address);
+
+        setState(() {
+          latitudeController.text = location.latitude.toString();
+          longitudeController.text = location.longitude.toString();
+        });
+
+        // Trigger the callback.
+        widget.onLocationChanged(location);
+      } catch (e) {
+        log.e('Failed to lookup address "$address": $e');
+      }
+    } else {
+      log.w('Address lookup attempted with an empty address string.');
+    }
+  }
+
   /// Determine the current position of the device.
   ///
   /// This method follows the complete process recommended by the `geolocator`
@@ -149,17 +177,40 @@ class _LocationEditorState extends State<LocationEditor> {
     ]);
   }
 
+  /// This function builds the panel of widgets used for looking up an address.
+  Widget _buildAddressPanel(BuildContext context) {
+    late final Widget result;
+
+    result = Column(
+      children: [
+        buildTextFieldEditor(context, addressController, 'Address', ''),
+        const SizedBox(height: 16.0),
+        ElevatedButton.icon(
+          onPressed: _handleAddressLookup,
+          icon: const Icon(Icons.search),
+          label: const Text('Lookup Address'),
+        ),
+      ],
+    );
+
+    return result;
+  }
+
   /// Builds the panel with the action widgets based on the selected method.
   Widget _buildActionPanel() {
+    late final Widget result;
+
     switch (_selectedMethod) {
       case LocationPickerMethod.auto:
-        return _buildAutoLocatorPanel(context);
+        result = _buildAutoLocatorPanel(context);
       case LocationPickerMethod.map:
         // Placeholder for map picker functionality
-        return const Center(child: Text('Map picker not implemented.'));
+        result = const Center(child: Text('Map picker not implemented.'));
       case LocationPickerMethod.address:
-        return buildTextFieldEditor(context, addressController, 'Address', '');
+        result = _buildAddressPanel(context);
     }
+
+    return result;
   }
 
   @override

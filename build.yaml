@@ -1,0 +1,17 @@
+targets:
+  $default:
+    sources:
+      include:
+        - lib/**
+        - test/**
+      exclude:
+        - example/**
+        - .dart_tool/**
+
+builders:
+  hello_builder:
+      import: "package:stager_platform/builders/hello_builder.dart"
+      builder_factories: ["helloBuilder"]
+      build_extensions: {".dart": [".hello.dart"]}
+      auto_apply: dependents
+      build_to: source

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager_platform/editors/location_picker.dart';
+import 'package:stager_platform/mapping/location_picker.dart';
 
 void main() {
   group('LocationPicker', () {

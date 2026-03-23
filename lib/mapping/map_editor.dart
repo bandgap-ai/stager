@@ -2,7 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:stager_platform/stager.dart';
+import '../editors/standard_widgets.dart';
+import '../system/basic_selection_visitor_handler.dart';
+import '../system/selection.dart';
+import '../system/selection_service.dart';
+import '../system/selection_visitor.dart';
+import '../system/selection_visitor_handler.dart';
+import 'location_editor.dart';
+import 'nodes/map_selection_visitor_handler.dart';
+import '../system/generic_delegating_observer.dart';
 import '../editors/stager_editor.dart';
 import 'map_state.dart';
 
@@ -34,17 +42,6 @@ class MapEditor extends StagerEditor<MapState> {
   State<MapEditor> createState() => _MapEditorState();
 }
 
-class _PositionSelectionVisitor implements SelectionVisitor<LatLng> {
-  LatLng position;
-
-  _PositionSelectionVisitor([this.position = const LatLng(0.0, 0.0)]);
-
-  @override
-  void visit(LatLng element) {
-    position = element;
-  }
-}
-
 /// The state class for [MapEditor], managing the Flutter Map lifecycle.
 ///
 /// While [MapState] focuses on the data state (layer adapters, tile servers),
@@ -52,38 +49,88 @@ class _PositionSelectionVisitor implements SelectionVisitor<LatLng> {
 /// managing viewable layers, handling re-renders triggered by [MapState]
 /// notifications (via [SelectionService]), and coordinating with the
 /// [SelectionService] for automated navigation.
-class _MapEditorState extends State<MapEditor>
-    implements SelectionObserver<LatLng> {
+class _MapEditorState extends State<MapEditor> {
   final SelectionService selectionService = SelectionService();
   final SelectionVisitorHandler handler = BasicSelectionVisitorHandler();
-  final _PositionSelectionVisitor posVisitor = _PositionSelectionVisitor();
+  late GenericSelectionVisitor<LatLng> locationChangeVisitor;
+  late MapSelectionVisitorHandler globalSelectionHandler;
+  bool _useSatellite = false;
+
+  late final GenericDelegatingObserver _localObserver;
+  late final GenericDelegatingObserver _globalObserver;
 
   @override
   void initState() {
     super.initState();
-    // Register against the selection service for location updates
-    selectionService.attach(this, MapEditor.viewId);
+
+    // Initialize specialized observers
+    _localObserver = GenericDelegatingObserver(_handleLocalSelection);
+    _globalObserver = GenericDelegatingObserver(_handleGlobalSelection);
+
+    // Register against the selection service for location updates from the
+    // location editor
+    selectionService.attach(_localObserver, MapEditor.viewId);
     // Setup its visitor
-    handler.register(LatLng, posVisitor);
+    final defaultLoc = widget.state.mapOptions.initialCenter;
+    locationChangeVisitor = GenericSelectionVisitor(defaultLoc);
+    handler.register(LatLng, locationChangeVisitor);
+
+    // And global selection updates
+    selectionService.attach(_globalObserver);
+    // Setup the visitor for global selection updates
+    globalSelectionHandler = MapSelectionVisitorHandler();
   }
 
   @override
   void dispose() {
     // Detach from the selection service because this class will be destroyed,
     // which will cause errors until it is reinitialized.
-    selectionService.detach(this, MapEditor.viewId);
+    selectionService.detach(_localObserver, MapEditor.viewId);
+    selectionService.detach(_globalObserver);
     super.dispose();
+  }
+
+  /// Utility function for moving to a location. It preserves the current zoom
+  /// level.
+  void _moveToPoint(LatLng point) {
+    final currentZoom = widget.state.mapController.camera.zoom;
+    widget.state.mapController.move(point, currentZoom);
+  }
+
+  /// Handles selection updates from the local "mapEditor" channel (e.g. from
+  /// the LocationEditor).
+  void _handleLocalSelection() {
+    if (mounted && selectionService.isSet(MapEditor.viewId)) {
+      setState(() {
+        Selection<dynamic> selection = selectionService.getSelectionForView(
+          MapEditor.viewId,
+        );
+        selection.accept(handler);
+        _moveToPoint(locationChangeVisitor.value);
+      });
+    }
+  }
+
+  /// Handles selection updates from the global selection channel (e.g. marker
+  /// taps).
+  void _handleGlobalSelection() {
+    if (mounted && selectionService.isSet()) {
+      setState(() {
+        selectionService.selection.accept(globalSelectionHandler);
+        _moveToPoint(globalSelectionHandler.location);
+      });
+    }
   }
 
   FlutterMap _buildMap(MapState state) {
     return FlutterMap(
       mapController: state.mapController,
-      options: state.options,
+      options: state.mapOptions.flutterMapOptions,
       children: [
-        state.tileLayerAdapter.tileLayer,
-        state.tileLayerAdapter.attributionWidget,
-        state.markerLayerAdapter.markerLayer,
+        state.tileLayerAdapter.getTileLayer(_useSatellite),
+        state.tileLayerAdapter.getAttributionWidget(_useSatellite),
         state.polygonLayerAdapter.polygonLayer,
+        state.markerLayerAdapter.markerLayer,
       ],
     );
   }
@@ -115,17 +162,31 @@ class _MapEditorState extends State<MapEditor>
 
   Align _buildControlBar(BuildContext context, MapState state) {
     return Align(
-      alignment: Alignment.topCenter,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 16.0), // Margin from the top
-        child: FloatingActionButton.small(
-          onPressed: () {
-            _showLocationDialog(context, state);
-          },
-          child: const Icon(Icons.search), // The "looking glass" icon
-        ),
-      ),
-    );
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FloatingActionButton.small(
+                onPressed: () {
+                  _showLocationDialog(context, state);
+                },
+                child: const Icon(Icons.search),
+              ),
+              const SizedBox(width: 8),
+              FloatingActionButton.small(
+                onPressed: () {
+                  setState(() {
+                    // Toggle the value in stagerMapOptions via state
+                    _useSatellite = !_useSatellite;
+                  });
+                },
+                child: Icon(_useSatellite ? Icons.map : Icons.satellite_alt),
+              ),
+            ],
+          ),
+        ));
   }
 
   @override
@@ -139,21 +200,5 @@ class _MapEditorState extends State<MapEditor>
         _buildControlBar(context, widget.state),
       ],
     );
-  }
-
-  @override
-  void update() {
-    // Verify the widget is still mounted before attempting to update state,
-    // especially in case it is triggered by asynchronous services (like from
-    // the location editor's lookups).
-    if (mounted) {
-      setState(() {
-        Selection<dynamic> selection = selectionService.getSelectionForView(
-          MapEditor.viewId,
-        );
-        selection.accept(handler);
-        widget.state.mapController.move(posVisitor.position, 15.0);
-      });
-    }
   }
 }

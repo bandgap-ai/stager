@@ -120,7 +120,7 @@ execute a new render of the map. One way to think about this statement is that t
 abstract thing defined by the data in `MapState` whereas the view of that map is the concrete thing
 rendered in the `MapEditor` with view options set in `_MapEditorState`.
 
-The `MapEditor` uses [the new `LocationEditor`](../lib/editors/location_editor.dart) to allow users to
+The `MapEditor` uses [the new `LocationEditor`](../lib/mapping/location_editor.dart) to allow users to
 configure their location or automatically detect it with GPS.
 
 The `MapEditor` is the first `StagerEditor` to use 
