@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/persistence/json_codec.dart';
 import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/tree/concrete_tree.dart';
 
 void main() {
   group('JsonCodec', () {

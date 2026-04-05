@@ -1,7 +1,6 @@
 import 'package:latlong2/latlong.dart';
 import 'package:logger/logger.dart';
 import '../../system/basic_selection_visitor_handler.dart';
-import '../../system/selection_visitor.dart';
 import '../../tree/concrete_composite_node.dart';
 import '../../tree/concrete_leaf_node.dart';
 import '../../tree/concrete_tree_node.dart';

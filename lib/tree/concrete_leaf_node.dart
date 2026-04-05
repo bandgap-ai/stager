@@ -4,7 +4,6 @@
 library;
 import 'package:stager_platform/tree/node_visitor.dart';
 import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/tree/concrete_node_properties.dart';
 import 'package:stager_platform/tree/node_observer.dart';
 
 /// A concrete implementation of a [LeafNode] that provides basic functionality.

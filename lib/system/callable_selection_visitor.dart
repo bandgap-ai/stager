@@ -1,4 +1,3 @@
-import 'package:latlong2/latlong.dart';
 
 import 'selection_visitor.dart';
 

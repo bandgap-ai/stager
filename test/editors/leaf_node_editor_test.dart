@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/leaf_node_editor.dart';
 import 'package:stager_platform/editors/single_point_map_editor.dart';
-import 'package:stager_platform/tree/concrete_leaf_node.dart';
 import 'package:stager_platform/tree/tree.dart';
 
 void main() {

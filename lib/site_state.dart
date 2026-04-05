@@ -1,5 +1,4 @@
 // lib/stager/site_state.dart
-import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/data/basic_sample_data.dart';
 import 'package:stager_platform/site_state_observer.dart';
 import 'package:stager_platform/tree/node_observer.dart';

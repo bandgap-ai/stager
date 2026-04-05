@@ -3,7 +3,6 @@
 library;
 
 import 'package:latlong2/latlong.dart';
-import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/tree.dart';
 
 import '../mapping/nodes/kml_polygon_node.dart';

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/iterators.dart';
 
 /// A codec for serializing and deserializing a tree of [TreeNode]s to and from JSON.

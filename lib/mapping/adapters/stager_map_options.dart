@@ -1,8 +1,6 @@
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../system/selection_service.dart';
-import '../../tree/leaf_node.dart';
 
 /// A class for managing [MapOptions] in Stager.
 ///

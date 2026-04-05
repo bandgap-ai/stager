@@ -3,7 +3,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/editors/tree_view.dart';
 

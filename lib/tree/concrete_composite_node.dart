@@ -5,7 +5,6 @@
 /// manages a list of children.
 library;
 import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/tree/concrete_leaf_node.dart';
 import 'package:stager_platform/tree/node_observer.dart';
 
 class ConcreteCompositeNode extends ConcreteLeafNode implements CompositeNode {

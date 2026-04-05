@@ -502,7 +502,7 @@ void main() {
 
     group('buildBottomSheet', () {
 
-      WidgetBuilder _getPropertiesWidgetBuilder(PropertiesWidget widget) {
+      WidgetBuilder getPropertiesWidgetBuilder(PropertiesWidget widget) {
         return (BuildContext context) {
           return widget;
         };
@@ -521,7 +521,7 @@ void main() {
                       pin: pin,
                     );
                     // Build the bottom sheet that will actually be tested
-                    return buildBottomSheet(context, _getPropertiesWidgetBuilder(propertiesWidget), null);
+                    return buildBottomSheet(context, getPropertiesWidgetBuilder(propertiesWidget), null);
                   },
               ),
             ),

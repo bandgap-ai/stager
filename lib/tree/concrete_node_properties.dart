@@ -1,6 +1,7 @@
 /// Concrete implementation of [NodeProperties].
 ///
 /// This class stores properties in a simple [Map<String, Object?>].
+library;
 
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/tree/node_observer.dart';

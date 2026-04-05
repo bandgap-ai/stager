@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:stager_platform/system/selection.dart';
 import 'package:stager_platform/system/selection_observer.dart';
 import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/editors/stager_tree_viewers.dart';
