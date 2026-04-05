@@ -4,14 +4,41 @@ targets:
       include:
         - lib/**
         - test/**
+        - $package$
+        - $lib$
       exclude:
         - example/**
         - .dart_tool/**
+        - "**/*.g.dart"        # Ignores json_serializable outputs
+        - "**/*.freezed.dart"  # In case we adopt Freezed in the future.
+    builders:
+      # This forces the builder our own stager_platform package
+      stager_platform|hello_builder:
+        enabled: true
+      stager_platform|builder_extractor:
+        enabled: true
+      stager_platform|builder_compiler:
+        enabled: true
 
 builders:
   hello_builder:
-      import: "package:stager_platform/builders/hello_builder.dart"
-      builder_factories: ["helloBuilder"]
-      build_extensions: {".dart": [".hello.dart"]}
-      auto_apply: dependents
-      build_to: source
+    import: "package:stager_platform/builders/hello_builder.dart"
+    builder_factories: ["helloBuilder"]
+    build_extensions: {".dart": [".hello.dart"]}
+    auto_apply: dependents     # Applies automatically to our clients
+    build_to: source
+  builder_extractor:
+    import: "package:stager_platform/builders/builder_extractor.dart"
+    builder_factories: [ "builderExtractor" ]
+    build_extensions: { ".dart": [ ".builder.info" ] }
+    # Applies automatically to our clients
+    auto_apply: dependents
+    build_to: cache
+    # Guarantees execution order
+    runs_before: ["stager_platform|builder_compiler"]
+  builder_compiler:
+    import: "package:stager_platform/builders/builder_compiler.dart"
+    builder_factories: [ "builderCompilerBuilder" ]
+    build_extensions: { "$lib$": [ "stager_registry.g.dart" ] }
+    auto_apply: dependents
+    build_to: source

@@ -30,3 +30,6 @@ coverage/
 .flutter-plugins
 .flutter-plugins-dependencies
 build/
+
+# Auto-generated factory. Must be rebuilt.
+/lib/stager_registry.g.dart

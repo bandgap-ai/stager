@@ -61,15 +61,15 @@ handled efficiently.
 
 ### Second Audit - 20260212
 * This plan did not previously consider the already existing Selection classes: 
-[Selection](../lib/system/selection.dart)] and 
-[SelectionObserver](../lib/system/selection_observer.dart). They are now discussed in the 
+[Selection](../../lib/system/selection.dart)] and 
+[SelectionObserver](../../lib/system/selection_observer.dart). They are now discussed in the 
 implementation details. 
 
 ## Implementation Details
 This package uses the Flutter Map plugin. The base map is OpenStreetMap and there 
 [are specific rules around using the OpenStreetMap tile server](https://operations.osmfoundation.org/policies/tiles/).
 
-The [`MapEditor`](../lib/mapping/map_editor.dart) is small by design. It externalizes as much of its
+The [`MapEditor`](../../lib/mapping/map_editor.dart) is small by design. It externalizes as much of its
 functionality as possible to remain reconfigurable and reusable. The Map Editor's Flutter Map Layers
 are implemented in separate files and loaded dynamically based on the configuration of the `MapEditor`
 widget as it reloads.
@@ -78,7 +78,7 @@ Marker and Polygon layers are constructed with specialized `LayerAdapter`s. `Lay
 specialized to data types without introducing those dependencies to `MapEditor`. `LayerAdapter`s can
 adapt to any input, but their intended purpose is to adapt data in Stager `TreeNode`s to the flattened
 form (set of arrays) required by Flutter Map. `LayerAdapter`s should observer the data they adapt and
-reload the layers when the data changes. [Tree Node Iterators](../lib/tree/iterators.dart) are used
+reload the layers when the data changes. [Tree Node Iterators](../../lib/tree/iterators.dart) are used
 to iterate over the tree in the specialized `LayerAdapter`s. Tile layers and 
 `RichAttributionWidget`s are handled as special `LayerAdapter` subclasses.
 
@@ -99,16 +99,16 @@ Creating nodes can happen in at least two ways. First, users can add nodes by ed
 directly via an editor. Second, users can activate a `Create` control in the `MapEditor` to add
 Markers and Polygons.
 
-The `MapEditor` widget is [a standard Stager editor](../lib/editors/stager_editor.dart), (and because
+The `MapEditor` widget is [a standard Stager editor](../../lib/editors/stager_editor.dart), (and because
 of its highly specialized purpose it is stored in the mapping directory). Thus, it participates in
 both the Stager and the Flutter lifecycles. This means that some elements of the `MapEditor` can be
-reconfigured using [an Editor Factory](../lib/editors/editor_factory.dart). It uses other Editor 
-utilities as needed, such as [message dialogs](../lib/editors/message_dialog.dart). The view of the 
+reconfigured using [an Editor Factory](../../lib/editors/editor_factory.dart). It uses other Editor 
+utilities as needed, such as [message dialogs](../../lib/editors/message_dialog.dart). The view of the 
 map and data (handled by Flutter Map) is wrapped inside a standard Flutter Stateful Widget, and this 
 provides some limited opportunity for customization of the utility bar and controls used to 
 manipulate the map.
 
-The state of the `MapEditor` is stored in a [`MapState`](../lib/mapping/map_state.dart) object.
+The state of the `MapEditor` is stored in a [`MapState`](../../lib/mapping/map_state.dart) object.
 It is a collection of tile, marker, and polygon layer adapters; configuration details; attribution
 widgets, and other data used by the `MapEditor`. The `MapState` class is distinct from the
 `_MapEditorState` class defined in the `MapEditor` because `_MapEditorState` is specifically focused 
@@ -120,28 +120,28 @@ execute a new render of the map. One way to think about this statement is that t
 abstract thing defined by the data in `MapState` whereas the view of that map is the concrete thing
 rendered in the `MapEditor` with view options set in `_MapEditorState`.
 
-The `MapEditor` uses [the new `LocationEditor`](../lib/mapping/location_editor.dart) to allow users to
+The `MapEditor` uses [the new `LocationEditor`](../../lib/mapping/location_editor.dart) to allow users to
 configure their location or automatically detect it with GPS.
 
 The `MapEditor` is the first `StagerEditor` to use 
-[the new `SelectionService`](../lib/system/selection_service.dart). The `SelectionService` replaces 
+[the new `SelectionService`](../../lib/system/selection_service.dart). The `SelectionService` replaces 
 the `_selectedNode` variable in the original implementation with 
-[a `Selection<T>`](../lib/system/selection.dart) retrieved from the Service. The Service is a global
+[a `Selection<T>`](../../lib/system/selection.dart) retrieved from the Service. The Service is a global
 registry of selections that includes the current global selection (i.e., a single point 
 picked on a map or a selected node in a TreeView) and local selections within a specific view (like 
 a local element selected in a `NodePropertiesView`). The `SelectionService` can both observe other
 objects and be observed. The `MapEditor` observes the `SelectionService` to automatically focus or 
 highlight nodes selected elsewhere in clients.  The `SelectionService` exposes an API for   
-[`SelectionObserver`](../lib/system/selection_observer.dart) for both global and local selections. 
+[`SelectionObserver`](../../lib/system/selection_observer.dart) for both global and local selections. 
 `SelectionObserver` clients can register against the `SelectionService` without specifying a view to
 receive updates about global selections. Alternatively, they can register against specific view ids
 to receive updates about local selections. In cases where it makes more sense to avoid the service,
 for local selections, `Selection` is observable by `SelectionObserver` instances too.
 
 The `SelectionService` also exposes a dynamic visitor interface for processing selections without
-guessing or explicit type casting. The [`SelectionVisitor`](../lib/system/selection_visitor.dart),
+guessing or explicit type casting. The [`SelectionVisitor`](../../lib/system/selection_visitor.dart),
 ['SelectionVisitorHandler'](../lib/system/selection_visitor_handler.dart], and
-['BasicSelectionVisitorHandler'](../lib/system/basic_selection_visitor_handler.dart) are the main
+['BasicSelectionVisitorHandler'](../../lib/system/basic_selection_visitor_handler.dart) are the main
 classes providing this functionality and they are linked to `Selection` objects with its `accept()`
 method.
 
@@ -184,7 +184,7 @@ logic and data transformation from the rendering layer.
 
 ## Short Example
 The following example show show to configure the Map Editor in a simple client application. A robust
-version of this is implemented [in the example](../example/lib/main.dart).
+version of this is implemented [in the example](../../example/lib/main.dart).
 
 ```dart
 To be added later

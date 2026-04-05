@@ -124,7 +124,7 @@ try {
 }
 ```
 
-This example is encoded in [the KML integration test](../test/mapping/kml_integration_test.dart).
+This example is encoded in [the KML integration test](../../test/mapping/kml_integration_test.dart).
 
 ## Open Questions
 

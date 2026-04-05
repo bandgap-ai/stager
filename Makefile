@@ -34,8 +34,13 @@ generate:
 	$(FLUTTER_EXE) pub get
 	$(DART_EXE) run build_runner build --delete-conflicting-outputs
 
-test:
+dart_test:
+	$(DART_EXE) test generator_test
+
+flutter_test:
 	$(FLUTTER_EXE) test
+
+test: dart_test flutter_test
 
 build: generate
 	cd example && $(FLUTTER_EXE) pub get

@@ -1,5 +1,12 @@
 // Project files
+import '../builders/basic_builder.dart';
+import '../builders/stager_context.dart';
 import '../data/stager_icon.dart';
+
+@BasicBuilder(name: 'KMLIcon')
+KMLIcon buildKMLIcon(StagerContext context) {
+  return KMLIcon(href: context.getOrDefault("href", "https://example.com/kml_icon.png"));
+}
 
 /// A specialized icon class for KML features.
 ///

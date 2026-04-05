@@ -1,6 +1,6 @@
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:code_builder/code_builder.dart' hide LibraryBuilder;
 import 'package:dart_style/dart_style.dart';
 
@@ -13,14 +13,14 @@ Builder helloBuilder(BuilderOptions options) {
 class HelloGenerator extends GeneratorForAnnotation<Hello> {
   @override
   String generateForAnnotatedElement(
-      Element2 element, ConstantReader annotation, BuildStep buildStep) {
+      Element element, ConstantReader annotation, BuildStep buildStep) {
 
     // 1. Define the code structure
     final helloVariable = Field((b) => b
-      ..name = 'hello${element.name3}'
+      ..name = 'hello${element.name}'
       ..modifier = FieldModifier.constant
       ..type = refer('String')
-      ..assignment = Code("'Hello World from ${element.name3}!'")
+      ..assignment = Code("'Hello World from ${element.name}!'")
     );
 
     // 2. Emit it to a String

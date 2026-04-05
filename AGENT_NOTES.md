@@ -49,6 +49,18 @@ This document contains a running list of lessons learned to ensure continuous im
     *   **Mistake:** Used the erroneous term 'Non-Goal' in design plans and templates.
     *   **Correction:** Replaced 'Non-Goal' with 'Exclusion' in all design documents.
 
+10. **Build Infrastructure & Tooling Stability:**
+    *   **Rule:** Core build tools like `build_runner`, `source_gen`, and `analyzer` must have strictly compatible versions to prevent "Broken Build Infrastructure" errors (e.g., `Couldn't resolve package 'build_runner_core'`).
+    *   **Mistake:** Incompatible versions of `build` and `analyzer` were used, causing `build_runner`'s internal entrypoint script to fail compilation.
+    *   **Correction:** Use a "Deep Clean" strategy to recover from corrupted tool states:
+        1. `flutter clean`
+        2. `rm -rf .dart_tool`
+        3. `rm -rf .packages`
+        4. `rm pubspec.lock`
+        5. `flutter pub cache clean --force`
+        6. `flutter pub get`
+        7. `dart run build_runner build --delete-conflicting-outputs`
+
 ## Pre-Task Checklist
 
 Before writing any code, confirm you have reviewed and understood:
@@ -57,6 +69,10 @@ Before writing any code, confirm you have reviewed and understood:
 3.  `AGENT_NOTES.md` (These learnings to avoid repeating mistakes)
 
 ## Changelog
+
+*   **2026-02-22:** Recovered from corrupted `build_runner` infrastructure.
+    *   Learned the "Deep Clean" strategy for solving internal build script compilation errors.
+    *   Reinforced the importance of dependency alignment for core build tools.
 
 *   **2026-01-31:** Refactored KML documents.
     *   Banned the use of the term 'Non-Goal'.

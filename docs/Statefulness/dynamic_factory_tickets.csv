@@ -1,0 +1,52 @@
+title,description,due_date,milestone
+"Implement StagerBuilder and StagerContext","Create core API contracts following TDD and project standards.
+1. Write unit tests for `StagerContext` to verify configuration storage and retrieval.
+2. Create `StagerBuilder` annotation in `lib/annotations/stager_builder.dart` with comprehensive doc comments.
+3. Implement `StagerContext` in `lib/system/stager_context.dart`.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~""Full AI"" ~Testing",,
+"Implement BasicBuilder and Execution Tests","Implement the generic delegation model using TDD.
+1. Write unit tests for `BasicBuilder<T>` verifying delegate execution, context handling, and type reification.
+2. Implement `BasicBuilder<T>` in `lib/builders/basic_builder.dart`.
+3. Document delegation logic and internal method bodies thoroughly.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~""Full AI"" ~Testing",,
+"Implement BuilderExtractor (Pass 1)","Create the `source_gen` generator using TDD.
+1. Write `source_gen_test` cases defining expected JSON metadata output for valid and invalid annotations.
+2. Implement `BuilderExtractor` in `lib/builders/builder_extractor.dart`.
+3. Parse top-level functions and extract name, return type, and canonical `package:` URIs.
+4. Output metadata to `.builder.info` JSON files in the `.dart_tool` cache.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~""Full AI"" ~Testing",,
+"Implement BuilderCompiler (Pass 2)","Develop the registry compiler following TDD and architectural guidelines.
+1. Write unit tests for the registry generation logic and collision detection.
+2. Implement `BuilderCompiler` in `lib/builders/builder_compiler.dart` using `glob` to aggregate metadata.
+3. Use `code_builder` to generate `stager_registry.g.dart` with master builder list and type map.
+4. Implement collision detection to ensure `name` uniqueness within the package.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~""Full AI"" ~Testing",,
+"Configure build.yaml and Project Integration","Wire the two-pass system into the Flutter build pipeline.
+1. Configure `builder_extractor` with `build_to: cache` and `runs_before` the compiler.
+2. Configure `builder_compiler` with `build_to: source` to enable standalone imports.
+3. Verify that the generated registry is correctly placed in `lib/stager_registry.g.dart`.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~""Full AI""",,
+"Create Dynamic Factory Integration Tests","Perform end-to-end validation following TDD.
+1. Set up a test fixture with dummy nodes and factory functions.
+2. Execute `build_runner` and verify the content and location of `stager_registry.g.dart`.
+3. Verify that the generated registry can be imported and used to instantiate nodes at runtime.
+
+/assign @jayjaybillings_bg
+/label ~Testing ~""Full AI""",,
+"Update Public API and Documentation","Finalize the feature for public use with thorough documentation.
+1. Export `StagerBuilder`, `StagerContext`, and `BasicBuilder` in `lib/stager.dart`.
+2. Update the project README with usage instructions and the 'Short Example' from the design plan.
+3. Ensure all new public APIs have complete doc comments for classes and methods.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~""Full AI""",,
