@@ -15,7 +15,10 @@ endif
 FLUTTER_EXE := flutter
 DART_EXE := dart
 
-.PHONY: help generate test build run all clean
+# Path to specialized generator tests
+GENERATOR_TESTS := generator_test
+
+.PHONY: help generate test dart_test flutter_test build run all clean analyze
 
 help:
 	@echo "Stager Platform Makefile"
@@ -24,7 +27,8 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  generate - Run build_runner code generation"
-	@echo "  test     - Run unit tests"
+	@echo "  analyze  - Run static analysis"
+	@echo "  test     - Run all unit tests"
 	@echo "  build    - Build the example app for $(FLUTTER_OS)"
 	@echo "  run      - Run the example app on $(FLUTTER_OS)"
 	@echo "  all      - Run generate, build, and test"
@@ -34,8 +38,11 @@ generate:
 	$(FLUTTER_EXE) pub get
 	$(DART_EXE) run build_runner build --delete-conflicting-outputs
 
+analyze:
+	$(FLUTTER_EXE) analyze --no-fatal-infos --no-fatal-warnings
+
 dart_test:
-	$(DART_EXE) test generator_test
+	$(DART_EXE) test $(GENERATOR_TESTS)
 
 flutter_test:
 	$(FLUTTER_EXE) test

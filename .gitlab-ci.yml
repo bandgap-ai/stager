@@ -53,10 +53,11 @@ setup_dependencies:
   script:
     - flutter --version
     - flutter doctor -v
-    - flutter pub get
+    - make generate
   artifacts:
     paths:
       - pubspec.lock
+      - lib/stager_registry.g.dart
       - .pub-cache/
       - .dart_tool/
     expire_in: 2 hours
@@ -70,9 +71,9 @@ test_all:
     - apt-get update -qq && apt-get install -y -qq lcov python3-pip
     - pip install --break-system-packages lcov_cobertura
   script:
-    - flutter pub get
-    - echo "Running all Flutter tests..."
-    # Run Flutter tests and generate coverage data
+    # Run specialized generator tests
+    - make dart_test
+    # Run Flutter unit tests and generate coverage data
     - flutter test --coverage
     # Generate HTML coverage report
     - genhtml coverage/lcov.info -o $CI_PROJECT_DIR/coverage/html
@@ -96,16 +97,14 @@ analyze:
   stage: analyze
   needs: ["setup_dependencies"]
   script:
-    - flutter pub get
-    - echo "Running Flutter analyzer..."
-    - flutter analyze --no-fatal-infos --no-fatal-warnings
+    - echo "Running static analysis..."
+    - make analyze
 
 # Dry run of dart publish.
 dart-publish-dry-run:
   stage: build
   needs: ["test_all", "analyze"]
   script:
-    - flutter pub get
     - echo "Running 'dart pub publish --dry-run'."
     - dart pub publish --dry-run
 
