@@ -27,7 +27,7 @@ abstractions, and `system` services for global concerns like selection
 brokerage.
 
 Detailed design specifications, technical roadmaps, and integration guides are
-maintained in the `docs/` directory. This includes comprehensive plans for KML
+maintained in the `doc/` directory. This includes comprehensive plans for KML
 data integration, map editor development, and the implementation of a
 compile-time dynamic factory system to manage statefulness across different
 platforms.
