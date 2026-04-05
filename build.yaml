@@ -13,20 +13,12 @@ targets:
         - "**/*.freezed.dart"  # In case we adopt Freezed in the future.
     builders:
       # This forces the builder our own stager_platform package
-      stager_platform|hello_builder:
-        enabled: true
       stager_platform|builder_extractor:
         enabled: true
       stager_platform|builder_compiler:
         enabled: true
 
 builders:
-  hello_builder:
-    import: "package:stager_platform/builders/hello_builder.dart"
-    builder_factories: ["helloBuilder"]
-    build_extensions: {".dart": [".hello.dart"]}
-    auto_apply: dependents     # Applies automatically to our clients
-    build_to: source
   builder_extractor:
     import: "package:stager_platform/builders/builder_extractor.dart"
     builder_factories: [ "builderExtractor" ]
