@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/mapping/nodes/map_selection_visitor_handler.dart';
 import 'package:stager_platform/system/selection.dart';
+import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/tree/concrete_composite_node.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';
 import 'package:stager_platform/tree/concrete_tree_node.dart';
@@ -24,8 +25,8 @@ void main() {
         id: 'leaf-1',
         name: 'Test Leaf',
         initialProperties: {
-          'latitude': 38.0,
-          'longitude': -77.0,
+          'latitude': TypedValue<double>(38.0),
+          'longitude': TypedValue<double>(-77.0),
         },
       );
       final selection = Selection<ConcreteLeafNode>(node);
@@ -43,8 +44,8 @@ void main() {
         id: 'comp-1',
         name: 'Test Composite',
         initialProperties: {
-          'latitude': 40.0,
-          'longitude': -74.0,
+          'latitude': TypedValue<double>(40.0),
+          'longitude': TypedValue<double>(-74.0),
         },
       );
       final selection = Selection<ConcreteCompositeNode>(node);
@@ -62,8 +63,8 @@ void main() {
         id: 'tree-1',
         name: 'Test Tree',
         initialProperties: {
-          'latitude': 39.0,
-          'longitude': -76.0,
+          'latitude': TypedValue<double>(39.0),
+          'longitude': TypedValue<double>(-76.0),
         },
       );
       final selection = Selection<ConcreteTreeNode>(node);
@@ -84,7 +85,7 @@ void main() {
         id: 'leaf-no-loc',
         name: 'No Location Leaf',
         initialProperties: {
-          'name': 'Just a name',
+          'name': TypedValue<String>('Just a name'),
         },
       );
       final selection = Selection<ConcreteLeafNode>(node);
@@ -110,7 +111,7 @@ void main() {
         id: 'leaf-partial',
         name: 'Partial Location',
         initialProperties: {
-          'latitude': 38.0,
+          'latitude': TypedValue<double>(38.0),
           // longitude missing
         },
       );

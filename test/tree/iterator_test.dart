@@ -35,7 +35,7 @@ void main() {
       final iterator = DepthFirstIterator(root);
       final visitedNodes = <String>[];
       while (iterator.moveNext()) {
-        visitedNodes.add(iterator.current.properties.getProperty('id') as String);
+        visitedNodes.add(iterator.current.properties.get<String>('id'));
       }
       expect(visitedNodes, ['root', 'comp1', 'leaf1', 'leaf2', 'comp2', 'leaf3', 'leaf4']);
     });
@@ -44,7 +44,7 @@ void main() {
       final iterator = BreadthFirstIterator(root);
       final visitedNodes = <String>[];
       while (iterator.moveNext()) {
-        visitedNodes.add(iterator.current.properties.getProperty('id') as String);
+        visitedNodes.add(iterator.current.properties.get<String>('id'));
       }
       expect(visitedNodes, ['root', 'comp1', 'leaf4', 'leaf1', 'leaf2', 'comp2', 'leaf3']);
     });

@@ -18,8 +18,8 @@ void main() {
     /// Stager does not yet define any special graphical behavior for composite
     /// nodes.
     testWidgets('CompositeNodeEditor delegates to LeafNodeEditor', (WidgetTester tester) async {
-      testProperties.setProperty('name', 'Test Node');
-      testProperties.setProperty('description', 'Some description');
+      testProperties.set('name', 'Test Node');
+      testProperties.set('description', 'Some description');
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
           body: CompositeNodeEditor(state:node),

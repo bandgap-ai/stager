@@ -20,10 +20,10 @@ void main() {
     setUp(() {
       node = ConcreteLeafNode(id: 'test_id', name: 'Test Node');
       testProperties = node.properties;
-      testProperties.setProperty('id', 'test_id');
-      testProperties.setProperty('name', 'Test Node');
-      testProperties.setProperty('latitude', 36.73444);
-      testProperties.setProperty('longitude', -81.86052);
+      testProperties.set<String>('id', 'test_id');
+      testProperties.set<String>('name', 'Test Node');
+      testProperties.set<double>('latitude', 36.73444);
+      testProperties.set<double>('longitude', -81.86052);
     });
 
     testWidgets('should display node properties correctly', (WidgetTester tester) async {
@@ -82,7 +82,7 @@ void main() {
       expect(find.text('Test Node'), findsOneWidget);
 
       // Update property
-      testProperties.setProperty('name', 'Updated Node');
+      testProperties.set<String>('name', 'Updated Node');
       await tester.pump();
 
       // Verify update

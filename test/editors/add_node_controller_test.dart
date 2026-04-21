@@ -77,8 +77,8 @@ void main() {
       Map<String, Object> results = {'name': name, 'isGroup': false};
       controller.process(results);
       expect(parent.children.length, equals(1));
-      expect(parent.children[0].properties.getProperty('name') as String, equals(name));
-      expect(() => Uuid.parse(parent.children[0].properties.getProperty('id') as String), returnsNormally);
+      expect(parent.children[0].properties.get<String>('name'), equals(name));
+      expect(() => Uuid.parse(parent.children[0].properties.get<String>('id')), returnsNormally);
       // Make sure it was observed and reset the observer.
       expect(observer.updated, isTrue);
       observer.reset();
@@ -88,8 +88,8 @@ void main() {
       results = {'name': name, 'isGroup': true};
       controller.process(results);
       expect(parent.children.length, equals(2));
-      expect(parent.children[1].properties.getProperty('name') as String, equals(name));
-      expect(() => Uuid.parse(parent.children[1].properties.getProperty('id') as String), returnsNormally);
+      expect(parent.children[1].properties.get<String>('name'), equals(name));
+      expect(() => Uuid.parse(parent.children[1].properties.get<String>('id')), returnsNormally);
       // Make sure it was observed and reset the observer.
       expect(observer.updated, isTrue);
       observer.reset();
@@ -106,13 +106,13 @@ void main() {
       String name = 'Test Mock Leaf Node';
       Map<String, Object> results = {'name': name, 'isGroup': false};
       customController.process(results);
-      expect(customParent.children[0].properties.getProperty('isMock'),isFalse);
+      expect(customParent.children[0].properties.get<bool>('isMock'),isFalse);
 
       // Check adding a composite node.
       name = 'Test Mock Composite Node';
       results = {'name': name, 'isGroup': true};
       customController.process(results);
-      expect(customParent.children[1].properties.getProperty('isMock'),isTrue);
+      expect(customParent.children[1].properties.get<bool>('isMock'),isTrue);
 
       return;
     });

@@ -37,7 +37,7 @@ void main() {
 
       // Assert
       expect(visitor.value, newNode);
-      expect(visitor.value.properties.getProperty('name'), 'New Node');
+      expect(visitor.value.properties.get<String>('name'), 'New Node');
     });
 
     test('should work with KMLPlacemarkNode', () {
@@ -60,7 +60,7 @@ void main() {
 
       // Assert
       expect(visitor.value, newNode);
-      expect(visitor.value.properties.getProperty('name'), 'New Placemark');
+      expect(visitor.value.properties.get<String>('name'), 'New Placemark');
     });
 
     test('should work with complex types', () {

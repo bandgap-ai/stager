@@ -33,7 +33,7 @@ class _EditNodeDialogState extends State<EditNodeDialog> {
   void initState() {
     super.initState();
     properties = widget.state.properties;
-    _nameController = TextEditingController(text: properties.getProperty('name') as String);
+    _nameController = TextEditingController(text: properties.get<String>('name'));
   }
 
   void _cancelEdit() {

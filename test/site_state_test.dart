@@ -113,7 +113,7 @@ void main() {
 
       // Assert
       expect(siteState.treeData.length, initialTreeCount + 1);
-      expect(siteState.treeData.last.properties.getProperty("name"), 'New Site');
+      expect(siteState.treeData.last.properties.get<String>("name"), 'New Site');
       expect(observer.wasUpdated, isTrue);
     });
   });

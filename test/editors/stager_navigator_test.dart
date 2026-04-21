@@ -157,7 +157,7 @@ void main() {
       final treeFinder = find.byType(TreeView);
       final nodeViewFinder = find.descendant(
         of: treeFinder,
-        matching: find.text(nodeToDelete.properties.getProperty('name') as String),
+        matching: find.text(nodeToDelete.properties.get<String>('name')),
       );
       expect(nodeViewFinder, findsOneWidget);
       await tester.tap(nodeViewFinder);
@@ -209,7 +209,7 @@ void main() {
 
       // Find the parent in the TreeView
       final parentFinder = find.descendant( of: treeFinder,
-          matching: find.text(parent.properties.getProperty('name') as String));
+          matching: find.text(parent.properties.get<String>('name')));
       // Tap the parent to expand the list of children
       await tester.ensureVisible(parentFinder);
       await tester.tap(parentFinder);
@@ -222,7 +222,7 @@ void main() {
       // items in the list view are children of the TreeView.
       final nodeFinder = find.descendant(
           of: treeFinder,
-          matching: find.text(nodeToDelete.properties.getProperty('name') as String));
+          matching: find.text(nodeToDelete.properties.get<String>('name')));
       await tester.ensureVisible(nodeFinder);
       await tester.tap(nodeFinder);
       await tester.pumpAndSettle();
@@ -252,7 +252,7 @@ void main() {
       final treeFinder = find.byType(TreeView);
       final nodeViewFinder = find.descendant(
         of: treeFinder,
-        matching: find.text(nodeToTest.properties.getProperty('name') as String),
+        matching: find.text(nodeToTest.properties.get<String>('name')),
       );
       expect(nodeViewFinder, findsOneWidget);
       await tester.tap(nodeViewFinder);

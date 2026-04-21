@@ -15,12 +15,12 @@ class MapSelectionVisitorHandler extends BasicSelectionVisitorHandler {
   void _getNodeLocation(NodeProperties props) {
 
     // Check that the latitude and longitude properties are set
-    if (props.getProperty("latitude") != null &&
-        props.getProperty("longitude") != null) {
+    if (props.contains("latitude") &&
+        props.contains("longitude")) {
       location = LatLng(
         // This is not a nice way to get the position. Need to update those classes.
-        props.getProperty("latitude")! as double,
-        props.getProperty("longitude")! as double,
+        props.get<double>("latitude"),
+        props.get<double>("longitude"),
       );
     } else {
       // If not, complain and bounce the location to the middle of the ocean.

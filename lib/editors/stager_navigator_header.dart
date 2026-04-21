@@ -54,8 +54,8 @@ class StagerNavigatorHeader extends StatelessWidget {
   void _addSite(Map<String, Object> nodeInfo) {
     TreeNode site = siteState.addSite(nodeInfo['name'] as String);
     NodeProperties properties = site.properties;
-    properties.setProperty('latitude', double.parse(nodeInfo['latitude'] as String));
-    properties.setProperty('longitude', double.parse(nodeInfo['longitude'] as String));
+    properties.set('latitude', double.parse(nodeInfo['latitude'] as String));
+    properties.set('longitude', double.parse(nodeInfo['longitude'] as String));
   }
 
   @override

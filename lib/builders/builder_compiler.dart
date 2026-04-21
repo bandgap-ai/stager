@@ -20,6 +20,9 @@ class BuilderCompiler implements Builder {
 
   @override
   Future<void> build(BuildStep buildStep) async {
+    // Although we avoid Map<String, dynamic> in client-facing parts of Stager,
+    // the use of Map<String, dynamic> is appropriate in in this case because it
+    // is loading json, which returns this value since the output can be null.
     final builders = <Map<String, dynamic>>[];
     final imports = <String>{};
 

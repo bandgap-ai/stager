@@ -2,9 +2,12 @@
 ///
 /// This class represents a basic node in the tree that does not have children.
 library;
+import 'package:stager_platform/builders/stager_context.dart';
 import 'package:stager_platform/tree/node_visitor.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/tree/node_observer.dart';
+
+import '../system/typed_value.dart';
 
 /// A concrete implementation of a [LeafNode] that provides basic functionality.
 ///
@@ -40,10 +43,10 @@ class ConcreteLeafNode implements LeafNode {
   ConcreteLeafNode({
     required String id,
     required String name,
-    Map<String, Object?>? initialProperties,
+    Map<String, TypedValue<Object>> initialProperties = const {},
   }) : properties = ConcreteNodeProperties(initialProperties) {
-    properties.setProperty('id', id);
-    properties.setProperty('name', name);
+    properties.set<String>('id', id);
+    properties.set<String>('name', name);
   }
 
   @override
@@ -93,11 +96,20 @@ class ConcreteLeafNode implements LeafNode {
   }
 
   @override
-  void loadPropertiesFromMap(Map<String, dynamic> mapInput) {
-    // Load all the properties
+  void loadPropertiesFromMap(Map<String, Object> mapInput) {
+    // Rebuild the map as a Map<String,TypedObject<Object>> to get the behavior
+    // we expect.
+    final map = <String,TypedValue<Object>>{};
     for (final entry in mapInput.entries) {
-        properties.setProperty(entry.key, entry.value);
+      map[entry.key] = buildTypedValue(
+          StagerContext({"type" : entry.value.runtimeType.toString(),
+            "value": entry.value}));
     }
+
+    // Load all the properties
+    final tempProps = ConcreteNodeProperties(map);
+    // Merge everything
+    properties.merge(tempProps);
 
     // Notify observers about the change in properties
     notify();

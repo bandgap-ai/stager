@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 /// This class provides a snapshot of node data useful for analysis,
 /// reporting, and visualization purposes in forestry applications.
 /// Can be used to summarize any node and all its children.
+@Deprecated("This class violates several Stager policies and is deprecated.")
 class NodeSummary {
   /// Total number of nodes in the tree.
   final int totalNodes;

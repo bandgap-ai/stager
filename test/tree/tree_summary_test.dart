@@ -102,16 +102,16 @@ void main() {
       
       // Create nodes with specific coordinates
       final node1 = ConcreteLeafNode(id: 'n1', name: 'Node 1');
-      node1.properties.setProperty('latitude', 40.0);
-      node1.properties.setProperty('longitude', -74.0);
+      node1.properties.set<double>('latitude', 40.0);
+      node1.properties.set<double>('longitude', -74.0);
       
       final node2 = ConcreteLeafNode(id: 'n2', name: 'Node 2');
-      node2.properties.setProperty('latitude', 40.2);
-      node2.properties.setProperty('longitude', -74.2);
+      node2.properties.set<double>('latitude', 40.2);
+      node2.properties.set<double>('longitude', -74.2);
       
       final node3 = ConcreteLeafNode(id: 'n3', name: 'Node 3');
-      node3.properties.setProperty('latitude', 40.1);
-      node3.properties.setProperty('longitude', -74.1);
+      node3.properties.set<double>('latitude', 40.1);
+      node3.properties.set<double>('longitude', -74.1);
       
       tree.addChild(node1);
       tree.addChild(node2);
@@ -131,8 +131,8 @@ void main() {
       
       // Node with coordinates
       final nodeWithCoords = ConcreteLeafNode(id: 'with_coords', name: 'With Coords');
-      nodeWithCoords.properties.setProperty('latitude', 40.0);
-      nodeWithCoords.properties.setProperty('longitude', -74.0);
+      nodeWithCoords.properties.set<double>('latitude', 40.0);
+      nodeWithCoords.properties.set<double>('longitude', -74.0);
       
       // Node without coordinates
       final nodeWithoutCoords = ConcreteLeafNode(id: 'no_coords', name: 'No Coords');
@@ -162,8 +162,8 @@ void main() {
       
       for (int i = 0; i < coordinates.length; i++) {
         final node = ConcreteLeafNode(id: 'n$i', name: 'Node $i');
-        node.properties.setProperty('latitude', coordinates[i][0]);
-        node.properties.setProperty('longitude', coordinates[i][1]);
+        node.properties.set<double>('latitude', coordinates[i][0]);
+        node.properties.set<double>('longitude', coordinates[i][1]);
         tree.addChild(node);
       }
       
@@ -179,11 +179,11 @@ void main() {
       final level1Node = ConcreteCompositeNode(id: 'l1', name: 'Level 1 with Outline');
       
       // Add outline area to Level 1 node (rectangular area)
-      level1Node.properties.setProperty('outline', [
-        {'latitude': 40.0, 'longitude': -74.0},
-        {'latitude': 40.0, 'longitude': -74.1},
-        {'latitude': 40.1, 'longitude': -74.1},
-        {'latitude': 40.1, 'longitude': -74.0},
+      level1Node.properties.set<List<LatLng>>('outline', [
+        LatLng(40.0, -74.0),
+        LatLng(40.1, -74.0),
+        LatLng(40.1, -74.1),
+        LatLng(40.0, -74.1),
       ]);
       
       tree.addChild(level1Node);
@@ -240,12 +240,12 @@ void main() {
       final tree = ConcreteTreeNode(id: 'root', name: 'Root');
       
       final nodeWithInvalidCoords = ConcreteLeafNode(id: 'invalid', name: 'Invalid');
-      nodeWithInvalidCoords.properties.setProperty('latitude', 'not_a_number');
-      nodeWithInvalidCoords.properties.setProperty('longitude', null);
+      nodeWithInvalidCoords.properties.set('latitude', 'not_a_number');
+      nodeWithInvalidCoords.properties.set('longitude', '');
       
       final nodeWithValidCoords = ConcreteLeafNode(id: 'valid', name: 'Valid');
-      nodeWithValidCoords.properties.setProperty('latitude', 40.0);
-      nodeWithValidCoords.properties.setProperty('longitude', -74.0);
+      nodeWithValidCoords.properties.set('latitude', 40.0);
+      nodeWithValidCoords.properties.set('longitude', -74.0);
       
       tree.addChild(nodeWithInvalidCoords);
       tree.addChild(nodeWithValidCoords);

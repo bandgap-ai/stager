@@ -30,7 +30,7 @@ void main() {
 
       // Assert
       expect(node, isA<KMLGeometryNode>());
-      expect(node.properties.getProperty('id'), 'poly1');
+      expect(node.properties.get<String>('id'), 'poly1');
       expect(node.isComposite, isFalse);
     });
 
@@ -82,8 +82,8 @@ void main() {
       expect(retrievedHoles, equals(holes));
       
       // Assert: Verify internal storage in NodeProperties.
-      expect(node.properties.getProperty('outline'), equals(outline));
-      expect(node.properties.getProperty('kml_holes'), equals(holes));
+      expect(node.properties.get<List<LatLng>>('outline'), equals(outline));
+      expect(node.properties.get<List<KMLHole>>('kml_holes'), equals(holes));
     });
 
   });

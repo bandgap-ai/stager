@@ -29,7 +29,7 @@ void main() {
 
       // Assert
       expect(node, isA<KMLGeometryNode>());
-      expect(node.properties.getProperty('id'), 'path1');
+      expect(node.properties.get<String>('id'), 'path1');
       expect(node.isComposite, isFalse);
     });
 
@@ -72,7 +72,7 @@ void main() {
       expect(retrievedOutline, equals(points));
       
       // Assert: Verify internal storage in NodeProperties.
-      final rawOutline = node.properties.getProperty('outline') as List;
+      final rawOutline = node.properties.get<List<LatLng>>('outline');
       expect(rawOutline.length, 2);
       expect(rawOutline[0], equals(points[0]));
     });

@@ -32,8 +32,8 @@ void main() {
       );
 
       // Assert
-      expect(node.properties.getProperty('id'), 'geo1');
-      expect(node.properties.getProperty('name'), 'Geometry 1');
+      expect(node.properties.get<String>('id'), 'geo1');
+      expect(node.properties.get<String>('name'), 'Geometry 1');
       expect(node.isComposite, isFalse);
     });
 

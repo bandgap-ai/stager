@@ -25,11 +25,11 @@ class IntegrationTestVisitor extends NodeVisitor {
     visitCount++;
     // Capture names from KML-specific nodes to verify identity.
     if (node is KMLTreeRootNode) {
-      nodeNames.add(node.properties.getProperty('name').toString());
+      nodeNames.add(node.properties.get<String>('name'));
     } else if (node is KMLPlacemarkNode) {
-      nodeNames.add(node.properties.getProperty('name').toString());
+      nodeNames.add(node.properties.get<String>('name'));
     } else if (node is KMLPointNode) {
-      nodeNames.add(node.properties.getProperty('name').toString());
+      nodeNames.add(node.properties.get<String>('name'));
     }
   }
 }
@@ -90,7 +90,7 @@ void main() {
 
         // 3. Assert: Basic verification of the parsed root.
         expect(root, isA<KMLTreeRootNode>());
-        expect(root.properties.getProperty('name'), 'KML Document');
+        expect(root.properties.get<String>('name'), 'KML Document');
         
         // Refactored: Root contains 1 child (Placemark).
         expect(root.children.length, 1);

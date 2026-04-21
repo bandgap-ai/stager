@@ -67,7 +67,7 @@ void main() {
 
       // Assert
       expect(siteState.treeData.length, initialSiteCount + 1);
-      expect(siteState.treeData.last.properties.getProperty('name'), 'New Test Site');
+      expect(siteState.treeData.last.properties.get<String>('name'), 'New Test Site');
     });
 
     // Test that the "Create New Folder" button is visible when a composite node is selected.
@@ -86,7 +86,7 @@ void main() {
       final treeFinder = find.byType(TreeView);
       final nodeViewFinder = find.descendant(
         of: treeFinder,
-        matching: find.text(nodeToTest.properties.getProperty('name') as String),
+        matching: find.text(nodeToTest.properties.get<String>('name')),
       );
       expect(nodeViewFinder, findsOneWidget);
       await tester.tap(nodeViewFinder);
@@ -114,7 +114,7 @@ void main() {
       final treeFinder = find.byType(TreeView);
       final nodeViewFinder = find.descendant(
         of: treeFinder,
-        matching: find.text(parentNode.properties.getProperty('name') as String),
+        matching: find.text(parentNode.properties.get<String>('name')),
       );
       expect(nodeViewFinder, findsOneWidget);
       await tester.tap(nodeViewFinder);
@@ -136,7 +136,7 @@ void main() {
       // Assert
       expect(parentNode.children.length, initialChildCount + 1);
       final newNode = parentNode.children.last;
-      expect(newNode.properties.getProperty('name'), 'New Folder');
+      expect(newNode.properties.get<String>('name'), 'New Folder');
       expect(newNode.isComposite, isTrue);
     });
   });

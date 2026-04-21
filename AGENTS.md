@@ -160,20 +160,22 @@ Linux, Android, iOS, and the web.
 - Write unit tests for all public methods and functions
 - Use widget tests for UI components
 - Use mockito for mocking dependencies in tests
-- Follow the Arrange-Act-Assert pattern in tests
+- Follow the Arrange-Act-Assert pattern in tests, but provide descriptive 
+documentation for each phase. Generic comments like "// Arrange", "// Act", or 
+"// Assert" are prohibited.
 - Test both success and failure scenarios
 - Use descriptive test names that explain what is being tested
 - Example test structure:
   ```dart
   group('showNotification', () {
     test('displays snackbar with given message', () async {
-      // Arrange
+      // Create the mock context required for the notification.
       final mockContext = MockBuildContext();
       
-      // Act
+      // Trigger the notification display.
       showNotification(mockContext, 'Test message');
       
-      // Assert
+      // Verify that the snackbar was called with the correct message.
       verify(mockContext.showSnackBar('Test message')).called(1);
     });
   });

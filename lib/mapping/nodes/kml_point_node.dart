@@ -34,7 +34,7 @@ class KMLPointNode extends KMLGeometryNode {
     super.initialProperties,
   }) {
     // Storing the position directly in the property map.
-    properties.setProperty(positionKey, location);
+    properties.set<LatLng>(positionKey, location);
   }
 
   /// The geographic location of the point.
@@ -43,6 +43,6 @@ class KMLPointNode extends KMLGeometryNode {
   /// 
   /// Throws a [StateError] if [hasLocation] is false.
   LatLng get location {
-    return properties.getProperty(positionKey) as LatLng;
+    return properties.get<LatLng>(positionKey);
   }
 }

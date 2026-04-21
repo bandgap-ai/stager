@@ -28,7 +28,7 @@ void main() {
 
       // Assert
       expect(node, isA<KMLGeometryNode>());
-      expect(node.properties.getProperty('id'), 'pt1');
+      expect(node.properties.get<String>('id'), 'pt1');
       expect(node.isComposite, isFalse);
     });
 
@@ -58,7 +58,7 @@ void main() {
 
       // Assert: Verify via accessors and underlying properties.
       expect(node.location, equals(testLocation));
-      expect(node.properties.getProperty('position'), equals(testLocation));
+      expect(node.properties.get<LatLng>('position'), equals(testLocation));
     });
 
   });

@@ -119,7 +119,7 @@ class KMLParserUtils {
     // Capture feature attributes.
     final desc = element.getElement('description')?.innerText;
     if (desc != null) {
-      node.properties.setProperty('description', desc);
+      node.properties.set('description', desc);
     }
 
     return node;

@@ -7,6 +7,7 @@ import 'package:stager_platform/tree/tree.dart';
 
 import '../mapping/nodes/kml_polygon_node.dart';
 import '../mapping/style/kml_style_manager.dart';
+import '../system/typed_value.dart';
 
 /// A list of [TreeNode]s representing sample sites for testing and development.
 ///
@@ -21,8 +22,8 @@ List<TreeNode> _buildSampleSites() {
     name: 'Meadowview Research Farm',
     initialProperties: {
       // Approximate center of Meadowview Research Farm
-      'latitude': 36.73444,
-      'longitude': -81.86052,
+      'latitude': TypedValue<double>(36.73444),
+      'longitude': TypedValue<double>(-81.86052),
     },
   );
 
@@ -31,16 +32,16 @@ List<TreeNode> _buildSampleSites() {
     name: '2025 Planting',
     initialProperties: {
       // Location of the 2025 planting area
-      'latitude': 36.73442,
-      'longitude': -81.86052,
+      'latitude': TypedValue<double>(36.73442),
+      'longitude': TypedValue<double>(-81.86052),
       // Location of the 2025 planting area
-      'outline': [
+      'outline': TypedValue<List<Map<String, TypedValue<double>>>>([
         // Define a rectangular outline around the planting area
-        {'latitude': 36.73445, 'longitude': -81.86050}, // Top-left
-        {'latitude': 36.73445, 'longitude': -81.86060}, // Top-right
-        {'latitude': 36.73438, 'longitude': -81.86060}, // Bottom-right
-        {'latitude': 36.73438, 'longitude': -81.86050}, // Bottom-left
-      ],
+        {'latitude': TypedValue<double>(36.73445), 'longitude': TypedValue<double>(-81.86050)}, // Top-left
+        {'latitude': TypedValue<double>(36.73445), 'longitude': TypedValue<double>(-81.86060)}, // Top-right
+        {'latitude': TypedValue<double>(36.73438), 'longitude': TypedValue<double>(-81.86060)}, // Bottom-right
+        {'latitude': TypedValue<double>(36.73438), 'longitude': TypedValue<double>(-81.86050)}, // Bottom-left
+      ]),
     },
   );
 
@@ -49,39 +50,39 @@ List<TreeNode> _buildSampleSites() {
     name: 'Row 1',
     initialProperties: {
       // Start of Row 1
-      'latitude': 36.73441,
-      'longitude': -81.86052,
+      'latitude': TypedValue<double>(36.73441),
+      'longitude': TypedValue<double>(-81.86052),
     },
   );
   row1.addChild(ConcreteLeafNode(
       id: 'tree_1',
       name: 'Tree 1',
       initialProperties: {
-        'latitude': 36.73441,
-        'longitude': -81.86053,
-        'species': 'American Chestnut',
-        'age': 1,
-        'health': 'Good'
+        'latitude': TypedValue<double>(36.73441),
+        'longitude': TypedValue<double>(-81.86053),
+        'species': TypedValue<String>('American Chestnut'),
+        'age': TypedValue<int>(1),
+        'health': TypedValue<String>('Good'),
       }));
   row1.addChild(ConcreteLeafNode(
       id: 'tree_2',
       name: 'Tree 2',
       initialProperties: {
-        'latitude': 36.73441,
-        'longitude': -81.86054,
-        'species': 'American Chestnut',
-        'age': 1,
-        'health': 'Good'
+        'latitude': TypedValue<double>(36.73441),
+        'longitude': TypedValue<double>(-81.86054),
+        'species': TypedValue<String>('American Chestnut'),
+        'age': TypedValue<int>(1),
+        'health': TypedValue<String>('Good'),
       }));
   row1.addChild(ConcreteLeafNode(
       id: 'tree_3',
       name: 'Tree 3',
       initialProperties: {
-        'latitude': 36.73441,
-        'longitude': -81.86055,
-        'species': 'American Chestnut',
-        'age': 1,
-        'health': 'Fair'
+        'latitude': TypedValue<double>(36.73441),
+        'longitude': TypedValue<double>(-81.86055),
+        'species': TypedValue<String>('American Chestnut'),
+        'age': TypedValue<int>(1),
+        'health': TypedValue<String>('Fair'),
       }));
 
   final row2 = ConcreteTreeNode(
@@ -89,39 +90,39 @@ List<TreeNode> _buildSampleSites() {
     name: 'Row 2',
     initialProperties: {
       // Start of Row 2
-      'latitude': 36.73440,
-      'longitude': -81.86052,
+      'latitude': TypedValue<double>(36.73440),
+      'longitude': TypedValue<double>(-81.86052),
     },
   );
   row2.addChild(ConcreteLeafNode(
       id: 'tree_4',
       name: 'Tree 4',
       initialProperties: {
-        'latitude': 36.73440,
-        'longitude': -81.86056,
-        'species': 'American Chestnut',
-        'age': 1,
-        'health': 'Good'
+        'latitude': TypedValue<double>(36.73440),
+        'longitude': TypedValue<double>(-81.86056),
+        'species': TypedValue<String>('American Chestnut'),
+        'age': TypedValue<int>(1),
+        'health': TypedValue<String>('Good'),
       }));
   row2.addChild(ConcreteLeafNode(
       id: 'tree_5',
       name: 'Tree 5',
       initialProperties: {
-        'latitude': 36.73440,
-        'longitude': -81.86057,
-        'species': 'American Chestnut',
-        'age': 1,
-        'health': 'Poor'
+        'latitude': TypedValue<double>(36.73440),
+        'longitude': TypedValue<double>(-81.86057),
+        'species': TypedValue<String>('American Chestnut'),
+        'age': TypedValue<int>(1),
+        'health': TypedValue<String>('Poor'),
       }));
   row2.addChild(ConcreteLeafNode(
       id: 'tree_6',
       name: 'Tree 6',
       initialProperties: {
-        'latitude': 36.73440,
-        'longitude': -81.86059,
-        'species': 'American Chestnut',
-        'age': 1,
-        'health': 'Good'
+        'latitude': TypedValue<double>(36.73440),
+        'longitude': TypedValue<double>(-81.86059),
+        'species': TypedValue<String>('American Chestnut'),
+        'age': TypedValue<int>(1),
+        'health': TypedValue<String>('Good'),
       }));
 
   planting2025.addChild(row1);
@@ -132,10 +133,10 @@ List<TreeNode> _buildSampleSites() {
     name: 'Access Road',
     initialProperties: {
       // Location of an access road
-      'latitude': 36.73408,
-      'longitude': -81.86114,
-      'type': 'gravel',
-      'length_m': 500,
+      'latitude': TypedValue<double>(36.73408),
+      'longitude': TypedValue<double>(-81.86114),
+      'type': TypedValue<String>('gravel'),
+      'length_m': TypedValue<double>(500.0),
     },
   );
 
@@ -147,8 +148,8 @@ List<TreeNode> _buildSampleSites() {
     name: 'Urban Chestnut Park',
     initialProperties: {
       // Approximate center of a park in Philadelphia
-      'latitude': 39.95,
-      'longitude': -75.16,
+      'latitude': TypedValue<double>(39.95),
+      'longitude': TypedValue<double>(-75.16),
     },
   );
 
@@ -156,43 +157,43 @@ List<TreeNode> _buildSampleSites() {
     id: 'section_a',
     name: 'Section A',
     initialProperties: {
-      'latitude': 39.951,
-      'longitude': -75.161,
-      'outline': [
+      'latitude': TypedValue<double>(39.951),
+      'longitude': TypedValue<double>(-75.161),
+      'outline': TypedValue<List<Map<String, TypedValue<double>>>>([
         // Define a triangular outline for Section A
-        {'latitude': 39.9512, 'longitude': -75.1608}, // Top
-        {'latitude': 39.9508, 'longitude': -75.1615}, // Bottom-right
-        {'latitude': 39.9508, 'longitude': -75.1605}, // Bottom-left
-      ],
+        {'latitude': TypedValue<double>(39.9512), 'longitude': TypedValue<double>(-75.1608)}, // Top
+        {'latitude': TypedValue<double>(39.9508), 'longitude': TypedValue<double>(-75.1615)}, // Bottom-right
+        {'latitude': TypedValue<double>(39.9508), 'longitude': TypedValue<double>(-75.1605)}, // Bottom-left
+      ]),
     },
   );
   sectionA.addChild(ConcreteLeafNode(
       id: 'tree_urban_1',
       name: 'Urban Tree 1',
       initialProperties: {
-        'latitude': 39.951,
-        'longitude': -75.161,
-        'species': 'Hybrid Chestnut',
-        'planted_year': 2010
+        'latitude': TypedValue<double>(39.951),
+        'longitude': TypedValue<double>(-75.161),
+        'species': TypedValue<String>('Hybrid Chestnut'),
+        'planted_year': TypedValue<int>(2010)
       }));
   sectionA.addChild(ConcreteLeafNode(
       id: 'tree_urban_2',
       name: 'Urban Tree 2',
       initialProperties: {
-        'latitude': 39.951,
-        'longitude': -75.1615,
-        'species': 'American Chestnut',
-        'planted_year': 2012
+        'latitude': TypedValue<double>(39.951),
+        'longitude': TypedValue<double>(-75.1615),
+        'species': TypedValue<String>('American Chestnut'),
+        'planted_year': TypedValue<int>(2012)
       }));
 
   final playground = ConcreteLeafNode(
     id: 'playground',
     name: 'Playground Area',
     initialProperties: {
-      'latitude': 39.949,
-      'longitude': -75.162,
-      'amenity': 'playground',
-      'surface': 'wood_chips',
+      'latitude': TypedValue<double>(39.949),
+      'longitude': TypedValue<double>(-75.162),
+      'amenity': TypedValue<String>('playground'),
+      'surface': TypedValue<String>('wood_chips'),
     },
   );
 
@@ -203,8 +204,8 @@ List<TreeNode> _buildSampleSites() {
     id: 'adanor',
     name: 'Adanor - Maple Trees',
     initialProperties: {
-      'latitude': 39.25000,
-      'longitude': -77.76200,
+      'latitude': TypedValue<double>(39.25000),
+      'longitude': TypedValue<double>(-77.76200),
     },
   );
 
@@ -212,8 +213,8 @@ List<TreeNode> _buildSampleSites() {
     id: 'west_grove',
     name: 'West Grove',
     initialProperties: {
-      'latitude': 39.25010,
-      'longitude': -77.76040,
+      'latitude': TypedValue<double>(39.25010),
+      'longitude': TypedValue<double>(-77.76040),
     },
   );
 
@@ -221,90 +222,90 @@ List<TreeNode> _buildSampleSites() {
       id: 'maple_1',
       name: 'Maple 1',
       initialProperties: {
-        'latitude': 39.249890,
-        'longitude': -77.760150,
-        'species': 'Silver/Red Maple',
-        'health': 'Good'
+        'latitude': TypedValue<double>(39.249890),
+        'longitude': TypedValue<double>(-77.760150),
+        'species': TypedValue<String>('Silver/Red Maple'),
+        'health': TypedValue<String>('Good'),
       }));
   westGrove.addChild(ConcreteLeafNode(
       id: 'maple_2',
       name: 'Maple 2',
       initialProperties: {
-        'latitude': 39.249930,
-        'longitude': -77.760410,
-        'species': 'Silver/Red Maple',
-        'health': 'Good'
+        'latitude': TypedValue<double>(39.249930),
+        'longitude': TypedValue<double>(-77.760410),
+        'species': TypedValue<String>('Silver/Red Maple'),
+        'health': TypedValue<String>('Good'),
       }));
   westGrove.addChild(ConcreteLeafNode(
       id: 'maple_3',
       name: 'Maple 3',
       initialProperties: {
-        'latitude': 39.249900,
-        'longitude': -77.760620,
-        'species': 'Silver/Red Maple',
-        'health': 'Good'
+        'latitude': TypedValue<double>(39.249900),
+        'longitude': TypedValue<double>(-77.760620),
+        'species': TypedValue<String>('Silver/Red Maple'),
+        'health': TypedValue<String>('Good'),
       }));
   westGrove.addChild(ConcreteLeafNode(
       id: 'maple_4',
       name: 'Maple 4',
       initialProperties: {
-        'latitude': 39.250090,
-        'longitude': -77.760680,
-        'species': 'Silver/Red Maple',
-        'health': 'Good'
+        'latitude': TypedValue<double>(39.250090),
+        'longitude': TypedValue<double>(-77.760680),
+        'species': TypedValue<String>('Silver/Red Maple'),
+        'health': TypedValue<String>('Good'),
       }));
   westGrove.addChild(ConcreteLeafNode(
       id: 'maple_5',
       name: 'Maple 5',
       initialProperties: {
-        'latitude': 39.250180,
-        'longitude': -77.760620,
-        'species': 'Silver/Red Maple',
-        'health': 'Good'
+        'latitude': TypedValue<double>(39.250180),
+        'longitude': TypedValue<double>(-77.760620),
+        'species': TypedValue<String>('Silver/Red Maple'),
+        'health': TypedValue<String>('Good'),
       }));
   westGrove.addChild(ConcreteLeafNode(
       id: 'maple_6',
       name: 'Maple 6',
       initialProperties: {
-        'latitude': 39.250320,
-        'longitude': -77.760330,
-        'species': 'Silver/Red Maple',
-        'health': 'Good'
+        'latitude': TypedValue<double>(39.250320),
+        'longitude': TypedValue<double>(-77.760330),
+        'species': TypedValue<String>('Silver/Red Maple'),
+        'health': TypedValue<String>('Good'),
       }));
   westGrove.addChild(ConcreteLeafNode(
       id: 'maple_7',
       name: 'Maple 7',
       initialProperties: {
-        'latitude': 39.250200,
-        'longitude': -77.760140,
-        'species': 'Silver/Red Maple',
-        'health': 'Good'
+        'latitude': TypedValue<double>(39.250200),
+        'longitude': TypedValue<double>(-77.760140),
+        'species': TypedValue<String>('Silver/Red Maple'),
+        'health': TypedValue<String>('Good'),
       }));
   westGrove.addChild(ConcreteLeafNode(
       id: 'maple_8',
       name: 'Maple 8',
       initialProperties: {
-        'latitude': 39.250090,
-        'longitude': -77.760500,
-        'species': 'Silver/Red Maple',
-        'health': 'Good'
+        'latitude': TypedValue<double>(39.250090),
+        'longitude': TypedValue<double>(-77.760500),
+        'species': TypedValue<String>('Silver/Red Maple'),
+        'health': TypedValue<String>('Good'),
       }));
   westGrove.addChild(ConcreteLeafNode(
       id: 'maple_9',
       name: 'Maple 9',
       initialProperties: {
-        'latitude': 39.250040,
-        'longitude': -77.760360,
-        'species': 'Silver/Red Maple',
-        'health': 'Good'
+        'latitude': TypedValue<double>(39.250040),
+        'longitude': TypedValue<double>(-77.760360),
+        'species': TypedValue<String>('Silver/Red Maple'),
+        'health': TypedValue<String>('Good'),
       }));
 
   final middleGrove = ConcreteTreeNode(
     id: 'middle_grove',
     name: 'Middle Grove',
     initialProperties: {
-      'latitude': 39.25020,
-      'longitude': -77.76380,
+      'latitude': TypedValue<double>(39.25020),
+      'longitude': TypedValue<double>(-77.76380),
     },
   );
 
@@ -312,28 +313,28 @@ List<TreeNode> _buildSampleSites() {
       id: 'chestnut_tubes',
       name: 'Chestnut tubes',
       initialProperties: {
-        'latitude': 39.250030,
-        'longitude': -77.763860,
-        'species': 'LSA C. Dentata',
-        'health': 'Unknown'
+        'latitude': TypedValue<double>(39.250030),
+        'longitude': TypedValue<double>(-77.763860),
+        'species': TypedValue<String>('LSA C. Dentata'),
+        'health': TypedValue<String>('Unknown'),
       }));
   middleGrove.addChild(ConcreteLeafNode(
       id: 'maple_10',
       name: 'Maple 10',
       initialProperties: {
-        'latitude': 39.250220,
-        'longitude': -77.763810,
-        'species': 'Silver/Red Maple',
-        'health': 'Good'
+        'latitude': TypedValue<double>(39.250220),
+        'longitude': TypedValue<double>(-77.763810),
+        'species': TypedValue<String>('Silver/Red Maple'),
+        'health': TypedValue<String>('Good'),
       }));
   middleGrove.addChild(ConcreteLeafNode(
       id: 'maple_11',
       name: 'Maple 11',
       initialProperties: {
-        'latitude': 39.250320,
-        'longitude': -77.763750,
-        'species': 'Silver/Red Maple',
-        'health': 'Good'
+        'latitude': TypedValue<double>(39.250320),
+        'longitude': TypedValue<double>(-77.763750),
+        'species': TypedValue<String>('Silver/Red Maple'),
+        'health': TypedValue<String>('Good'),
       }));
 
   adanor.addChild(westGrove);
@@ -343,91 +344,91 @@ List<TreeNode> _buildSampleSites() {
     id: 'johns_creek',
     name: 'Johns Creek',
     initialProperties: {
-      'latitude': 37.380000,
-      'longitude': -80.427600,
+      'latitude': TypedValue<double>(37.380000),
+      'longitude': TypedValue<double>(-80.427600),
     },
   );
 
-  const tacfSpecies = 'TACF B3F3 C. Dentata x Mollisima';
+  const tacfSpecies = TypedValue<String>('TACF B3F3 C. Dentata x Mollisima');
 
   johnsCreek.addChild(ConcreteLeafNode(
       id: 'base_camp',
       name: 'Base camp',
-      initialProperties: {'latitude': 37.379040, 'longitude': -80.427570}));
+      initialProperties: {'latitude': TypedValue<double>(37.379040), 'longitude': TypedValue<double>(-80.427570)}));
   johnsCreek.addChild(ConcreteLeafNode(
       id: '641',
       name: '641',
       initialProperties: {
-        'latitude': 37.379630,
-        'longitude': -80.427530,
+        'latitude': TypedValue<double>(37.379630),
+        'longitude': TypedValue<double>(-80.427530),
         'species': tacfSpecies
       }));
   johnsCreek.addChild(ConcreteLeafNode(
       id: '640',
       name: '640',
       initialProperties: {
-        'latitude': 37.379640,
-        'longitude': -80.427540,
+        'latitude': TypedValue<double>(37.379640),
+        'longitude': TypedValue<double>(-80.427540),
         'species': tacfSpecies
       }));
   johnsCreek.addChild(ConcreteLeafNode(
       id: '589',
       name: '589',
       initialProperties: {
-        'latitude': 37.379700,
-        'longitude': -80.427580,
+        'latitude': TypedValue<double>(37.379700),
+        'longitude': TypedValue<double>(-80.427580),
         'species': tacfSpecies
       }));
   johnsCreek.addChild(ConcreteLeafNode(
       id: '529',
       name: '529',
       initialProperties: {
-        'latitude': 37.380090,
-        'longitude': -80.427670,
+        'latitude': TypedValue<double>(37.380090),
+        'longitude': TypedValue<double>(-80.427670),
         'species': tacfSpecies
       }));
   johnsCreek.addChild(ConcreteLeafNode(
       id: '528',
       name: '528',
       initialProperties: {
-        'latitude': 37.380040,
-        'longitude': -80.427650,
+        'latitude': TypedValue<double>(37.380040),
+        'longitude': TypedValue<double>(-80.427650),
         'species': tacfSpecies
       }));
   johnsCreek.addChild(ConcreteLeafNode(
       id: '573',
       name: '573',
       initialProperties: {
-        'latitude': 37.380190,
-        'longitude': -80.427620,
+        'latitude': TypedValue<double>(37.380190),
+        'longitude': TypedValue<double>(-80.427620),
         'species': tacfSpecies
       }));
   johnsCreek.addChild(ConcreteLeafNode(
       id: '565',
       name: '565',
       initialProperties: {
-        'latitude': 37.380480,
-        'longitude': -80.427640,
+        'latitude': TypedValue<double>(37.380480),
+        'longitude': TypedValue<double>(-80.427640),
         'species': tacfSpecies
       }));
   johnsCreek.addChild(ConcreteLeafNode(
       id: 'pole_949',
       name: 'Pole 949 (near 553)',
-      initialProperties: {'latitude': 37.382420, 'longitude': -80.427630}));
+      initialProperties: {'latitude': TypedValue<double>(37.382420), 'longitude': TypedValue<double>(-80.427630)}));
   johnsCreek.addChild(ConcreteLeafNode(
       id: '307',
       name: '307',
       initialProperties: {
-        'latitude': 37.382130,
-        'longitude': -80.427790,
+        'latitude': TypedValue<double>(37.382130),
+        'longitude': TypedValue<double>(-80.427790),
         'species': tacfSpecies
       }));
   johnsCreek.addChild(ConcreteLeafNode(
       id: '19',
       name: '19',
       initialProperties: {
-        'latitude': 37.381090,
-        'longitude': -80.428150,
+        'latitude': TypedValue<double>(37.381090),
+        'longitude': TypedValue<double>(-80.428150),
         'species': tacfSpecies
       }));
 
@@ -435,8 +436,8 @@ List<TreeNode> _buildSampleSites() {
     id: 'sky_meadows',
     name: 'Sky Meadows',
     initialProperties: {
-      'latitude': 38.9908317,
-      'longitude': -77.9661061,
+      'latitude': TypedValue<double>(38.9908317),
+      'longitude': TypedValue<double>(-77.9661061),
     },
   );
 
@@ -455,8 +456,8 @@ List<TreeNode> _buildSampleSites() {
     id: 'tacf_planting',
     name: 'TACF Planting',
     initialProperties: {
-      'latitude': 38.98924852060698,
-      'longitude': -77.96862560999737,
+      'latitude': TypedValue<double>(38.98924852060698),
+      'longitude': TypedValue<double>(-77.96862560999737),
     },
   );
 
@@ -464,10 +465,10 @@ List<TreeNode> _buildSampleSites() {
       id: 'sky_meadows_tree_1',
       name: 'Sky Meadows Tree 1',
       initialProperties: {
-        'latitude': 38.989033187855455,
-        'longitude': -77.96854440131268,
+        'latitude': TypedValue<double>(38.989033187855455),
+        'longitude': TypedValue<double>(-77.96854440131268),
         'species': tacfSpecies,
-        'health': 'Good'
+        'health': TypedValue<String>('Good'),
       }));
 
   skyMeadows.addChild(tacfPlanting);
@@ -476,8 +477,8 @@ List<TreeNode> _buildSampleSites() {
     id: 'knoxville',
     name: 'City of Knoxville',
     initialProperties: {
-      'latitude': 35.96045020327116,
-      'longitude': -83.91684780417694,
+      'latitude': TypedValue<double>(35.96045020327116),
+      'longitude': TypedValue<double>(-83.91684780417694),
     },
   );
 
@@ -506,30 +507,30 @@ List<TreeNode> _buildSampleSites() {
       id: 'knox_t1',
       name: 'T1',
       initialProperties: {
-        'latitude': 35.96032717171685,
-        'longitude': -83.9177178521555
+        'latitude': TypedValue<double>(35.96032717171685),
+        'longitude': TypedValue<double>(-83.9177178521555)
       }));
   knoxville.addChild(ConcreteLeafNode(
       id: 'knox_t2',
       name: 'T2',
       initialProperties: {
-        'latitude': 35.96086993079152,
-        'longitude': -83.917873420264
+        'latitude': TypedValue<double>(35.96086993079152),
+        'longitude': TypedValue<double>(-83.917873420264)
       }));
   knoxville.addChild(ConcreteLeafNode(
       id: 'knox_t3',
       name: 'T3',
       initialProperties: {
-        'latitude': 35.96086558873374,
-        'longitude': -83.91851715036813,
-        'species': 'Oak',
-        'health': 'Good'
+        'latitude': TypedValue<double>(35.96086558873374),
+        'longitude': TypedValue<double>(-83.91851715036813),
+        'species': TypedValue<String>('Oak'),
+        'health': TypedValue<String>('Good'),
       }));
 
   final thirdCreekGreenway = ConcreteCompositeNode(id: 'tcg', name: 'Third Creek Greenway',
     initialProperties: {
-      'latitude': 35.94845624432757,
-      'longitude': -83.966116113303});
+      'latitude': TypedValue<double>(35.94845624432757),
+      'longitude': TypedValue<double>(-83.966116113303)});
   final thirdCreekGreenwayOutline = KMLPolygonNode(
     id: 'third_creek_greenway',
     name: 'Third Creek Greenway',

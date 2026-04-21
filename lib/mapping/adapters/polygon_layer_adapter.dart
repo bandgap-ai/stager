@@ -54,11 +54,9 @@ class PolygonLayerAdapter {
     for (final entry in entries) {
       for (final node in entry.value) {
         // We look for an "outline" property which should be a List<LatLng>.
-        final dynamic outline =
-            node.properties.getProperty(KMLPolygonNode.outlineKey);
-        if (outline is List<LatLng>) {
-          polygons.add(_makePolygon(outline, node));
-        }
+        final outline =
+            node.properties.get<List<LatLng>>(KMLPolygonNode.outlineKey);
+        polygons.add(_makePolygon(outline, node));
       }
     }
 

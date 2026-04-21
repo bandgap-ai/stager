@@ -61,6 +61,14 @@ This document contains a running list of lessons learned to ensure continuous im
         6. `flutter pub get`
         7. `dart run build_runner build --delete-conflicting-outputs`
 
+11. **Check Map Containment Before Access:**
+    *   **Rule:** When accessing a value in a map that might not exist, prefer checking for its existence using `containsKey()` (or a domain-specific equivalent like `containsProperty()`) instead of retrieving the value and checking for `null`.
+    *   **Reason:** This follows a defensive programming style that avoids "pulling a null value" and makes the code's intent clearer, especially in a codebase with a strict "no-null" policy. While it may result in two map lookups, it aligns with the project's safety and clarity standards.
+
+12. **Prefer Single Boolean Expressions for Equality:**
+    *   **Rule:** When overriding `operator ==` or writing simple conditional checks, prefer a single boolean expression using logical operators (`||`, `&&`) instead of multiple `if` blocks or temporary variables.
+    *   **Reason:** This enhances readability, leverages short-circuiting for performance (e.g., placing `identical()` first), and naturally adheres to the Single Return Principle.
+
 ## Pre-Task Checklist
 
 Before writing any code, confirm you have reviewed and understood:
@@ -69,6 +77,14 @@ Before writing any code, confirm you have reviewed and understood:
 3.  `AGENT_NOTES.md` (These learnings to avoid repeating mistakes)
 
 ## Changelog
+
+*   **2026-04-06:** Collapsed `operator ==` into a single expression in `TypedValue`.
+    *   Learned to prefer single-expression boolean returns for equality and simple checks.
+    *   Added Rule 12 to `AGENT_NOTES.md`.
+
+*   **2026-04-06:** Updated `ConcreteNodeProperties` to use `containsProperty` before map access.
+    *   Learned to prefer checking map containment over null checks for value retrieval.
+    *   Reinforced the project's "no-null" policy by avoiding null value pulling.
 
 *   **2026-02-22:** Recovered from corrupted `build_runner` infrastructure.
     *   Learned the "Deep Clean" strategy for solving internal build script compilation errors.

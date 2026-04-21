@@ -33,21 +33,20 @@ void main() {
   group('NodeProperties', () {
     test('ConcreteNodeProperties can set and get properties', () {
       final properties = ConcreteNodeProperties();
-      properties.setProperty('name', 'Test Name');
-      properties.setProperty('value', 123);
-      properties.setProperty('is_active', true);
+      properties.set<String>('name', 'Test Name');
+      properties.set<int>('value', 123);
+      properties.set<bool>('is_active', true);
 
-      expect(properties.getProperty('name'), 'Test Name');
-      expect(properties.getProperty('value'), 123);
-      expect(properties.getProperty('is_active'), true);
-      expect(properties.getProperty('non_existent'), isNull);
+      expect(properties.get<String>('name'), 'Test Name');
+      expect(properties.get<int>('value'), 123);
+      expect(properties.get<bool>('is_active'), true);
+      expect(properties.contains('non_existent'), false);
+      // Check that being a moron and asking for something that isn't there
+      // throws a NodePropertyException.
+      expect(() => properties.get<String>('non_existent'),
+          throwsA(isA<NodePropertyException>()));
     });
 
-    test('ConcreteNodeProperties handles null values', () {
-      final properties = ConcreteNodeProperties();
-      properties.setProperty('nullable_value', null);
-      expect(properties.getProperty('nullable_value'), isNull);
-    });
   });
 
   group('LeafNode', () {
@@ -59,8 +58,10 @@ void main() {
       leaf.attach(observer);
       expect(observer.lastUpdatedNode, isNull);
 
+      // FIXME! Can't load the properties like this!
+
       // Make some new property values
-      Map<String, dynamic> mapInput = {
+      Map<String, Object> mapInput = {
         'name': 'Updated Name',
         'value': 456,
         'is_active': false,
@@ -70,10 +71,10 @@ void main() {
       leaf.loadPropertiesFromMap(mapInput);
 
       // Get and check the properties. The id should be unchanged:
-      expect(leaf.properties.getProperty('id'), id);
-      expect(leaf.properties.getProperty('name'), 'Updated Name');
-      expect(leaf.properties.getProperty('value'), 456);
-      expect(leaf.properties.getProperty('is_active'), false);
+      expect(leaf.properties.get<String>('id'), id);
+      expect(leaf.properties.get<String>('name'), 'Updated Name');
+      expect(leaf.properties.get<int>('value'), 456);
+      expect(leaf.properties.get<bool>('is_active'), false);
       // There should now be 4 properties
       expect(leaf.properties.map.length, 4);
       // Ensure that observers were notified the state changed.
@@ -83,8 +84,8 @@ void main() {
 
     test('ConcreteLeafNode initializes correctly', () {
       final leaf = ConcreteLeafNode(id: 'l1', name: 'Leaf 1');
-      expect(leaf.properties.getProperty('id'), 'l1');
-      expect(leaf.properties.getProperty('name'), 'Leaf 1');
+      expect(leaf.properties.get<String>('id'), 'l1');
+      expect(leaf.properties.get<String>('name'), 'Leaf 1');
       expect(leaf.parent, isNull);
       expect(leaf.next, isNull);
       expect(leaf.previous, isNull);
@@ -135,8 +136,8 @@ void main() {
   group('CompositeNode', () {
     test('ConcreteCompositeNode initializes correctly', () {
       final composite = ConcreteCompositeNode(id: 'c1', name: 'Composite 1');
-      expect(composite.properties.getProperty('id'), 'c1');
-      expect(composite.properties.getProperty('name'), 'Composite 1');
+      expect(composite.properties.get<String>('id'), 'c1');
+      expect(composite.properties.get<String>('name'), 'Composite 1');
       expect(composite.isComposite, isTrue);
       expect(composite.children, isEmpty);
     });
@@ -254,7 +255,7 @@ void main() {
       final iterator = root.createIterator();
       final visitedNodes = <String>[];
       while (iterator.moveNext()) {
-        visitedNodes.add(iterator.current.properties.getProperty('id') as String);
+        visitedNodes.add(iterator.current.properties.get<String>('id'));
       }
       expect(visitedNodes, ['root', 'comp1', 'leaf1', 'leaf2', 'comp2', 'leaf3', 'leaf4', 'comp3', 'comp4', 'leaf5']);
     });
@@ -263,7 +264,7 @@ void main() {
       final iterator = root.depthFirstIterator;
       final visitedNodes = <String>[];
       while (iterator.moveNext()) {
-        visitedNodes.add(iterator.current.properties.getProperty('id') as String);
+        visitedNodes.add(iterator.current.properties.get<String>('id'));
       }
       expect(visitedNodes, ['root', 'comp1', 'leaf1', 'leaf2', 'comp2', 'leaf3', 'leaf4', 'comp3', 'comp4', 'leaf5']);
     });
@@ -272,7 +273,7 @@ void main() {
       final iterator = root.breadthFirstIterator;
       final visitedNodes = <String>[];
       while (iterator.moveNext()) {
-        visitedNodes.add(iterator.current.properties.getProperty('id') as String);
+        visitedNodes.add(iterator.current.properties.get<String>('id'));
       }
       expect(visitedNodes, ['root', 'comp1', 'leaf4', 'comp3', 'leaf1', 'leaf2', 'comp2', 'comp4', 'leaf3', 'leaf5']);
     });
@@ -281,20 +282,20 @@ void main() {
       // Test case 1: Find all leaf nodes (nodes that are not composite)
       final allLeafNodes = root.find((node) => !node.isComposite);
       expect(allLeafNodes, hasLength(5));
-      expect(allLeafNodes.map((n) => n.properties.getProperty('id')), containsAll(['leaf1', 'leaf2', 'leaf3', 'leaf4', 'leaf5']));
+      expect(allLeafNodes.map((n) => n.properties.get<String>('id')), containsAll(['leaf1', 'leaf2', 'leaf3', 'leaf4', 'leaf5']));
 
       // Test case 2: Find nodes with a specific name containing 'Composite'
-      final namedNodes = root.find((node) => (node.properties.getProperty('name') as String).contains('Composite'));
+      final namedNodes = root.find((node) => (node.properties.get<String>('name')).contains('Composite'));
       expect(namedNodes, hasLength(4));
-      expect(namedNodes.map((n) => n.properties.getProperty('id')), containsAll(['comp1', 'comp2', 'comp3', 'comp4']));
+      expect(namedNodes.map((n) => n.properties.get<String>('id')), containsAll(['comp1', 'comp2', 'comp3', 'comp4']));
 
       // Test case 3: Find a specific node by its ID
-      final specificNode = root.find((node) => node.properties.getProperty('id') == 'leaf3');
+      final specificNode = root.find((node) => node.properties.get<String>('id') == 'leaf3');
       expect(specificNode, hasLength(1));
-      expect(specificNode.first.properties.getProperty('id'), 'leaf3');
+      expect(specificNode.first.properties.get<String>('id'), 'leaf3');
 
       // Test case 4: Find nodes that do not exist
-      final nonExistentNode = root.find((node) => node.properties.getProperty('id') == 'non_existent');
+      final nonExistentNode = root.find((node) => node.properties.get<String>('id') == 'non_existent');
       expect(nonExistentNode, isEmpty);
     });
   });

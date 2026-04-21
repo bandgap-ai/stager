@@ -68,10 +68,13 @@ abstract class LeafNode implements ObservableSubject {
   /// Loads the properties from a map. The map should contain key-value pairs
   /// representing the properties already set by the node.
   ///
-  /// The implementation is responsible for accurately loading the properties
-  /// from the provided map and casting to the appropriate types.
+  /// The implementation attempts to merge the new properties with the existing
+  /// properties. In the event of a duplicate entry, it will accept the value of
+  /// the [mapInput]. The implementation may also be expensive based based on
+  /// the requirement of NodeProperties to use TypedValues for each property to
+  /// ensure type safety.
   ///
   /// [mapInput]: The map containing the properties to be loaded.
-  void loadPropertiesFromMap(Map<String, dynamic> mapInput);
+  void loadPropertiesFromMap(Map<String, Object> mapInput);
 
 }

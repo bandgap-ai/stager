@@ -71,7 +71,7 @@ void main() {
       expect(observer.updated, isFalse);
 
       // Make some new property values
-      Map<String, dynamic> results = {
+      Map<String, Object> results = {
         'name': 'Updated Name',
         'value': 456,
         'is_active': false,
@@ -81,9 +81,9 @@ void main() {
       controller.process(results);
 
       // Get and check the properties.
-      expect(parent.properties.getProperty('name'), 'Updated Name');
-      expect(parent.properties.getProperty('value'), 456);
-      expect(parent.properties.getProperty('is_active'), false);
+      expect(parent.properties.get<String>('name'), 'Updated Name');
+      expect(parent.properties.get<int>('value'), 456);
+      expect(parent.properties.get<bool>('is_active'), false);
       // There should now be 4 properties
       expect(parent.properties.map.length, 4);
       // Ensure that observers were notified the state changed.

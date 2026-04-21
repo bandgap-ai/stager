@@ -3,9 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/editors/file_handler.dart';
-import 'package:stager_platform/persistence/json_codec.dart';
+import 'package:stager_platform/persistence/json_io_util.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 
 void main() {
@@ -69,7 +70,7 @@ void main() {
       // Arrange
       final filePath = '${testDir.path}/import_test.json';
       final file = File(filePath);
-      await file.writeAsString('[{"type":"tree","properties":{"id":"1","name":"Test Node"},"children":[]}]');
+      await file.writeAsString('[{"type":"tree","properties":{"id":{"type":"String","value":"1"},"name":{"type":"String","value":"Test Node"}},"children":[]}]');
 
       // Act
       final importedNodes = await fileHandler.readFromFile(filePath);
@@ -77,7 +78,7 @@ void main() {
       // Assert
       expect(importedNodes, isNotNull);
       expect(importedNodes!.length, 1);
-      expect(importedNodes.first.properties.getProperty('name'), 'Test Node');
+      expect(importedNodes.first.properties.get<String>('name'), 'Test Node');
     });
   });
 
@@ -123,8 +124,8 @@ void main() {
         // In this case, 'parentId' would be part of their 'properties' or a dedicated field
         // that your toJson/fromJson logic handles.
         // For ConcreteTreeNode, if parentId is managed via properties:
-        final node1 = ConcreteTreeNode(id: '1', name: 'Node One', initialProperties: {'type': 'root'});
-        final node2 = ConcreteTreeNode(id: '2', name: 'Node Two', initialProperties: {'type': 'child', 'parentId': '1'});
+        final node1 = ConcreteTreeNode(id: '1', name: 'Node One', initialProperties: {'type': TypedValue<String>('root')});
+        final node2 = ConcreteTreeNode(id: '2', name: 'Node Two', initialProperties: {'type': TypedValue<String>('child'), 'parentId': TypedValue<String>('1')});
 
         // For this test, let's assume 'parentId' is a property that gets serialized if present.
         // The toJson() method of ConcreteTreeNode is responsible for what gets written.
@@ -162,21 +163,21 @@ void main() {
         }
         // ---- END DEBUGGING ----
 
-
         // Find node1 data by looking into its 'properties' map
         final Map<String, dynamic> node1Json = decodedJson.firstWhere(
               (n) => n is Map &&
               n.containsKey('properties') &&
               n['properties'] is Map &&
-              n['properties']['id'] == '1', // ID is a string '1' in your node setup
+              n['properties']['id'] is Map &&
+              n['properties']['id']['value'] == '1', // ID is a string '1' in your node setup
           orElse: () => throw StateError('Node with properties.id "1" not found or structure incorrect'),
         );
 
         // All relevant data for node1 is within its 'properties' map in the JSON
         final Map<String, dynamic> node1Properties = node1Json['properties'];
         expect(node1Json['type'], 'tree'); // Top-level type
-        expect(node1Properties['name'], 'Node One');
-        expect(node1Properties['type'], 'root');
+        expect(node1Properties['name']['value'], 'Node One');
+        expect(node1Properties['type']['value'], 'root');
         expect(node1Json['children'], isEmpty); // Assuming it has no children in this basic setup
 
         // Find node2 data
@@ -184,15 +185,15 @@ void main() {
               (n) => n is Map &&
               n.containsKey('properties') &&
               n['properties'] is Map &&
-              n['properties']['id'] == '2', // ID is a string '2'
+              n['properties']['id']['value'] == '2', // ID is a string '2'
           orElse: () => throw StateError('Node with properties.id "2" not found or structure incorrect'),
         );
 
         final Map<String, dynamic> node2Properties = node2Json['properties'];
         expect(node2Json['type'], 'tree'); // Top-level type
-        expect(node2Properties['name'], 'Node Two');
-        expect(node2Properties['type'], 'child');
-        expect(node2Properties['parentId'], '1'); // parentId is also in properties
+        expect(node2Properties['name']['value'], 'Node Two');
+        expect(node2Properties['type']['value'], 'child');
+        expect(node2Properties['parentId']['value'], '1'); // parentId is also in properties
         expect(node2Json['children'], isEmpty);
       });
 
@@ -226,7 +227,7 @@ void main() {
         // Prepare a file with valid JSON content
         final nodesToSave = [
           ConcreteTreeNode(id: 'node1', name: 'First Node'),
-          ConcreteTreeNode(id: 'node2', name: 'Second Node', initialProperties: {'custom': 'value'}),
+          ConcreteTreeNode(id: 'node2', name: 'Second Node', initialProperties: {'custom': TypedValue<String>('value')}),
         ];
         // Use the handler's own write method to ensure format consistency (or craft JSON string manually)
         await fileHandler.writeToFile(filePath, nodesToSave);
@@ -238,10 +239,10 @@ void main() {
         // Assert
         expect(importedNodes, isNotNull, reason: 'Should return a list of nodes, not null');
         expect(importedNodes!.length, 2, reason: 'Should import two nodes');
-        expect(importedNodes.first.properties.getProperty('name'), 'First Node');
-        expect(importedNodes.first.properties.getProperty('id'), 'node1');
-        expect(importedNodes.last.properties.getProperty('name'), 'Second Node');
-        expect(importedNodes.last.properties.getProperty('custom'), 'value');
+        expect(importedNodes.first.properties.get<String>('name'), 'First Node');
+        expect(importedNodes.first.properties.get<String>('id'), 'node1');
+        expect(importedNodes.last.properties.get<String>('name'), 'Second Node');
+        expect(importedNodes.last.properties.get<String>('custom'), 'value');
       });
 
       test('should return an empty list if JSON file contains an empty list', () async {
@@ -324,8 +325,8 @@ void main() {
         // Assert
         expect(importedNodes, isNotNull, reason: 'Imported nodes should not be null for a valid file.');
         expect(importedNodes?.length, 2, reason: 'Should import the correct number of nodes.');
-        expect(importedNodes?.any((n) => n.properties.getProperty('id') == 'nodeImport1' && n.properties.getProperty('name') == 'Imported Node 1'), isTrue);
-        expect(importedNodes?.any((n) => n.properties.getProperty('id') == 'nodeImport2' && n.properties.getProperty('name') == 'Imported Node 2'), isTrue);
+        expect(importedNodes?.any((n) => n.properties.get<String>('id') == 'nodeImport1' && n.properties.get<String>('name') == 'Imported Node 1'), isTrue);
+        expect(importedNodes?.any((n) => n.properties.get<String>('id') == 'nodeImport2' && n.properties.get<String>('name') == 'Imported Node 2'), isTrue);
 
         // SnackBar Assertion (basic check that it tried to show, requires tester)
         // This checks if a SnackBar was added to the widget tree.
@@ -396,8 +397,8 @@ void main() {
         // Arrange
         final filePath = '${testDir.path}/export_test_output_no_snackbar.json';
         final nodesToExport = [
-          ConcreteTreeNode(id: 'nodeExport1', name: 'Exported Node 1', initialProperties: {'data': 'value1'}),
-          ConcreteTreeNode(id: 'nodeExport2', name: 'Exported Node 2', initialProperties: {'data': 'value2'}),
+          ConcreteTreeNode(id: 'nodeExport1', name: 'Exported Node 1', initialProperties: {'data': TypedValue<String>('value1')}),
+          ConcreteTreeNode(id: 'nodeExport2', name: 'Exported Node 2', initialProperties: {'data': TypedValue<String>('value2')}),
         ];
 
         // Create a BuildContext (needed for the method signature, but UI interaction ignored)
@@ -452,7 +453,7 @@ void main() {
         late List<dynamic> expectedDecodedJson;
         late String expectedJsonString;
         await tester.runAsync( () async {
-        JsonCodec codec = JsonCodec();
+        JsonIOUtil codec = JsonIOUtil();
         expectedJsonString = codec.serialize(
             nodesToExport);
         });

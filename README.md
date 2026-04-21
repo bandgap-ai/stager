@@ -32,6 +32,30 @@ data integration, map editor development, and the implementation of a
 compile-time dynamic factory system to manage statefulness across different
 platforms.
 
+### `buildX()` versus `X.fromJson()`
+
+Stager allows clients to dynamically register builder functions (see 
+[`BasicBuilder`](lib/builders/basic_builder.dart) and its tests) using 
+annotations akin to `@Provider` in Java. In Stager might look like
+
+```
+@BasicBuilder(name: 'DataBuilder')
+DataBuilder buildDataBuilder(StagerContext context) {
+    ... code to build a DataBuilder instance
+}
+
+class DataBuilder {
+    ... DataBuilder implementation
+}
+```
+
+We use this mechanism for "dynamically" (although there is little dynamic about
+it...) building classes for several reasons. First, it works well with large
+class hierarchies and generics. Second, it doesn't have the type restrictions
+of factory constructors. Finally, it allows us to construct classes via a
+lookup table created by the Dart code generator instead of hard-wiring the
+necessary logic everywhere.
+
 ## Developer Workflow
 
 Development on the Stager Platform is primarily driven through the included

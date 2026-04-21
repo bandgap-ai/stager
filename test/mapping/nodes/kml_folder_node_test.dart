@@ -18,8 +18,8 @@ void main() {
 
       // Assert
       expect(node, isA<KMLFeatureNode>());
-      expect(node.properties.getProperty('id'), 'folder1');
-      expect(node.properties.getProperty('name'), 'My Folder');
+      expect(node.properties.get<String>('id'), 'folder1');
+      expect(node.properties.get<String>('name'), 'My Folder');
       expect(node.isComposite, isTrue);
     });
 

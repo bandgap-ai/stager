@@ -15,8 +15,8 @@ void main() {
 
   group('LeafNodeEditor Tests', () {
     testWidgets('LeafNodeEditor displays title and content', (WidgetTester tester) async {
-      testProperties.setProperty('name', 'Test Node');
-      testProperties.setProperty('description', 'Some description');
+      testProperties.set('name', 'Test Node');
+      testProperties.set('description', 'Some description');
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
           body: LeafNodeEditor(state:node),
@@ -30,8 +30,8 @@ void main() {
     });
 
     testWidgets('LeafNodeEditor displays latitude and longitude', (WidgetTester tester) async {
-      testProperties.setProperty('latitude', 10.0);
-      testProperties.setProperty('longitude', 20.0);
+      testProperties.set('latitude', 10.0);
+      testProperties.set('longitude', 20.0);
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
           body: LeafNodeEditor(state: node),
@@ -45,10 +45,10 @@ void main() {
     });
 
     testWidgets('LeafNodeEditor returns updated properties on Save', (WidgetTester tester) async {
-      testProperties.setProperty('name', 'Old Name');
-      testProperties.setProperty('description', 'Old Description');
-      testProperties.setProperty('latitude', 1.0);
-      testProperties.setProperty('longitude', 2.0);
+      testProperties.set('name', 'Old Name');
+      testProperties.set('description', 'Old Description');
+      testProperties.set('latitude', 1.0);
+      testProperties.set('longitude', 2.0);
 
       Map<String, dynamic>? result;
 
@@ -82,15 +82,15 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(result, isNotNull);
-      expect(result!['name'], 'Old Name'); // Name is not editable in this dialog
-      expect(result!['description'], 'New Description');
-      expect(result!['latitude'], 100.0);
-      expect(result!['longitude'], 200.0);
+      expect(result!['name'].value, 'Old Name'); // Name is not editable in this dialog
+      expect(result!['description'].value, 'New Description');
+      expect(result!['latitude'].value, 100.0);
+      expect(result!['longitude'].value, 200.0);
     });
 
     testWidgets('LeafNodeEditor displays position method widget and switches editors', (WidgetTester tester) async {
-      testProperties.setProperty('latitude', 10.0);
-      testProperties.setProperty('longitude', 20.0);
+      testProperties.set('latitude', 10.0);
+      testProperties.set('longitude', 20.0);
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(

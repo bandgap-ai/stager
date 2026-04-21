@@ -41,8 +41,8 @@ class MarkerLayerAdapter {
     List<Marker> markers = [];
     for (final entry in entries) {
       for (final node in entry.value) {
-        final latitude = node.properties.getProperty("latitude");
-        final longitude = node.properties.getProperty("longitude");
+        final latitude = node.properties.get<double>("latitude");
+        final longitude = node.properties.get<double>("longitude");
         if (latitude != null && longitude != null) {
           markers.add(_makeMarker(latitude, longitude, node));
         }

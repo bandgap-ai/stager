@@ -2,6 +2,12 @@
 
 * Added a generic Selection class and observer to manage UI selection state.
 
+## 0.0.3
+* Added dynamic type factory for persistence.
+* Added a new map editor with partial KML support.
+* Added new Agent management constructs.
+* Added new HLDs in doc/.
+
 ## 0.0.2
 
 * Enhancements to add node editing to the new UI architecture.

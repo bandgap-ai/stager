@@ -35,8 +35,8 @@ class KMLGroundOverlayNode extends KMLGeometryNode {
     super.initialProperties,
   }) {
     // Storing the provided overlay data directly in the property map.
-    properties.setProperty(iconKey, icon);
-    properties.setProperty(latLonBoxKey, latLonBox);
+    properties.set<KMLIcon>(iconKey, icon);
+    properties.set<LatLonBox>(latLonBoxKey, latLonBox);
   }
 
   /// The icon (image) to be overlaid on the map.
@@ -45,7 +45,7 @@ class KMLGroundOverlayNode extends KMLGeometryNode {
   /// 
   /// Throws a [StateError] if [hasIcon] is false.
   KMLIcon get icon {
-    return properties.getProperty(iconKey) as KMLIcon;
+    return properties.get<KMLIcon>(iconKey);
   }
 
   /// The geographic bounding box where the icon is rendered.
@@ -54,6 +54,6 @@ class KMLGroundOverlayNode extends KMLGeometryNode {
   /// 
   /// Throws a [StateError] if [hasLatLonBox] is false.
   LatLonBox get latLonBox {
-    return properties.getProperty(latLonBoxKey) as LatLonBox;
+    return properties.get<LatLonBox>(latLonBoxKey);
   }
 }

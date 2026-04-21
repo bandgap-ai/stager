@@ -39,8 +39,8 @@ void main() {
       );
 
       // Assert
-      expect(root.properties.getProperty('id'), 'root1');
-      expect(root.properties.getProperty('name'), 'KML Document');
+      expect(root.properties.get<String>('id'), 'root1');
+      expect(root.properties.get<String>('name'), 'KML Document');
       expect(root.styleUrl, 'default');
       expect(root.kmlStyle.id, 'default');
     });

@@ -38,7 +38,7 @@ void main() {
 
       // Assert: Verify the root node type and its properties.
       expect(root, isA<KMLTreeRootNode>());
-      expect(root.properties.getProperty("name"), 'Test Document');
+      expect(root.properties.get<String>("name"), 'Test Document');
       expect(root.children, isEmpty);
     });
 
@@ -66,11 +66,11 @@ void main() {
       expect(root.children.length, 1);
       
       final folder = root.children.first as KMLFolderNode;
-      expect(folder.properties.getProperty("name"), 'Folder 1');
+      expect(folder.properties.get<String>("name"), 'Folder 1');
       expect(folder.children.length, 1);
 
       final placemark = folder.children.first as KMLPlacemarkNode;
-      expect(placemark.properties.getProperty("name"), 'Placemark 1');
+      expect(placemark.properties.get<String>("name"), 'Placemark 1');
     });
 
     /// Verifies that <Point> geometries are correctly extracted into 

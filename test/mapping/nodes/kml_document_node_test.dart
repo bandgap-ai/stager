@@ -25,8 +25,8 @@ void main() {
 
       // Assert
       expect(node, isA<KMLFeatureNode>());
-      expect(node.properties.getProperty('id'), 'doc1');
-      expect(node.properties.getProperty('name'), 'My Document');
+      expect(node.properties.get<String>('id'), 'doc1');
+      expect(node.properties.get<String>('name'), 'My Document');
       expect(node.isComposite, isTrue);
     });
 

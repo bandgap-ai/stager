@@ -29,7 +29,7 @@ void main() {
 
       // Assert
       expect(node, isA<KMLGeometryNode>());
-      expect(node.properties.getProperty('id'), 'overlay1');
+      expect(node.properties.get<String>('id'), 'overlay1');
       expect(node.isComposite, isFalse);
     });
 

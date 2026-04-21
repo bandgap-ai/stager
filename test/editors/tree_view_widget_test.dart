@@ -68,7 +68,7 @@ void main() {
 
       // Verify that the callback was triggered with the correct node.
       expect(tappedNode, isNotNull);
-      expect(tappedNode?.properties.getProperty('name'), 'Leaf 1');
+      expect(tappedNode?.properties.get<String>('name'), 'Leaf 1');
     });
 
     testWidgets('should highlight the selected node', (WidgetTester tester) async {

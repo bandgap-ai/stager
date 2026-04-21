@@ -9,14 +9,14 @@ class MockNodeBuilder extends BasicNodeBuilder {
   @override
   CompositeNode buildCompositeNode(String id, String name, [CompositeNode? parent]) {
     CompositeNode node = super.buildCompositeNode(id, name, parent);
-    node.properties.setProperty("isMock", true);
+    node.properties.set("isMock", true);
     return node;
   }
 
   @override
   LeafNode buildLeafNode(String id, String name, [CompositeNode? parent]) {
     LeafNode node = super.buildLeafNode(id, name, parent);
-    node.properties.setProperty("isMock", false);
+    node.properties.set("isMock", false);
     return node;
   }
 

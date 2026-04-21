@@ -31,8 +31,8 @@ void main() {
       expect(node.hasExtendedData,true);
       expect(node.extendedData['key'], 'value');
       
-      expect(node.properties.getProperty('kml_visibility'), isFalse);
-      expect(node.properties.getProperty('kml_snippet'), 'A brief snippet');
+      expect(node.properties.get<bool>('kml_visibility'), isFalse);
+      expect(node.properties.get<String>('kml_snippet'), 'A brief snippet');
     });
   });
 }

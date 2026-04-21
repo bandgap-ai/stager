@@ -39,8 +39,8 @@ class KMLPolygonNode extends KMLGeometryNode {
     super.initialProperties,
   }) {
     // Storing the provided geometry data directly in the property map.
-    properties.setProperty(outlineKey, outline);
-    properties.setProperty(holesKey, holes);
+    properties.set<List<LatLng>>(outlineKey, outline);
+    properties.set<List<KMLHole>>(holesKey, holes);
   }
 
   /// The list of geographic coordinates defining the outer boundary.
@@ -49,7 +49,7 @@ class KMLPolygonNode extends KMLGeometryNode {
   /// 
   /// Throws a [StateError] if [hasOutline] is false.
   List<LatLng> get outline {
-    return List<LatLng>.from(properties.getProperty(outlineKey) as Iterable);
+    return List<LatLng>.from(properties.get<List<LatLng>>(outlineKey));
   }
 
   /// The list of [KMLHole] objects defining inner cutout regions.
@@ -58,6 +58,6 @@ class KMLPolygonNode extends KMLGeometryNode {
   /// 
   /// Throws a [StateError] if [hasHoles] is false.
   List<KMLHole> get holes {
-    return List<KMLHole>.from(properties.getProperty(holesKey) as Iterable);
+    return List<KMLHole>.from(properties.get<List<KMLHole>>(holesKey));
   }
 }

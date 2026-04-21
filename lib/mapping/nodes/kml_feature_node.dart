@@ -34,19 +34,19 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
     bool result = true;
     // Adhering to the project standard of using containsProperty() instead 
     // of null checks.
-    if (properties.containsProperty(visibilityKey)) {
-      result = properties.getProperty(visibilityKey) as bool;
+    if (properties.contains(visibilityKey)) {
+      result = properties.get<bool>(visibilityKey);
     }
     return result;
   }
 
   set visibility(bool value) {
-    properties.setProperty(visibilityKey, value);
+    properties.set<bool>(visibilityKey, value);
   }
 
   /// Returns `true` if this feature has a snippet description.
   bool get hasSnippet {
-    return properties.containsProperty(snippetKey);
+    return properties.contains(snippetKey);
   }
 
   /// Returns the short description of the feature.
@@ -58,7 +58,7 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
     late String result;
     // Adhering to the standard of using the "has" method for initial check.
     if (hasSnippet) {
-      result = properties.getProperty(snippetKey) as String;
+      result = properties.get<String>(snippetKey);
     } else {
       throw StateError('KML Feature does not have a snippet.');
     }
@@ -66,12 +66,12 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
   }
 
   set snippet(String value) {
-    properties.setProperty(snippetKey, value);
+    properties.set(snippetKey, value);
   }
 
   /// Returns `true` if this feature has custom extended data.
   bool get hasExtendedData {
-    return properties.containsProperty(extendedDataKey);
+    return properties.contains(extendedDataKey);
   }
 
   /// Returns the map of custom data associated with the feature.
@@ -79,18 +79,18 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
   /// Maps to the `<ExtendedData>` element in the KML specification.
   /// 
   /// Throws a [StateError] if [hasExtendedData] is false.
-  Map<String, dynamic> get extendedData {
-    late Map<String, dynamic> result;
+  Map<String, Object> get extendedData {
+    late Map<String, Object> result;
     // Adhering to the standard of using the "has" method for initial check.
     if (hasExtendedData) {
-      result = properties.getProperty(extendedDataKey) as Map<String, dynamic>;
+      result = properties.get<Map<String, Object>>(extendedDataKey);
     } else {
       throw StateError('KML Feature does not have extended data.');
     }
     return result;
   }
 
-  set extendedData(Map<String, dynamic> value) {
-    properties.setProperty(extendedDataKey, value);
+  set extendedData(Map<String, Object> value) {
+    properties.set(extendedDataKey, value);
   }
 }

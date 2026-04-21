@@ -15,8 +15,8 @@ void main() {
       String id = "1";
       String name = "One";
       LeafNode node = builder.buildLeafNode(id, name);
-      expect(node.properties.getProperty('id'), id);
-      expect(node.properties.getProperty('name'), name);
+      expect(node.properties.get<String>('id'), id);
+      expect(node.properties.get<String>('name'), name);
       expect(node.isComposite,isFalse);
     });
 
@@ -26,8 +26,8 @@ void main() {
       String id = "2";
       String name = "Two";
       CompositeNode node = builder.buildCompositeNode(id, name);
-      expect(node.properties.getProperty('id'), id);
-      expect(node.properties.getProperty('name'), name);
+      expect(node.properties.get<String>('id'), id);
+      expect(node.properties.get<String>('name'), name);
       expect(node.isComposite,isTrue);
 
       // Register as an observer of the composite node for the next exercise

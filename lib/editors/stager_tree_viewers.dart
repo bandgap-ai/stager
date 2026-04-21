@@ -59,12 +59,12 @@ class _LeafNodeViewState extends State<LeafNodeView> implements LeafNodeObserver
   @override
   Widget build(BuildContext context) {
     IconData iconData = widget.iconProvider.getIconForLevel(widget.level);
-    final bool isSelected = widget.selectedNode?.properties.getProperty('id') ==
-        widget.node.properties.getProperty('id');
+    final bool isSelected = widget.selectedNode?.properties.get<String>('id') ==
+        widget.node.properties.get<String>('id');
 
     return ListTile(
       contentPadding: EdgeInsets.only(left: 16.0 + widget.level * 20.0),
-      title: Text(widget.node.properties.getProperty('name') as String),
+      title: Text(widget.node.properties.get<String>('name')),
       leading: Icon(iconData),
       selected: isSelected,
       onTap: () => widget.onNodeTap(widget.node),
@@ -132,12 +132,12 @@ class _CompositeNodeViewState extends State<CompositeNodeView>
   @override
   Widget build(BuildContext context) {
     IconData iconData = widget.iconProvider.getIconForLevel(widget.level);
-    final bool isSelected = widget.selectedNode?.properties.getProperty('id') ==
-        widget.node.properties.getProperty('id');
+    final bool isSelected = widget.selectedNode?.properties.get<String>('id') ==
+        widget.node.properties.get<String>('id');
 
     return ExpansionTile(
       tilePadding: EdgeInsets.only(left: 16.0 + widget.level * 20.0),
-      title: Text(widget.node.properties.getProperty('name') as String),
+      title: Text(widget.node.properties.get<String>('name')),
       leading: Icon(iconData),
       initiallyExpanded: isSelected,
       backgroundColor:

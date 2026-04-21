@@ -118,81 +118,51 @@ class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
 
   /// Extracts valid coordinates from a node's properties.
   LatLng? _extractCoordinates(LeafNode node) {
+    LatLng? pos;
     try {
-      final lat = node.properties.getProperty('latitude');
-      final lng = node.properties.getProperty('longitude');
-
-      if (lat != null && lng != null) {
-        double? latitude;
-        double? longitude;
-
-        // Handle different numeric types
-        if (lat is double) {
-          latitude = lat;
-        } else if (lat is int) {
-          latitude = lat.toDouble();
-        } else if (lat is String) {
-          latitude = double.tryParse(lat);
-        }
-
-        if (lng is double) {
-          longitude = lng;
-        } else if (lng is int) {
-          longitude = lng.toDouble();
-        } else if (lng is String) {
-          longitude = double.tryParse(lng);
-        }
-
-        if (latitude != null && longitude != null) {
-          return LatLng(latitude, longitude);
-        }
+      final props = node.properties;
+      if (props.contains('latitude') && props.contains('longitude')) {
+        final lat = node.properties.get<double>('latitude');
+        final lng = node.properties.get<double>('longitude');
+        pos = LatLng(lat,lng);
       }
     } catch (e) {
-      // Invalid coordinate data - return null
+      pos = null;
     }
-    return null;
+    return pos;
   }
 
   /// Calculates the area of an outline polygon for a node.
   double? _calculateOutlineArea(LeafNode node) {
+    double? retArea;
     try {
-      final outlineData = node.properties.getProperty('outline');
-      if (outlineData is! List || outlineData.length < 3) {
-        return null;
-      }
+      if (node.properties.contains('outline')) {
+        final points = node.properties.get<List<LatLng>>('outline');
 
-      final points = <LatLng>[];
-      for (final point in outlineData) {
-        if (point is Map<String, dynamic>) {
-          final lat = point['latitude'] ?? point['lat'];
-          final lng = point['longitude'] ?? point['lng'] ?? point['lon'];
-          
-          if (lat is num && lng is num) {
-            points.add(LatLng(lat.toDouble(), lng.toDouble()));
-          }
+        if (points.length < 3) return null;
+
+        // Calculate area using shoelace formula (approximation for small areas)
+        double area = 0.0;
+        for (int i = 0; i < points.length; i++) {
+          final j = (i + 1) % points.length;
+          area += points[i].longitude * points[j].latitude;
+          area -= points[j].longitude * points[i].latitude;
         }
+        area = (area / 2.0).abs();
+
+        // Convert from degrees squared to approximate square meters
+        // This is a rough approximation - for precise calculations,
+        // proper geographic projections should be used
+        const double degreesToMeters = 111320.0; // Approximate meters per degree
+        retArea = area * degreesToMeters * degreesToMeters;
+
+      } else {
+        retArea = null;
       }
-
-      if (points.length < 3) return null;
-
-      // Calculate area using shoelace formula (approximation for small areas)
-      double area = 0.0;
-      for (int i = 0; i < points.length; i++) {
-        final j = (i + 1) % points.length;
-        area += points[i].longitude * points[j].latitude;
-        area -= points[j].longitude * points[i].latitude;
-      }
-      area = (area / 2.0).abs();
-
-      // Convert from degrees squared to approximate square meters
-      // This is a rough approximation - for precise calculations, 
-      // proper geographic projections should be used
-      const double degreesToMeters = 111320.0; // Approximate meters per degree
-      return area * degreesToMeters * degreesToMeters;
-      
     } catch (e) {
-      return null;
+      retArea = null;
     }
+    return retArea;
   }
 
   /// Computes the convex hull of a set of points using Graham scan algorithm.

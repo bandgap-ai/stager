@@ -5,6 +5,8 @@ import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/editors/standard_widgets.dart';
 import 'package:stager_platform/editors/basic_widget_factory.dart';
 
+import '../system/typed_value.dart';
+
 /// A dialog for editing node properties.
 ///
 /// This widget provides a basic structure for an alert dialog that can be used
@@ -30,7 +32,7 @@ class _NodeEditorState extends State<LeafNodeEditor> {
   late NodeProperties properties;
 
   /// A map to store [TextEditingController]s for string-based properties.
-  final Map<String, TextEditingController> _controllers = {};
+  final Map<String, TextEditingController> _textControllers = {};
 
   /// The current selection for the position input method (map or coordinates).
   late bool _pickFromMap;
@@ -40,9 +42,9 @@ class _NodeEditorState extends State<LeafNodeEditor> {
     super.initState();
     properties = widget.state.properties;
     // Initialize controllers for each property based on their type.
-    properties.map.forEach((key, value) {
+    properties.map.forEach((key, typedValue) {
       // For all properties, create a TextEditingController.
-      _controllers[key] = TextEditingController(text: value?.toString() ?? '');
+      _textControllers[key] = TextEditingController(text: typedValue.value.toString() ?? '');
     });
 
     // Initialize _pickFromMap based on whether latitude/longitude exist
@@ -54,15 +56,15 @@ class _NodeEditorState extends State<LeafNodeEditor> {
   void _onPointChanged(LatLng newPoint) {
     setState(() {
       // Update the point in the text controllers
-      _controllers['latitude']!.text = newPoint.latitude.toString();
-      _controllers['longitude']!.text = newPoint.longitude.toString();
+      _textControllers['latitude']!.text = newPoint.latitude.toString();
+      _textControllers['longitude']!.text = newPoint.longitude.toString();
     });
   }
 
   @override
   void dispose() {
     // Dispose all created TextEditingController to prevent memory leaks.
-    _controllers.forEach((key, controller) => controller.dispose());
+    _textControllers.forEach((key, controller) => controller.dispose());
     super.dispose();
   }
 
@@ -84,7 +86,7 @@ class _NodeEditorState extends State<LeafNodeEditor> {
             ...properties.map.entries.where((entry) => entry.key != 'id' && entry.key != 'latitude' && entry.key != 'longitude').map((entry) {
               return buildTextFieldEditor(
                 context,
-                _controllers[entry.key]!, // Use the pre-initialized controller
+                _textControllers[entry.key]!, // Use the pre-initialized controller
                 '${_spruceUpKey(entry.key)}:', // Spruce up the key for display
                 'Enter ${entry.key}', // Hint text
               );
@@ -105,15 +107,15 @@ class _NodeEditorState extends State<LeafNodeEditor> {
                     ? buildSinglePointMapEditor(
                         context,
                         LatLng(
-                          double.tryParse(_controllers['latitude']!.text) ?? 0.0,
-                          double.tryParse(_controllers['longitude']!.text) ?? 0.0,
+                          double.tryParse(_textControllers['latitude']!.text) ?? 0.0,
+                          double.tryParse(_textControllers['longitude']!.text) ?? 0.0,
                         ),
                         _onPointChanged,
                       )
                     : buildGeoCoordEditor(
                         context,
-                        _controllers['latitude']!,
-                        _controllers['longitude']!,
+                        _textControllers['latitude']!,
+                        _textControllers['longitude']!,
                       ),
               ),
           ],
@@ -129,12 +131,13 @@ class _NodeEditorState extends State<LeafNodeEditor> {
         TextButton(
           onPressed: () {
             // Create a mutable copy of the properties map.
-            final updatedProperties = Map<String, dynamic>.from(properties.map);
-            _controllers.forEach((key, controller) {
+            // FIXME - This should be done
+            final updatedProperties = Map<String, TypedValue<Object>>.from(properties.map);
+            _textControllers.forEach((key, controller) {
               if (key == 'latitude' || key == 'longitude') {
-                updatedProperties[key] = double.tryParse(controller.text);
+                updatedProperties[key] = TypedValue<double>(double.tryParse(controller.text)!);
               } else {
-                updatedProperties[key] = controller.text;
+                updatedProperties[key] = TypedValue<String>(controller.text);
               }
             });
             Navigator.of(context).pop(updatedProperties);

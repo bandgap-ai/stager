@@ -82,9 +82,14 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
       // FIXME! Pretty sure this will break. The view needs to use visitation to
       // get this value.
       LeafNode node = widget.selectionService.selection.value;
-      final currentImagePaths =
-          (node.properties.getProperty('imagePaths') as List<String>?) ?? [];
-      node.properties.setProperty('imagePaths', [
+      // Get the current image paths if they exist, and otherwise start with an
+      // empty list.
+      List<String> currentImagePaths = [];
+      if (node.properties.contains('imagePaths')) {
+        currentImagePaths = node.properties.get<List<String>>('imagePaths');
+      }
+      // Merge the new image path with the existing list
+      node.properties.set<List<String>>('imagePaths', [
         ...currentImagePaths,
         pickedFile.path,
       ]);
@@ -151,8 +156,8 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
 
   /// Builds the images view
   Widget _buildImagesView(LeafNode node) {
-    final imagePaths =
-        (node.properties.getProperty('imagePaths') as List<String>?) ?? [];
+    final imagePaths = node.properties.contains('imagePaths') ?
+        (node.properties.get<List<String>>('imagePaths')) : [];
 
     return Column(
       children: [

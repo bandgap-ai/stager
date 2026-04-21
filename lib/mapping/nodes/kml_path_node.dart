@@ -32,7 +32,7 @@ class KMLPathNode extends KMLGeometryNode {
     super.initialProperties,
   }) {
     // Storing the provided outline directly in the property map.
-    properties.setProperty(outlineKey, outline);
+    properties.set<List<LatLng>>(outlineKey, outline);
   }
 
   /// The list of geographic coordinates defining the path.
@@ -41,6 +41,6 @@ class KMLPathNode extends KMLGeometryNode {
   /// 
   /// Throws a [StateError] if [hasOutline] is false.
   List<LatLng> get outline {
-    return List<LatLng>.from(properties.getProperty(outlineKey) as Iterable);
+    return List<LatLng>.from(properties.get<List<LatLng>>(outlineKey));
   }
 }
