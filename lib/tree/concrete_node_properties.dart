@@ -45,7 +45,7 @@ class ConcreteNodeProperties implements NodeProperties {
       final entry = _properties[key]!;
 
       // Handle the happy path where types match first.
-      if (entry.type == T) {
+      if (entry.type == T || T == Object) {
         // Perform the cast to the requested generic type T.
         result = entry.value as T;
       } else {

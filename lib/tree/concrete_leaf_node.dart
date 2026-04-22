@@ -2,11 +2,13 @@
 ///
 /// This class represents a basic node in the tree that does not have children.
 library;
-import 'package:stager_platform/builders/stager_context.dart';
-import 'package:stager_platform/tree/node_visitor.dart';
-import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/tree/node_observer.dart';
 
+import 'package:uuid/uuid.dart';
+
+import '../builders/stager_context.dart';
+import '../tree/node_visitor.dart';
+import '../tree/tree.dart';
+import '../tree/node_observer.dart';
 import '../system/typed_value.dart';
 
 /// A concrete implementation of a [LeafNode] that provides basic functionality.
@@ -17,10 +19,12 @@ import '../system/typed_value.dart';
 /// Subclasses can override this behavior as needed, or allow ConcreteLeafNode
 /// to load the properties and overwrite them after the initial values are
 /// loaded.
-class ConcreteLeafNode implements LeafNode {
-  /// The properties of this node.
-  @override
-  final ConcreteNodeProperties properties;
+class ConcreteLeafNode extends LeafNode {
+
+  /// The [NodeProperties] associated with this leaf node.
+  ///
+  /// This getter provides access to the data payload of the node.
+  final NodeProperties _properties;
 
   /// The parent of this node, or `null` if it is a root.
   @override
@@ -41,17 +45,74 @@ class ConcreteLeafNode implements LeafNode {
   /// [name]: The display name of the node. Stored in properties.
   /// [initialProperties]: Optional initial properties for the node.
   ConcreteLeafNode({
-    required String id,
-    required String name,
+    required super.name,
     Map<String, TypedValue<Object>> initialProperties = const {},
-  }) : properties = ConcreteNodeProperties(initialProperties) {
-    properties.set<String>('id', id);
-    properties.set<String>('name', name);
-  }
+  }) : _properties = ConcreteNodeProperties(initialProperties);
 
   @override
   bool get isComposite => false;
 
+  @override
+  bool containsProperty(String key) {
+    return _properties.contains(key);
+  }
+
+  @override
+  String property(String key) {
+    return _properties.get<Object>(key).toString();
+  }
+
+  @override
+  void setProperty(String key, TypedValue<Object> value) {
+    _properties.set<Object>(key, value);
+    // Notify observers about the change in properties
+    notify();
+  }
+
+  @override
+  TypedValue<Object> typedProperty(String key) {
+    return _properties.map[key]!;
+  }
+
+  @override
+  Map<String, TypedValue<Object>> toMap() {
+
+    // Add the name and id to the map as well as the node properties
+    return <String,TypedValue<Object>>{
+      'name' : TypedValue<String>(name),
+      'id' : TypedValue<UuidValue>(id),
+      ..._properties.map
+    };
+
+  }
+
+  @override
+  void fromMap(Map<String, TypedValue<Object>> inputMap) {
+
+    // Make a copy so we can do what we want
+    var map = Map.of(inputMap);
+
+    // Pull the name and id from the map, if it has it.
+    if (map.containsKey('name')) {
+      name = map['name']!.value.toString();
+      map.remove('name');
+    }
+    if (map.containsKey('id')) {
+      id = map['id']!.value as UuidValue;
+      map.remove('id');
+    }
+
+    // Load all the properties
+    final tempProps = ConcreteNodeProperties(map);
+    // Merge everything
+    _properties.merge(tempProps);
+
+    // Notify observers about the change in properties
+    notify();
+
+    return;
+  }
+  
   @override
   void setParent(LeafNode? parent) {
     this.parent = parent;
@@ -94,27 +155,5 @@ class ConcreteLeafNode implements LeafNode {
   void accept(NodeVisitor visitor) {
     visitor.visit(this);
   }
-
-  @override
-  void loadPropertiesFromMap(Map<String, Object> mapInput) {
-    // Rebuild the map as a Map<String,TypedObject<Object>> to get the behavior
-    // we expect.
-    final map = <String,TypedValue<Object>>{};
-    for (final entry in mapInput.entries) {
-      map[entry.key] = buildTypedValue(
-          StagerContext({"type" : entry.value.runtimeType.toString(),
-            "value": entry.value}));
-    }
-
-    // Load all the properties
-    final tempProps = ConcreteNodeProperties(map);
-    // Merge everything
-    properties.merge(tempProps);
-
-    // Notify observers about the change in properties
-    notify();
-
-    return;
-  }
-
+  
 }

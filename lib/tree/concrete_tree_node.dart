@@ -17,7 +17,6 @@ class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
   /// [name]: The display name of the tree node.
   /// [initialProperties]: Optional initial properties for the node.
   ConcreteTreeNode({
-    required super.id,
     required super.name,
     super.initialProperties,
   });
@@ -120,10 +119,10 @@ class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
   LatLng? _extractCoordinates(LeafNode node) {
     LatLng? pos;
     try {
-      final props = node.properties;
-      if (props.contains('latitude') && props.contains('longitude')) {
-        final lat = node.properties.get<double>('latitude');
-        final lng = node.properties.get<double>('longitude');
+      if (containsProperty('latitude') && containsProperty('longitude')) {
+        // Leaving this AS-IS for now because I need to fix positions differently.
+        final lat = typedProperty('latitude').value as double;
+        final lng = typedProperty('longitude').value as double;
         pos = LatLng(lat,lng);
       }
     } catch (e) {
@@ -136,8 +135,8 @@ class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
   double? _calculateOutlineArea(LeafNode node) {
     double? retArea;
     try {
-      if (node.properties.contains('outline')) {
-        final points = node.properties.get<List<LatLng>>('outline');
+      if (containsProperty('outline')) {
+        final points = property('outline') as List<LatLng>;
 
         if (points.length < 3) return null;
 

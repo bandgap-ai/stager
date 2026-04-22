@@ -7,6 +7,9 @@ import 'package:stager_platform/tree/node_summary.dart';
 /// This class extends [CompositeNode], providing methods to iterate through the tree
 /// structure and to find specific nodes based on a given predicate.
 abstract class TreeNode extends CompositeNode {
+
+  TreeNode({required super.name});
+
   /// Creates and returns an [Iterator] for traversing the tree.
   ///
   /// The default implementation of this method should provide a depth-first traversal.

@@ -3,6 +3,7 @@ import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/tree/node_builder.dart';
 import 'package:stager_platform/tree/concrete_composite_node.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';
+import 'package:uuid/uuid_value.dart';
 
 /// This is an implementation of [NodeBuilder] that provides a default
 /// implementation using [ConcreteLeafNode] and [ConcreteCompositeNode].
@@ -29,15 +30,17 @@ class BasicNodeBuilder extends NodeBuilder {
   }
 
   @override
-  CompositeNode buildCompositeNode(String id, String name, [CompositeNode? parent]) {
-    ConcreteCompositeNode node = ConcreteCompositeNode(id: id, name: name);
+  CompositeNode buildCompositeNode(UuidValue id, String name, [CompositeNode? parent]) {
+    ConcreteCompositeNode node = ConcreteCompositeNode(name: name);
+    node.id = id;
     linkParent(node, parent);
     return node;
   }
 
   @override
-  LeafNode buildLeafNode(String id, String name, [CompositeNode? parent]) {
-    ConcreteLeafNode node = ConcreteLeafNode(id: id, name: name);
+  LeafNode buildLeafNode(UuidValue id, String name, [CompositeNode? parent]) {
+    ConcreteLeafNode node = ConcreteLeafNode(name: name);
+    node.id = id;
     linkParent(node, parent);
     return node;
   }

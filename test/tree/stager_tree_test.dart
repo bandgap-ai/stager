@@ -4,7 +4,9 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/tree/tree.dart';
+import 'package:uuid/uuid.dart';
 
 import 'mock_node_visitor.dart';
 
@@ -52,51 +54,50 @@ void main() {
   group('LeafNode', () {
 
     test('ConcreteLeafNode can load properties from a map', () {
-      String id = 'l1';
-      final leaf = ConcreteLeafNode(id: id, name: 'Leaf 1');
+      UuidValue id = Uuid().v7obj();
+      final leaf = ConcreteLeafNode(name: 'Leaf 1');
       TestLeafNodeObserver observer = TestLeafNodeObserver();
       leaf.attach(observer);
       expect(observer.lastUpdatedNode, isNull);
-
-      // FIXME! Can't load the properties like this!
-
       // Make some new property values
-      Map<String, Object> mapInput = {
-        'name': 'Updated Name',
-        'value': 456,
-        'is_active': false,
+      Map<String, TypedValue<Object>> mapInput = {
+        'id': TypedValue<UuidValue>(id),
+        'name': TypedValue<String>('Updated Name'),
+        'value': TypedValue<int>(456),
+        'is_active': TypedValue<bool>(false),
       };
 
       // Set them.
-      leaf.loadPropertiesFromMap(mapInput);
+      leaf.fromMap(mapInput);
 
       // Get and check the properties. The id should be unchanged:
-      expect(leaf.properties.get<String>('id'), id);
-      expect(leaf.properties.get<String>('name'), 'Updated Name');
-      expect(leaf.properties.get<int>('value'), 456);
-      expect(leaf.properties.get<bool>('is_active'), false);
+      expect(leaf.id, id);
+      expect(leaf.name, 'Updated Name');
+      expect(leaf.property('value'), "456");
+      expect(leaf.typedProperty('value').value as int, 456);
+      expect(leaf.property('is_active'), "false");
+      expect(leaf.typedProperty('is_active').value as bool, false);
       // There should now be 4 properties
-      expect(leaf.properties.map.length, 4);
+      expect(leaf.toMap().length, 4);
       // Ensure that observers were notified the state changed.
       expect(observer.lastUpdatedNode, isNotNull);
 
     });
 
     test('ConcreteLeafNode initializes correctly', () {
-      final leaf = ConcreteLeafNode(id: 'l1', name: 'Leaf 1');
-      expect(leaf.properties.get<String>('id'), 'l1');
-      expect(leaf.properties.get<String>('name'), 'Leaf 1');
+      final leaf = ConcreteLeafNode(name: 'Leaf 1');
+      expect(Uuid.isValidUUID(fromString: leaf.id.toString()), true);
+      expect(leaf.name, 'Leaf 1');
       expect(leaf.parent, isNull);
       expect(leaf.next, isNull);
       expect(leaf.previous, isNull);
       expect(leaf.isComposite, isFalse);
-      expect(leaf.properties, isA<NodeProperties>());
     });
 
     test('ConcreteLeafNode sets parent, next, and previous correctly', () {
-      final leaf1 = ConcreteLeafNode(id: 'l1', name: 'Leaf 1');
-      final leaf2 = ConcreteLeafNode(id: 'l2', name: 'Leaf 2');
-      final leaf3 = ConcreteLeafNode(id: 'l3', name: 'Leaf 3');
+      final leaf1 = ConcreteLeafNode(name: 'Leaf 1');
+      final leaf2 = ConcreteLeafNode(name: 'Leaf 2');
+      final leaf3 = ConcreteLeafNode(name: 'Leaf 3');
 
       leaf2.setParent(leaf1);
       leaf2.setNext(leaf3);
@@ -108,24 +109,24 @@ void main() {
     });
 
     test('ConcreteLeafNode notifies observers on structural changes', () {
-      final leaf = ConcreteLeafNode(id: 'l1', name: 'Leaf 1');
+      final leaf = ConcreteLeafNode(name: 'Leaf 1');
       final observer = TestLeafNodeObserver();
       leaf.attach(observer);
 
-      leaf.setParent(ConcreteLeafNode(id: 'p1', name: 'Parent'));
+      leaf.setParent(ConcreteLeafNode(name: 'Parent'));
       expect(observer.lastUpdatedNode, leaf);
 
       observer.lastUpdatedNode = null; // Reset for next assertion
-      leaf.setNext(ConcreteLeafNode(id: 'n1', name: 'Next'));
+      leaf.setNext(ConcreteLeafNode(name: 'Next'));
       expect(observer.lastUpdatedNode, leaf);
 
       observer.lastUpdatedNode = null; // Reset for next assertion
-      leaf.setPrevious(ConcreteLeafNode(id: 'pr1', name: 'Previous'));
+      leaf.setPrevious(ConcreteLeafNode(name: 'Previous'));
       expect(observer.lastUpdatedNode, leaf);
     });
 
     test('ConcreteLeafNode can be visited', () {
-      final leaf = ConcreteLeafNode(id: 'l1', name: 'Leaf 1');
+      final leaf = ConcreteLeafNode(name: 'Leaf 1');
       final visitor = MockNodeVisitor();
 
       leaf.accept(visitor);
@@ -135,18 +136,18 @@ void main() {
 
   group('CompositeNode', () {
     test('ConcreteCompositeNode initializes correctly', () {
-      final composite = ConcreteCompositeNode(id: 'c1', name: 'Composite 1');
-      expect(composite.properties.get<String>('id'), 'c1');
-      expect(composite.properties.get<String>('name'), 'Composite 1');
+      final composite = ConcreteCompositeNode(name: 'Composite 1');
+      expect(Uuid.isValidUUID(fromString: composite.id.toString()), true);
+      expect(composite.name, 'Composite 1');
       expect(composite.isComposite, isTrue);
       expect(composite.children, isEmpty);
     });
 
     test('ConcreteCompositeNode adds and removes children correctly', () {
-      final composite = ConcreteCompositeNode(id: 'c1', name: 'Composite 1');
-      final leaf1 = ConcreteLeafNode(id: 'l1', name: 'Leaf 1');
-      final leaf2 = ConcreteLeafNode(id: 'l2', name: 'Leaf 2');
-      final nestedComposite = ConcreteCompositeNode(id: 'nc1', name: 'Nested Composite');
+      final composite = ConcreteCompositeNode(name: 'Composite 1');
+      final leaf1 = ConcreteLeafNode(name: 'Leaf 1');
+      final leaf2 = ConcreteLeafNode(name: 'Leaf 2');
+      final nestedComposite = ConcreteCompositeNode(name: 'Nested Composite');
 
       composite.addChild(leaf1);
       composite.addChild(leaf2);
@@ -167,11 +168,11 @@ void main() {
     });
 
     test('ConcreteCompositeNode notifies observers on child changes', () {
-      final composite = ConcreteCompositeNode(id: 'c1', name: 'Composite 1');
+      final composite = ConcreteCompositeNode(name: 'Composite 1');
       final observer = TestLeafNodeObserver();
       composite.attach(observer);
 
-      final leaf = ConcreteLeafNode(id: 'l1', name: 'Leaf 1');
+      final leaf = ConcreteLeafNode(name: 'Leaf 1');
       composite.addChild(leaf);
       expect(observer.lastUpdatedNode, composite);
 
@@ -181,10 +182,10 @@ void main() {
     });
 
     test('ConcreteCompositeNode attach/detach observers to children', () {
-      final rootComposite = ConcreteCompositeNode(id: 'root', name: 'Root Composite');
-      final childLeaf = ConcreteLeafNode(id: 'child1', name: 'Child Leaf');
-      final nestedComposite = ConcreteCompositeNode(id: 'nested', name: 'Nested Composite');
-      final nestedChildLeaf = ConcreteLeafNode(id: 'nestedChild1', name: 'Nested Child Leaf');
+      final rootComposite = ConcreteCompositeNode(name: 'Root Composite');
+      final childLeaf = ConcreteLeafNode(name: 'Child Leaf');
+      final nestedComposite = ConcreteCompositeNode(name: 'Nested Composite');
+      final nestedChildLeaf = ConcreteLeafNode(name: 'Nested Child Leaf');
 
       rootComposite.addChild(childLeaf);
       rootComposite.addChild(nestedComposite);
@@ -194,17 +195,17 @@ void main() {
       rootComposite.attach(observer);
 
       // Verify that changes in children notify the observer attached to the root composite
-      childLeaf.setNext(ConcreteLeafNode(id: 'dummy', name: 'Dummy'));
+      childLeaf.setNext(ConcreteLeafNode(name: 'Dummy'));
       expect(observer.lastUpdatedNode, childLeaf);
 
       observer.lastUpdatedNode = null;
-      nestedChildLeaf.setPrevious(ConcreteLeafNode(id: 'dummy2', name: 'Dummy2'));
+      nestedChildLeaf.setPrevious(ConcreteLeafNode(name: 'Dummy2'));
       expect(observer.lastUpdatedNode, nestedChildLeaf);
 
       // Detach observer from root and verify no more notifications from children
       rootComposite.detach(observer);
       observer.lastUpdatedNode = null;
-      childLeaf.setNext(ConcreteLeafNode(id: 'dummy3', name: 'Dummy3'));
+      childLeaf.setNext(ConcreteLeafNode(name: 'Dummy3'));
       expect(observer.lastUpdatedNode, isNull);
     });
   });
@@ -226,16 +227,16 @@ void main() {
       //  └── Composite 3 (comp3)
       //       └── Composite 4 (comp4)
       //            └── Leaf 5 (leaf5)
-      root = ConcreteTreeNode(id: 'root', name: 'Root');
-      comp1 = ConcreteCompositeNode(id: 'comp1', name: 'Composite 1');
-      leaf1 = ConcreteLeafNode(id: 'leaf1', name: 'Leaf 1');
-      leaf2 = ConcreteLeafNode(id: 'leaf2', name: 'Leaf 2');
-      comp2 = ConcreteCompositeNode(id: 'comp2', name: 'Composite 2');
-      leaf3 = ConcreteLeafNode(id: 'leaf3', name: 'Leaf 3');
-      leaf4 = ConcreteLeafNode(id: 'leaf4', name: 'Leaf 4');
-      final comp3 = ConcreteCompositeNode(id: 'comp3', name: 'Composite 3');
-      final comp4 = ConcreteCompositeNode(id: 'comp4', name: 'Composite 4');
-      final leaf5 = ConcreteLeafNode(id: 'leaf5', name: 'Leaf 5');
+      root = ConcreteTreeNode(name: 'root');
+      comp1 = ConcreteCompositeNode(name: 'comp1');
+      leaf1 = ConcreteLeafNode(name: 'leaf1');
+      leaf2 = ConcreteLeafNode(name: 'leaf2');
+      comp2 = ConcreteCompositeNode(name: 'comp2');
+      leaf3 = ConcreteLeafNode(name: 'leaf3');
+      leaf4 = ConcreteLeafNode(name: 'leaf4');
+      final comp3 = ConcreteCompositeNode(name: 'comp3');
+      final comp4 = ConcreteCompositeNode(name: 'comp4');
+      final leaf5 = ConcreteLeafNode(name: 'leaf5');
 
       root.addChild(comp1);
       root.addChild(leaf4);
@@ -255,7 +256,7 @@ void main() {
       final iterator = root.createIterator();
       final visitedNodes = <String>[];
       while (iterator.moveNext()) {
-        visitedNodes.add(iterator.current.properties.get<String>('id'));
+        visitedNodes.add(iterator.current.name);
       }
       expect(visitedNodes, ['root', 'comp1', 'leaf1', 'leaf2', 'comp2', 'leaf3', 'leaf4', 'comp3', 'comp4', 'leaf5']);
     });
@@ -264,7 +265,7 @@ void main() {
       final iterator = root.depthFirstIterator;
       final visitedNodes = <String>[];
       while (iterator.moveNext()) {
-        visitedNodes.add(iterator.current.properties.get<String>('id'));
+        visitedNodes.add(iterator.current.name);
       }
       expect(visitedNodes, ['root', 'comp1', 'leaf1', 'leaf2', 'comp2', 'leaf3', 'leaf4', 'comp3', 'comp4', 'leaf5']);
     });
@@ -273,7 +274,7 @@ void main() {
       final iterator = root.breadthFirstIterator;
       final visitedNodes = <String>[];
       while (iterator.moveNext()) {
-        visitedNodes.add(iterator.current.properties.get<String>('id'));
+        visitedNodes.add(iterator.current.name);
       }
       expect(visitedNodes, ['root', 'comp1', 'leaf4', 'comp3', 'leaf1', 'leaf2', 'comp2', 'comp4', 'leaf3', 'leaf5']);
     });
@@ -282,20 +283,20 @@ void main() {
       // Test case 1: Find all leaf nodes (nodes that are not composite)
       final allLeafNodes = root.find((node) => !node.isComposite);
       expect(allLeafNodes, hasLength(5));
-      expect(allLeafNodes.map((n) => n.properties.get<String>('id')), containsAll(['leaf1', 'leaf2', 'leaf3', 'leaf4', 'leaf5']));
+      expect(allLeafNodes.map((n) => n.name), containsAll(['leaf1', 'leaf2', 'leaf3', 'leaf4', 'leaf5']));
 
-      // Test case 2: Find nodes with a specific name containing 'Composite'
-      final namedNodes = root.find((node) => (node.properties.get<String>('name')).contains('Composite'));
+      // Test case 2: Find nodes with a specific name containing 'comp'
+      final namedNodes = root.find((node) => (node.name).contains('comp'));
       expect(namedNodes, hasLength(4));
-      expect(namedNodes.map((n) => n.properties.get<String>('id')), containsAll(['comp1', 'comp2', 'comp3', 'comp4']));
+      expect(namedNodes.map((n) => n.name), containsAll(['comp1', 'comp2', 'comp3', 'comp4']));
 
       // Test case 3: Find a specific node by its ID
-      final specificNode = root.find((node) => node.properties.get<String>('id') == 'leaf3');
+      final specificNode = root.find((node) => node.name == 'leaf3');
       expect(specificNode, hasLength(1));
-      expect(specificNode.first.properties.get<String>('id'), 'leaf3');
+      expect(specificNode.first.name, 'leaf3');
 
       // Test case 4: Find nodes that do not exist
-      final nonExistentNode = root.find((node) => node.properties.get<String>('id') == 'non_existent');
+      final nonExistentNode = root.find((node) => node.name == 'non_existent');
       expect(nonExistentNode, isEmpty);
     });
   });

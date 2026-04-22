@@ -47,6 +47,8 @@ void main() {
       // Verify that the generic getter correctly retrieves and casts the value 
       // without requiring manual casting at the call site.
       expect(properties.get<String>('name'), 'Test');
+      // Try getting the value as an object. Convert it to a string for testing.
+      expect(properties.get<Object>('name').toString(), 'Test');
     });
 
     test('getProperty should throw NodePropertyException for missing keys', () {

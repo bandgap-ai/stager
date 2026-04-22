@@ -18,7 +18,6 @@ class ConcreteCompositeNode extends ConcreteLeafNode implements CompositeNode {
   /// [name]: The display name of the composite node.
   /// [initialProperties]: Optional initial properties for the node.
   ConcreteCompositeNode({
-    required super.id,
     required super.name,
     super.initialProperties,
   });

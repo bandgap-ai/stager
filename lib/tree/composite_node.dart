@@ -6,6 +6,9 @@ import 'package:stager_platform/tree/leaf_node.dart';
 /// thereby implementing the Composite design pattern. A composite node can
 /// contain both leaf nodes and other composite nodes.
 abstract class CompositeNode extends LeafNode {
+
+  CompositeNode({required super.name});
+
   /// Retrieves the list of child [LeafNode]s directly associated with this composite node.
   ///
   /// This getter provides access to the immediate children of this node.

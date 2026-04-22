@@ -9,19 +9,16 @@ void main() {
 
       // 1. Create a root node for the tree.
       final ConcreteTreeNode root = ConcreteTreeNode(
-        id: 'root-id',
         name: 'Root Node',
       );
 
       // 2. Create a composite node.
       final ConcreteCompositeNode composite = ConcreteCompositeNode(
-        id: 'comp-id',
         name: 'Composite Node',
       );
 
       // 3. Create a leaf node.
       final ConcreteLeafNode leaf = ConcreteLeafNode(
-        id: 'leaf-id',
         name: 'Leaf Node',
       );
 

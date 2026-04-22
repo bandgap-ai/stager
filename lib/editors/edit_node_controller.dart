@@ -39,7 +39,7 @@ class EditNodeController extends Controller<LeafNode> {
     // Prepare the input
     Map<String, Object> mapInput = input as Map<String, Object>;
     // Process the results
-    state.loadPropertiesFromMap(mapInput);
+    state.fromMap(mapInput);
     return;
   }
 }
