@@ -10,7 +10,7 @@ class MockVisitor implements NodeVisitor {
   @override
   void visit(Object node) {
     if (node is KMLPlacemarkNode) {
-      visitedIds.add(node.properties.get<String>("id").toString());
+      visitedIds.add(node.id.toString());
     }
   }
 }

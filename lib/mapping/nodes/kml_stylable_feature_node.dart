@@ -18,7 +18,6 @@ class KmlStylableFeatureNode extends KMLFeatureNode with KMLStylable {
   /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
   /// [initialProperties]: Optional initial metadata.
   KmlStylableFeatureNode({
-    required super.id,
     required super.name,
     required KMLStyleManager styleManager,
     String styleUrl = 'default',

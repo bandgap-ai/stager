@@ -30,7 +30,6 @@ class KMLPolygonNode extends KMLGeometryNode {
   /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
   /// [initialProperties]: Optional initial metadata.
   KMLPolygonNode({
-    required super.id,
     required super.name,
     required super.styleManager,
     required List<LatLng> outline,

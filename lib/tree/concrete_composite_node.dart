@@ -35,7 +35,8 @@ class ConcreteCompositeNode extends ConcreteLeafNode implements CompositeNode {
   @override
   void removeChild(LeafNode child) {
     if (children.remove(child)) {
-      child.setParent(null); // Clear parent reference for the removed child
+      // Clear the relatives since there is no longer a valid relationship.
+      child.resetRelatives();
       notify(); // Notify composite observers of change in children
     }
   }

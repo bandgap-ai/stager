@@ -6,6 +6,7 @@ library;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/tree/point.dart';
 import 'package:uuid/uuid.dart';
 
 import 'mock_node_visitor.dart';
@@ -65,6 +66,8 @@ void main() {
         'name': TypedValue<String>('Updated Name'),
         'value': TypedValue<int>(456),
         'is_active': TypedValue<bool>(false),
+        'position': TypedValue<Point>(Point(coords: [-77.9687646357412,
+          38.98951052421746]))
       };
 
       // Set them.
@@ -73,12 +76,14 @@ void main() {
       // Get and check the properties. The id should be unchanged:
       expect(leaf.id, id);
       expect(leaf.name, 'Updated Name');
+      expect(leaf.position, Point(coords: [-77.9687646357412,
+        38.98951052421746]));
       expect(leaf.property('value'), "456");
       expect(leaf.typedProperty('value').value as int, 456);
       expect(leaf.property('is_active'), "false");
       expect(leaf.typedProperty('is_active').value as bool, false);
       // There should now be 4 properties
-      expect(leaf.toMap().length, 4);
+      expect(leaf.toMap().length, 5);
       // Ensure that observers were notified the state changed.
       expect(observer.lastUpdatedNode, isNotNull);
 
@@ -88,9 +93,22 @@ void main() {
       final leaf = ConcreteLeafNode(name: 'Leaf 1');
       expect(Uuid.isValidUUID(fromString: leaf.id.toString()), true);
       expect(leaf.name, 'Leaf 1');
-      expect(leaf.parent, isNull);
-      expect(leaf.next, isNull);
-      expect(leaf.previous, isNull);
+      expect(leaf.position == Point(coords: [-77.96876463574121, 38.98951052421746]), true);
+      expect(leaf.hasParent(), isFalse);
+      expect(leaf.hasNext(), isFalse);
+      expect(leaf.hasPrevious(), isFalse);
+      expect(() => leaf.parent, throwsA(isA<NodeStructureException>().having(
+          (e) => e.toString(), 'toString()', contains('NodeStructureException: '
+          'parent node is not available.'),
+      )));
+      expect(() => leaf.next, throwsA(isA<NodeStructureException>().having(
+            (e) => e.toString(), 'toString()', contains('NodeStructureException: '
+          'next node is not available.'),
+      )));
+      expect(() => leaf.previous, throwsA(isA<NodeStructureException>().having(
+            (e) => e.toString(), 'toString()', contains('NodeStructureException: '
+          'previous node is not available.'),
+      )));
       expect(leaf.isComposite, isFalse);
     });
 
@@ -106,6 +124,21 @@ void main() {
       expect(leaf2.parent, leaf1);
       expect(leaf2.next, leaf3);
       expect(leaf2.previous, leaf1);
+
+      // Reset the node's relative
+      leaf2.resetRelatives();
+      expect(() => leaf2.parent, throwsA(isA<NodeStructureException>().having(
+            (e) => e.toString(), 'toString()', contains('NodeStructureException: '
+          'parent node is not available.'),
+      )));
+      expect(() => leaf2.next, throwsA(isA<NodeStructureException>().having(
+            (e) => e.toString(), 'toString()', contains('NodeStructureException: '
+          'next node is not available.'),
+      )));
+      expect(() => leaf2.previous, throwsA(isA<NodeStructureException>().having(
+            (e) => e.toString(), 'toString()', contains('NodeStructureException: '
+          'previous node is not available.'),
+      )));
     });
 
     test('ConcreteLeafNode notifies observers on structural changes', () {
@@ -164,7 +197,13 @@ void main() {
       composite.removeChild(leaf1);
       expect(composite.children, hasLength(2));
       expect(composite.children, isNot(contains(leaf1)));
-      expect(leaf1.parent, isNull);
+      expect(leaf1.hasParent(), isFalse);
+      expect(leaf1.hasNext(), isFalse);
+      expect(leaf1.hasPrevious(), isFalse);
+      expect(() => leaf1.parent, throwsA(isA<NodeStructureException>().having(
+            (e) => e.toString(), 'toString()', contains('NodeStructureException: '
+          'parent node is not available.'),
+      )));
     });
 
     test('ConcreteCompositeNode notifies observers on child changes', () {

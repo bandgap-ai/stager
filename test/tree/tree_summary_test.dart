@@ -3,6 +3,8 @@ library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:stager_platform/system/typed_value.dart';
+import 'package:stager_platform/tree/point.dart';
 import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/node_summary.dart';
 
@@ -70,7 +72,7 @@ void main() {
 
   group('TreeNode.summarize()', () {
     test('should return empty summary for empty tree', () {
-      final tree = ConcreteTreeNode(id: 'root', name: 'Empty Tree');
+      final tree = ConcreteTreeNode(name: 'Empty Tree');
       
       final summary = tree.summarize();
       
@@ -82,10 +84,10 @@ void main() {
     });
 
     test('should count nodes correctly in simple hierarchy', () {
-      final tree = ConcreteTreeNode(id: 'root', name: 'Root');
-      final level1Node = ConcreteCompositeNode(id: 'l1', name: 'Level 1');
-      final level2Node1 = ConcreteLeafNode(id: 'l2_1', name: 'Level 2 Node 1');
-      final level2Node2 = ConcreteLeafNode(id: 'l2_2', name: 'Level 2 Node 2');
+      final tree = ConcreteTreeNode(name: 'Root');
+      final level1Node = ConcreteCompositeNode(name: 'Level 1');
+      final level2Node1 = ConcreteLeafNode(name: 'Level 2 Node 1');
+      final level2Node2 = ConcreteLeafNode(name: 'Level 2 Node 2');
       
       tree.addChild(level1Node);
       level1Node.addChild(level2Node1);
@@ -98,20 +100,17 @@ void main() {
     });
 
     test('should extract coordinates and compute center point', () {
-      final tree = ConcreteTreeNode(id: 'root', name: 'Root');
+      final tree = ConcreteTreeNode(name: 'Root');
       
       // Create nodes with specific coordinates
-      final node1 = ConcreteLeafNode(id: 'n1', name: 'Node 1');
-      node1.properties.set<double>('latitude', 40.0);
-      node1.properties.set<double>('longitude', -74.0);
+      final node1 = ConcreteLeafNode(name: 'Node 1');
+      node1.position = Point(coords: [-74.0, 40.0]);
       
-      final node2 = ConcreteLeafNode(id: 'n2', name: 'Node 2');
-      node2.properties.set<double>('latitude', 40.2);
-      node2.properties.set<double>('longitude', -74.2);
+      final node2 = ConcreteLeafNode(name: 'Node 2');
+      node1.position = Point(coords: [-74.2, 40.2]);
       
-      final node3 = ConcreteLeafNode(id: 'n3', name: 'Node 3');
-      node3.properties.set<double>('latitude', 40.1);
-      node3.properties.set<double>('longitude', -74.1);
+      final node3 = ConcreteLeafNode(name: 'Node 3');
+      node1.position = Point(coords: [-74.1, 40.1]);
       
       tree.addChild(node1);
       tree.addChild(node2);
@@ -127,15 +126,14 @@ void main() {
     });
 
     test('should handle nodes without coordinates gracefully', () {
-      final tree = ConcreteTreeNode(id: 'root', name: 'Root');
+      final tree = ConcreteTreeNode(name: 'Root');
       
       // Node with coordinates
-      final nodeWithCoords = ConcreteLeafNode(id: 'with_coords', name: 'With Coords');
-      nodeWithCoords.properties.set<double>('latitude', 40.0);
-      nodeWithCoords.properties.set<double>('longitude', -74.0);
+      final nodeWithCoords = ConcreteLeafNode(name: 'With Coords');
+      nodeWithCoords.position = Point(coords: [-74.0, 40.0]);
       
       // Node without coordinates
-      final nodeWithoutCoords = ConcreteLeafNode(id: 'no_coords', name: 'No Coords');
+      final nodeWithoutCoords = ConcreteLeafNode(name: 'No Coords');
       
       tree.addChild(nodeWithCoords);
       tree.addChild(nodeWithoutCoords);
@@ -149,7 +147,7 @@ void main() {
     });
 
     test('should compute convex hull for multiple points', () {
-      final tree = ConcreteTreeNode(id: 'root', name: 'Root');
+      final tree = ConcreteTreeNode(name: 'Root');
       
       // Create a square of points
       final coordinates = [
@@ -161,9 +159,8 @@ void main() {
       ];
       
       for (int i = 0; i < coordinates.length; i++) {
-        final node = ConcreteLeafNode(id: 'n$i', name: 'Node $i');
-        node.properties.set<double>('latitude', coordinates[i][0]);
-        node.properties.set<double>('longitude', coordinates[i][1]);
+        final node = ConcreteLeafNode(name: 'Node $i');
+        node.position = Point(coords: [coordinates[i][1], coordinates[i][0]]);
         tree.addChild(node);
       }
       
@@ -175,16 +172,18 @@ void main() {
     });
 
     test('should calculate outline area for Level 1 nodes', () {
-      final tree = ConcreteTreeNode(id: 'root', name: 'Root');
-      final level1Node = ConcreteCompositeNode(id: 'l1', name: 'Level 1 with Outline');
+      final tree = ConcreteTreeNode(name: 'Root');
+      final level1Node = ConcreteCompositeNode(name: 'Level 1 with Outline');
       
       // Add outline area to Level 1 node (rectangular area)
-      level1Node.properties.set<List<LatLng>>('outline', [
+
+      // Gemini, can you unfuck this?
+      level1Node.setProperty('outline', TypedValue<List<LatLng>>([
         LatLng(40.0, -74.0),
         LatLng(40.1, -74.0),
         LatLng(40.1, -74.1),
         LatLng(40.0, -74.1),
-      ]);
+      ]));
       
       tree.addChild(level1Node);
       
@@ -195,22 +194,22 @@ void main() {
     });
 
     test('should handle complex nested hierarchy', () {
-      final tree = ConcreteTreeNode(id: 'root', name: 'Forest');
+      final tree = ConcreteTreeNode(name: 'Forest');
       
       // Level 1: Sites
-      final site1 = ConcreteCompositeNode(id: 'site1', name: 'Site A');
-      final site2 = ConcreteCompositeNode(id: 'site2', name: 'Site B');
+      final site1 = ConcreteCompositeNode(name: 'Site A');
+      final site2 = ConcreteCompositeNode(name: 'Site B');
       
       // Level 2: Plots within sites
-      final plot1_1 = ConcreteCompositeNode(id: 'plot1_1', name: 'Plot A1');
-      final plot1_2 = ConcreteCompositeNode(id: 'plot1_2', name: 'Plot A2');
-      final plot2_1 = ConcreteCompositeNode(id: 'plot2_1', name: 'Plot B1');
+      final plot1_1 = ConcreteCompositeNode(name: 'Plot A1');
+      final plot1_2 = ConcreteCompositeNode(name: 'Plot A2');
+      final plot2_1 = ConcreteCompositeNode(name: 'Plot B1');
       
       // Level 3: Individual trees
-      final tree1_1_1 = ConcreteLeafNode(id: 'tree1_1_1', name: 'Tree A1-1');
-      final tree1_1_2 = ConcreteLeafNode(id: 'tree1_1_2', name: 'Tree A1-2');
-      final tree1_2_1 = ConcreteLeafNode(id: 'tree1_2_1', name: 'Tree A2-1');
-      final tree2_1_1 = ConcreteLeafNode(id: 'tree2_1_1', name: 'Tree B1-1');
+      final tree1_1_1 = ConcreteLeafNode(name: 'Tree A1-1');
+      final tree1_1_2 = ConcreteLeafNode(name: 'Tree A1-2');
+      final tree1_2_1 = ConcreteLeafNode(name: 'Tree A2-1');
+      final tree2_1_1 = ConcreteLeafNode(name: 'Tree B1-1');
       
       // Build hierarchy
       tree.addChild(site1);
@@ -234,27 +233,6 @@ void main() {
         3: 3, // Plots
         4: 4, // Trees
       });
-    });
-
-    test('should handle invalid coordinate data gracefully', () {
-      final tree = ConcreteTreeNode(id: 'root', name: 'Root');
-      
-      final nodeWithInvalidCoords = ConcreteLeafNode(id: 'invalid', name: 'Invalid');
-      nodeWithInvalidCoords.properties.set('latitude', 'not_a_number');
-      nodeWithInvalidCoords.properties.set('longitude', '');
-      
-      final nodeWithValidCoords = ConcreteLeafNode(id: 'valid', name: 'Valid');
-      nodeWithValidCoords.properties.set('latitude', 40.0);
-      nodeWithValidCoords.properties.set('longitude', -74.0);
-      
-      tree.addChild(nodeWithInvalidCoords);
-      tree.addChild(nodeWithValidCoords);
-      
-      final summary = tree.summarize();
-      
-      expect(summary.totalNodes, 3);
-      expect(summary.centerPoint, isNotNull); // Should compute from valid coordinates only
-      expect(summary.centerPoint!.latitude, 40.0);
     });
 
     test('toString() should produce a meaningful string representation', () {

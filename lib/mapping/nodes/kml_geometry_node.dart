@@ -17,7 +17,6 @@ abstract class KMLGeometryNode extends ConcreteLeafNode with KMLStylable {
   /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
   /// [initialProperties]: Optional initial metadata.
   KMLGeometryNode({
-    required super.id,
     required super.name,
     required KMLStyleManager styleManager,
     String styleUrl = 'default',

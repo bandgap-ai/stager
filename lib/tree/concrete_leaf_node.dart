@@ -5,10 +5,10 @@ library;
 
 import 'package:uuid/uuid.dart';
 
-import '../builders/stager_context.dart';
-import '../tree/node_visitor.dart';
-import '../tree/tree.dart';
-import '../tree/node_observer.dart';
+import 'node_visitor.dart';
+import 'tree.dart';
+import 'node_observer.dart';
+import 'point.dart';
 import '../system/typed_value.dart';
 
 /// A concrete implementation of a [LeafNode] that provides basic functionality.
@@ -26,15 +26,12 @@ class ConcreteLeafNode extends LeafNode {
   /// This getter provides access to the data payload of the node.
   final NodeProperties _properties;
 
-  /// The parent of this node, or `null` if it is a root.
-  @override
-  LeafNode? parent;
-  /// The next sibling of this node, or `null` if it is the last child.
-  @override
-  LeafNode? next;
-  /// The previous sibling of this node, or `null` if it is the first child.
-  @override
-  LeafNode? previous;
+  /// The parent of this node, or 'this' if no parent has been set.
+  late LeafNode _parent = this;
+  /// The next sibling of this node, or 'this' if it has no next sibling.
+  late LeafNode _next = this;
+  /// The previous sibling of this node, or 'this' if it has no previous sibling.
+  late LeafNode _previous = this;
 
   /// Internal list of observers attached to this leaf node.
   final List<NodeObserver> _leafNodeObservers = [];
@@ -81,6 +78,7 @@ class ConcreteLeafNode extends LeafNode {
     return <String,TypedValue<Object>>{
       'name' : TypedValue<String>(name),
       'id' : TypedValue<UuidValue>(id),
+      'position' : TypedValue<Point>(position),
       ..._properties.map
     };
 
@@ -101,6 +99,11 @@ class ConcreteLeafNode extends LeafNode {
       id = map['id']!.value as UuidValue;
       map.remove('id');
     }
+    // Grab the position
+    if (map.containsKey('position')) {
+      position = map['position']!.value as Point;
+      map.remove('position');
+    }
 
     // Load all the properties
     final tempProps = ConcreteNodeProperties(map);
@@ -112,23 +115,67 @@ class ConcreteLeafNode extends LeafNode {
 
     return;
   }
-  
+
   @override
-  void setParent(LeafNode? parent) {
-    this.parent = parent;
+  bool hasParent() => !identical(_parent, this);
+
+  @override
+  bool hasNext() => !identical(_next, this);
+
+  @override
+  bool hasPrevious() => !identical(_previous, this);
+
+  @override
+  LeafNode get next {
+    if (hasNext()) {
+      return _next;
+    } else {
+      throw NodeStructureException('next');
+    }
+  }
+
+  @override
+  LeafNode get parent {
+    if (hasParent()) {
+      return _parent;
+    } else {
+      throw NodeStructureException('parent');
+    }
+  }
+
+  @override
+  LeafNode get previous {
+    if (hasPrevious()) {
+      return _previous;
+    } else {
+      throw NodeStructureException('previous');
+    }
+  }
+
+
+  @override
+  void setParent(LeafNode parent) {
+    _parent = parent;
     notify(); // Notify observers about the change in parent
   }
 
   @override
-  void setNext(LeafNode? next) {
-    this.next = next;
+  void setNext(LeafNode next) {
+    _next = next;
     notify(); // Notify observers about the change in next sibling
   }
 
   @override
-  void setPrevious(LeafNode? previous) {
-    this.previous = previous;
+  void setPrevious(LeafNode previous) {
+    _previous = previous;
     notify(); // Notify observers about the change in previous sibling
+  }
+
+  @override
+  void resetRelatives() {
+    _parent = this;
+    _next = this;
+    _previous = this;
   }
 
   /// Attaches a [NodeObserver] to this leaf node.
@@ -155,5 +202,4 @@ class ConcreteLeafNode extends LeafNode {
   void accept(NodeVisitor visitor) {
     visitor.visit(this);
   }
-  
 }

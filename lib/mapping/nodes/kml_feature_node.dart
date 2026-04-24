@@ -1,18 +1,29 @@
 import '../../tree/concrete_composite_node.dart';
 
+/// This is a custom exception for KMLFeatureNodes.
+class KMLFeatureNodeException implements Exception {
+  final String message;
+
+  KMLFeatureNodeException(this.message);
+
+  @override
+  String toString() => 'KMLFeatureNodeException: $message';
+}
+
 /// An abstract base class for all KML feature nodes in the Stager tree.
 ///
 /// This class represents common KML feature attributes such as visibility, 
 /// snippets, and extended data. It extends [ConcreteCompositeNode].
 abstract class KMLFeatureNode extends ConcreteCompositeNode {
-  /// Internal key for storing the visibility property.
-  static const String visibilityKey = 'kml_visibility';
 
-  /// Internal key for storing the snippet property.
-  static const String snippetKey = 'kml_snippet';
+  /// Whether the feature is drawn in the geographic view.
+  bool _visibility = true;
 
-  /// Internal key for storing the extended data property.
-  static const String extendedDataKey = 'kml_extended_data';
+  /// The short description of the feature.
+  String _snippet = '';
+
+  /// The map of custom data associated with the feature.
+  Map<String, Object> _extendedData = {};
 
   /// Creates a [KMLFeatureNode] instance.
   ///
@@ -22,7 +33,6 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
   /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
   /// [initialProperties]: Optional initial metadata.
   KMLFeatureNode({
-    required super.id,
     required super.name,
     super.initialProperties,
   });
@@ -30,23 +40,18 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
   /// Indicates whether the feature is drawn in the geographic view.
   ///
   /// Maps to the `<visibility>` element in the KML specification.
-  bool get visibility {
-    bool result = true;
-    // Adhering to the project standard of using containsProperty() instead 
-    // of null checks.
-    if (properties.contains(visibilityKey)) {
-      result = properties.get<bool>(visibilityKey);
-    }
-    return result;
-  }
+  bool get visibility => _visibility;
 
+  /// Sets whether the feature is drawn in the geographic view.
+  ///
+  /// Maps to the `<visibility>` element in the KML specification.
   set visibility(bool value) {
-    properties.set<bool>(visibilityKey, value);
+    _visibility = value;
   }
 
   /// Returns `true` if this feature has a snippet description.
   bool get hasSnippet {
-    return properties.contains(snippetKey);
+    return _snippet.isNotEmpty;
   }
 
   /// Returns the short description of the feature.
@@ -55,23 +60,27 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
   /// 
   /// Throws a [StateError] if [hasSnippet] is false.
   String get snippet {
-    late String result;
-    // Adhering to the standard of using the "has" method for initial check.
     if (hasSnippet) {
-      result = properties.get<String>(snippetKey);
+      return _snippet;
     } else {
-      throw StateError('KML Feature does not have a snippet.');
+      throw KMLFeatureNodeException('KML Feature does not have a snippet.');
     }
-    return result;
   }
 
+  /// Sets the short description of the feature.
+  ///
+  /// Maps to the `<Snippet>` element in the KML specification.
   set snippet(String value) {
-    properties.set(snippetKey, value);
+    if (value.isNotEmpty) {
+      _snippet = value;
+    } else {
+      throw KMLFeatureNodeException('Snippet cannot be empty.');
+    }
   }
 
   /// Returns `true` if this feature has custom extended data.
   bool get hasExtendedData {
-    return properties.contains(extendedDataKey);
+    return _extendedData.isNotEmpty;
   }
 
   /// Returns the map of custom data associated with the feature.
@@ -80,17 +89,14 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
   /// 
   /// Throws a [StateError] if [hasExtendedData] is false.
   Map<String, Object> get extendedData {
-    late Map<String, Object> result;
-    // Adhering to the standard of using the "has" method for initial check.
     if (hasExtendedData) {
-      result = properties.get<Map<String, Object>>(extendedDataKey);
+      return _extendedData;
     } else {
-      throw StateError('KML Feature does not have extended data.');
+      throw KMLFeatureNodeException('KML Feature does not have extended data.');
     }
-    return result;
   }
 
   set extendedData(Map<String, Object> value) {
-    properties.set(extendedDataKey, value);
+    _extendedData = value;
   }
 }

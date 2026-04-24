@@ -1,4 +1,10 @@
-## 0.0.3
+## 0.0.5
+
+* Added TypedValue, Point, BasicBuilder, StagerContext, and other core classes.
+* Overhauled nodes with many updates to follow the no-null policy and create a much better dev 
+experience.
+
+## 0.0.4
 
 * Added a generic Selection class and observer to manage UI selection state.
 
