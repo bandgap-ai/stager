@@ -6,7 +6,7 @@ library;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/tree/point.dart';
+import 'package:stager_platform/system/point.dart';
 import 'package:uuid/uuid.dart';
 
 import 'mock_node_visitor.dart';
@@ -33,27 +33,8 @@ class TestNodePropertiesObserver implements NodePropertiesObserver {
 }
 
 void main() {
-  group('NodeProperties', () {
-    test('ConcreteNodeProperties can set and get properties', () {
-      final properties = ConcreteNodeProperties();
-      properties.set<String>('name', 'Test Name');
-      properties.set<int>('value', 123);
-      properties.set<bool>('is_active', true);
-
-      expect(properties.get<String>('name'), 'Test Name');
-      expect(properties.get<int>('value'), 123);
-      expect(properties.get<bool>('is_active'), true);
-      expect(properties.contains('non_existent'), false);
-      // Check that being a moron and asking for something that isn't there
-      // throws a NodePropertyException.
-      expect(() => properties.get<String>('non_existent'),
-          throwsA(isA<NodePropertyException>()));
-    });
-
-  });
 
   group('LeafNode', () {
-
     test('ConcreteLeafNode can load properties from a map', () {
       UuidValue id = Uuid().v7obj();
       final leaf = ConcreteLeafNode(name: 'Leaf 1');
@@ -61,13 +42,13 @@ void main() {
       leaf.attach(observer);
       expect(observer.lastUpdatedNode, isNull);
       // Make some new property values
-      Map<String, TypedValue<Object>> mapInput = {
-        'id': TypedValue<UuidValue>(id),
-        'name': TypedValue<String>('Updated Name'),
-        'value': TypedValue<int>(456),
-        'is_active': TypedValue<bool>(false),
-        'position': TypedValue<Point>(Point(coords: [-77.9687646357412,
-          38.98951052421746]))
+      Map<String, Object> mapInput = {
+        'id': id,
+        'name': 'Updated Name',
+        'value': TypedValue<int>(456).toTuple(),
+        'is_active': TypedValue<bool>(false).toTuple(),
+        'position': Point(coords: [-77.9687646357412,
+          38.98951052421746]).toMap()
       };
 
       // Set them.

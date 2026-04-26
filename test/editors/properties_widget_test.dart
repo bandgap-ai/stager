@@ -21,8 +21,8 @@ void main() {
     SelectionService selectionService = SelectionService();
 
     setUp(() {
-      selectedNode = Selection<LeafNode>(ConcreteLeafNode(id: '1', name: 'Test Node'));
-      selectedNode.value = ConcreteLeafNode(id: '1', name: 'Test Node');
+      selectedNode = Selection<LeafNode>(ConcreteLeafNode(name: 'Test Node'));
+      selectedNode.value = ConcreteLeafNode(name: 'Test Node');
       selectionService.selection = selectedNode;
     });
 

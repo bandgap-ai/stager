@@ -1,47 +1,54 @@
-// Flutter packages
 import 'package:flutter_test/flutter_test.dart';
-
-// External packages
-import 'package:latlong2/latlong.dart';
-
-// Project files
 import 'package:stager_platform/mapping/kml_hole.dart';
+import 'package:stager_platform/system/point.dart';
+import 'package:stager_platform/system/typed_value.dart';
 
-/// Unit tests for the [KMLHole] class.
-///
-/// These tests verify that the KMLHole correctly stores a list of geographic 
-/// coordinates representing an inner boundary and provides a descriptive 
-/// string representation including those coordinates.
 void main() {
-  group('KMLHole', () {
-    test('should store and retrieve coordinate points', () {
-      // Arrange
+  group('KMLHole Tests', () {
+    test('should store and retrieve Point coordinates', () {
+      // Create a set of coordinates using the new Point abstraction.
       final points = [
-        LatLng(40.771, -73.970),
-        LatLng(40.775, -73.968),
-        LatLng(40.771, -73.965),
-        LatLng(40.771, -73.970),
+        Point(coords: [-73.970, 40.771]),
+        Point(coords: [-73.968, 40.775]),
+        Point(coords: [-73.965, 40.771]),
+        Point(coords: [-73.970, 40.771]),
       ];
 
-      // Act
+      // Instantiate the hole and verify its contents.
       final hole = KMLHole(points: points);
 
-      // Assert
       expect(hole.points, equals(points));
       expect(hole.points.length, 4);
     });
 
-    test('toString should contain the coordinate values', () {
-      // Arrange
-      final points = [
-        LatLng(12.34, 56.78),
-      ];
+    test('should support value-based equality', () {
+      // Create two identical hole instances.
+      final hole1 = KMLHole(points: [Point(coords: [1.0, 1.0])]);
+      final hole2 = KMLHole(points: [Point(coords: [1.0, 1.0])]);
+      
+      // Verify that they are considered equal.
+      expect(hole1, equals(hole2));
+      expect(hole1.hashCode, equals(hole2.hashCode));
+    });
+
+    test('should export and rehydrate correctly via toMap and fromMap', () {
+      // Setup a hole with specific geometry.
+      final points = [Point(coords: [10.0, 20.0])];
       final hole = KMLHole(points: points);
 
-      // Act & Assert: Verify that LatLng's own toString output is nested.
-      final output = hole.toString();
-      expect(output, contains('12.34'));
-      expect(output, contains('56.78'));
+      // Export to reified map.
+      final map = hole.toMap();
+
+      // Verify that the points are exported as a reified list of maps.
+      expect(map.containsKey('points'), isTrue);
+      final reifiedPoints = map['points'] as Map<String, Object>;
+      expect(reifiedPoints['type'], 'List<Object>');
+
+      // Perform rehydration from the map.
+      final newHole = KMLHole.fromMap(map);
+
+      // Confirm that the geometry is faithfully restored.
+      expect(newHole.points, equals(points));
     });
   });
 }

@@ -4,7 +4,7 @@ library;
 
 import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/tree/point.dart';
+import 'package:stager_platform/system/point.dart';
 
 import '../mapping/nodes/kml_polygon_node.dart';
 import '../mapping/style/kml_style_manager.dart';
@@ -24,7 +24,7 @@ List<TreeNode> _buildSampleSites() {
   // Approximate center of Meadowview Research Farm
   meadowview.position = Point(coords: [-81.86052, 36.73444]);
 
-  final planting2025 = ConcreteTreeNode(
+  final planting2025 = ConcreteCompositeNode(
     name: '2025 Planting',
     initialProperties: {
       // Location of the 2025 planting area
@@ -40,7 +40,7 @@ List<TreeNode> _buildSampleSites() {
   // Location of the 2025 planting area
   planting2025.position = Point(coords: [-81.86052, 36.73442]);
 
-  final row1 = ConcreteTreeNode(
+  final row1 = ConcreteCompositeNode(
     name: 'Row 1',
   );
   // Start of Row 1
@@ -73,7 +73,7 @@ List<TreeNode> _buildSampleSites() {
       })
     ..position = Point(coords: [-81.86055, 36.73441]));
 
-  final row2 = ConcreteTreeNode(
+  final row2 = ConcreteCompositeNode(
     name: 'Row 2',
   );
   // Start of Row 2
@@ -126,7 +126,7 @@ List<TreeNode> _buildSampleSites() {
   // Approximate center of a park in Philadelphia
   urbanPark.position = Point(coords: [-75.16, 39.95]);
 
-  final sectionA = ConcreteTreeNode(
+  final sectionA = ConcreteCompositeNode(
     name: 'Section A',
     initialProperties: {
       'outline': TypedValue<List<Map<String, TypedValue<double>>>>([
@@ -171,7 +171,7 @@ List<TreeNode> _buildSampleSites() {
   );
   adanor.position = Point(coords: [-77.76200, 39.25000]);
 
-  final westGrove = ConcreteTreeNode(
+  final westGrove = ConcreteCompositeNode(
     name: 'West Grove',
   );
   westGrove.position = Point(coords: [-77.76040, 39.25010]);
@@ -248,7 +248,7 @@ List<TreeNode> _buildSampleSites() {
       })
     ..position = Point(coords: [-77.760360, 39.250040]));
 
-  final middleGrove = ConcreteTreeNode(
+  final middleGrove = ConcreteCompositeNode(
     name: 'Middle Grove',
   );
   middleGrove.position = Point(coords: [-77.76380, 39.25020]);
@@ -366,14 +366,14 @@ List<TreeNode> _buildSampleSites() {
   final skyMeadowsTestPolygon = KMLPolygonNode(
       name: 'testPoly',
       outline: [
-        const LatLng(38.99100, -77.96610),
-        const LatLng(38.99075, -77.96632),
-        const LatLng(38.99075, -77.9659)
+        Point(coords: [-77.96610, 38.99100]),
+        Point(coords: [-77.96632, 38.99075]),
+        Point(coords: [-77.9659, 38.99075])
       ],
       styleManager: KMLStyleManager());
   skyMeadows.addChild(skyMeadowsTestPolygon);
 
-  final tacfPlanting = ConcreteTreeNode(
+  final tacfPlanting = ConcreteCompositeNode(
     name: 'TACF Planting',
   );
   tacfPlanting.position = Point(coords: [-77.96862560999737, 38.98924852060698]);
@@ -396,18 +396,18 @@ List<TreeNode> _buildSampleSites() {
   final cityCountyLawn = KMLPolygonNode(
     name: 'City County Bldg Lawn',
     outline: [
-      const LatLng(35.96086794510828, -83.91823505202085),
-      const LatLng(35.960200675079406, -83.91786155192725),
-      const LatLng(35.960571649004365, -83.91687795207916),
-      const LatLng(35.960731841751425, -83.9169568186328),
-      const LatLng(35.9605836935831, -83.91734519920821),
-      const LatLng(35.960745090761066, -83.91743745819547),
-      const LatLng(35.960798086777416, -83.91744787453274),
-      const LatLng(35.960879989641846, -83.91744489843639),
-      const LatLng(35.960973936940526, -83.91740323308728),
-      const LatLng(35.96103415950911, -83.91734222311183),
-      const LatLng(35.96110401763115, -83.9172008585346),
-      const LatLng(35.96125216482341, -83.9172886533773),
+      Point(coords: [-83.91823505202085, 35.96086794510828]),
+      Point(coords: [-83.91786155192725, 35.960200675079406]),
+      Point(coords: [-83.91687795207916, 35.960571649004365]),
+      Point(coords: [-83.9169568186328, 35.960731841751425]),
+      Point(coords: [-83.91734519920821, 35.9605836935831]),
+      Point(coords: [-83.91743745819547, 35.960745090761066]),
+      Point(coords: [-83.91744787453274, 35.960798086777416]),
+      Point(coords: [-83.91744489843639, 35.960879989641846]),
+      Point(coords: [-83.91740323308728, 35.960973936940526]),
+      Point(coords: [-83.91734222311183, 35.96103415950911]),
+      Point(coords: [-83.9172008585346, 35.96110401763115]),
+      Point(coords: [-83.9172886533773, 35.96125216482341]),
     ],
     styleManager: KMLStyleManager(),
   );
@@ -435,16 +435,16 @@ List<TreeNode> _buildSampleSites() {
   final thirdCreekGreenwayOutline = KMLPolygonNode(
     name: 'Third Creek Greenway',
     outline: [
-      const LatLng(35.951011092447814, -83.96930241434303),
-      const LatLng(35.9483579792697, -83.96835411045664),
-      const LatLng(35.9477499616183, -83.96868791342465),
-      const LatLng(35.94743673857797, -83.9689989570994),
-      const LatLng(35.94705595595465, -83.97108522564947),
-      const LatLng(35.94533012783368, -83.97019761321181),
-      const LatLng(35.950986526993695, -83.95808208275918),
-      const LatLng(35.95218408399086, -83.9581351877768),
-      const LatLng(35.948585216988796, -83.96570644600583),
-      const LatLng(35.95168663944238, -83.96751201660554),
+      Point(coords: [-83.96930241434303, 35.951011092447814]),
+      Point(coords: [-83.96835411045664, 35.9483579792697]),
+      Point(coords: [-83.96868791342465, 35.9477499616183]),
+      Point(coords: [-83.9689989570994, 35.94743673857797]),
+      Point(coords: [-83.97108522564947, 35.94705595595465]),
+      Point(coords: [-83.97019761321181, 35.94533012783368]),
+      Point(coords: [-83.95808208275918, 35.950986526993695]),
+      Point(coords: [-83.9581351877768, 35.95218408399086]),
+      Point(coords: [-83.96570644600583, 35.948585216988796]),
+      Point(coords: [-83.96751201660554, 35.95168663944238]),
     ],
     styleManager: KMLStyleManager(),
   );

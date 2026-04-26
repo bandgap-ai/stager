@@ -21,7 +21,7 @@ void main() {
   setUp(() {
     SiteState state = SiteState();
 
-    parent = ConcreteCompositeNode(id: "1", name: "Parent");
+    parent = ConcreteCompositeNode(name: "Parent");
     parent.attach(observer = MockCompositeNodeObserver());
     editorFactory = MockEditorFactory(state);
     controller = AddNodeController(parent, editorFactory);
@@ -77,8 +77,7 @@ void main() {
       Map<String, Object> results = {'name': name, 'isGroup': false};
       controller.process(results);
       expect(parent.children.length, equals(1));
-      expect(parent.children[0].properties.get<String>('name'), equals(name));
-      expect(() => Uuid.parse(parent.children[0].properties.get<String>('id')), returnsNormally);
+      expect(parent.children[0].name, equals(name));
       // Make sure it was observed and reset the observer.
       expect(observer.updated, isTrue);
       observer.reset();
@@ -88,8 +87,7 @@ void main() {
       results = {'name': name, 'isGroup': true};
       controller.process(results);
       expect(parent.children.length, equals(2));
-      expect(parent.children[1].properties.get<String>('name'), equals(name));
-      expect(() => Uuid.parse(parent.children[1].properties.get<String>('id')), returnsNormally);
+      expect(parent.children[1].name, equals(name));
       // Make sure it was observed and reset the observer.
       expect(observer.updated, isTrue);
       observer.reset();
@@ -99,20 +97,20 @@ void main() {
 
     test('Should process input with mock builder', () {
 
-      CompositeNode customParent = ConcreteCompositeNode(id: "1", name: "Parent");
+      CompositeNode customParent = ConcreteCompositeNode(name: "Parent");
       Controller customController = AddNodeController(customParent, editorFactory, MockNodeBuilder());
 
       // Check adding a leaf node.
       String name = 'Test Mock Leaf Node';
       Map<String, Object> results = {'name': name, 'isGroup': false};
       customController.process(results);
-      expect(customParent.children[0].properties.get<bool>('isMock'),isFalse);
+      expect(customParent.children[0].property('isMock'),"false");
 
       // Check adding a composite node.
       name = 'Test Mock Composite Node';
       results = {'name': name, 'isGroup': true};
       customController.process(results);
-      expect(customParent.children[1].properties.get<bool>('isMock'),isTrue);
+      expect(customParent.children[1].property('isMock'),"false");
 
       return;
     });

@@ -94,7 +94,6 @@ class KMLParser {
 
     // Instantiate the root of our Stager tree.
     treeRoot = KMLTreeRootNode(
-      id: rootId,
       name: rootName,
       styleManager: _styleManager,
       styleUrl: rootStyleUrl,

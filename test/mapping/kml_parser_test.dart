@@ -38,7 +38,7 @@ void main() {
 
       // Assert: Verify the root node type and its properties.
       expect(root, isA<KMLTreeRootNode>());
-      expect(root.properties.get<String>("name"), 'Test Document');
+      expect(root.name, 'Test Document');
       expect(root.children, isEmpty);
     });
 
@@ -66,11 +66,11 @@ void main() {
       expect(root.children.length, 1);
       
       final folder = root.children.first as KMLFolderNode;
-      expect(folder.properties.get<String>("name"), 'Folder 1');
+      expect(folder.name, 'Folder 1');
       expect(folder.children.length, 1);
 
       final placemark = folder.children.first as KMLPlacemarkNode;
-      expect(placemark.properties.get<String>("name"), 'Placemark 1');
+      expect(placemark.name, 'Placemark 1');
     });
 
     /// Verifies that <Point> geometries are correctly extracted into 
@@ -96,11 +96,11 @@ void main() {
       
       // Assert: Geometry is a child of the placemark in the new hierarchy.
       final pointNode = placemark.children.first as KMLPointNode;
-      final location = pointNode.location;
+      final location = pointNode.position;
 
       // KML spec uses Lon,Lat order. Stager uses Lat,Lon. Verify the swap.
-      expect(location.latitude, closeTo(37.0, 0.0001));
-      expect(location.longitude, closeTo(-122.0, 0.0001));
+      expect(location.y, closeTo(37.0, 0.0001));
+      expect(location.x, closeTo(-122.0, 0.0001));
     });
 
     /// Verifies that styles defined *after* their usage in the XML document 

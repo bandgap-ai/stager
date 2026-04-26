@@ -1,18 +1,13 @@
-// Flutter packages
 import 'package:flutter_test/flutter_test.dart';
-
-// External packages
-import 'package:latlong2/latlong.dart';
-
-// Project files
 import 'package:stager_platform/mapping/nodes/kml_polygon_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_geometry_node.dart';
 import 'package:stager_platform/mapping/kml_hole.dart';
 import 'package:stager_platform/mapping/style/kml_style_manager.dart';
+import 'package:stager_platform/system/point.dart';
+import 'package:stager_platform/system/typed_value.dart';
 
-/// Unit tests for the [KMLPolygonNode] class.
 void main() {
-  group('KMLPolygonNode', () {
+  group('KMLPolygonNode Tests', () {
     late KMLStyleManager manager;
 
     setUp(() {
@@ -20,71 +15,89 @@ void main() {
     });
 
     test('should correctly instantiate and inherit from KMLGeometryNode', () {
-      // Arrange & Act
+      // Create a polygon node and verify its type hierarchy and initial name.
       final node = KMLPolygonNode(
-        id: 'poly1',
         name: 'My Polygon',
         styleManager: manager,
         outline: [],
       );
 
-      // Assert
       expect(node, isA<KMLGeometryNode>());
-      expect(node.properties.get<String>('id'), 'poly1');
+      expect(node.name, 'My Polygon');
       expect(node.isComposite, isFalse);
     });
 
-    test('should initialize with the provided outline and holes', () {
-      // Arrange
+    test('should initialize with provided outline and holes as intrinsic members', () {
+      // Setup an outer boundary and an inner hole using the Point abstraction.
       final outline = [
-        LatLng(40.0, -70.0),
-        LatLng(41.0, -71.0),
-        LatLng(40.0, -71.0),
-        LatLng(40.0, -70.0),
+        Point(coords: [-70.0, 40.0]),
+        Point(coords: [-71.0, 41.0]),
+        Point(coords: [-71.0, 40.0]),
+        Point(coords: [-70.0, 40.0]),
       ];
       final holes = [
-        KMLHole(points: [LatLng(0, 0), LatLng(1, 1), LatLng(0, 1)]),
+        KMLHole(points: [Point(coords: [0.0, 0.0]), Point(coords: [1.0, 1.0])]),
       ];
 
-      // Act
+      // Instantiate the node and verify that geometry is stored in intrinsic members.
       final node = KMLPolygonNode(
-        id: 'poly_init',
         name: 'Initial Polygon',
         styleManager: manager,
         outline: outline,
         holes: holes,
       );
 
-      // Assert
       expect(node.outline, equals(outline));
       expect(node.holes, equals(holes));
     });
 
-    test('should retrieve outline and holes via strongly-typed accessors', () {
-      // Arrange
-      final outline = [LatLng(0, 0), LatLng(1, 1), LatLng(0, 1)];
-      final holes = [KMLHole(points: [LatLng(0.1, 0.1), LatLng(0.2, 0.2), LatLng(0.1, 0.2)])];
+    test('should update geometry via intrinsic setters', () {
+       final node = KMLPolygonNode(
+        name: 'Update Polygon',
+        styleManager: manager,
+        outline: [],
+      );
+
+      final newOutline = [Point(coords: [1.0, 1.0])];
+      final newHoles = [KMLHole(points: [Point(coords: [0.5, 0.5])])];
       
+      node.outline = newOutline;
+      node.holes = newHoles;
+
+      expect(node.outline, equals(newOutline));
+      expect(node.holes, equals(newHoles));
+    });
+
+    test('should export and rehydrate correctly via toMap and fromMap', () {
+      // Setup a complex polygon with an outline and a hole.
+      final outline = [Point(coords: [2.0, 3.0])];
+      final holes = [KMLHole(points: [Point(coords: [2.1, 3.1])])];
       final node = KMLPolygonNode(
-        id: 'poly2',
-        name: 'Geo Polygon',
+        name: 'Export Polygon',
         styleManager: manager,
         outline: outline,
         holes: holes,
       );
 
-      // Act
-      final retrievedOutline = node.outline;
-      final retrievedHoles = node.holes;
+      // Export the full node state to a reified map.
+      final map = node.toMap();
 
-      // Assert
-      expect(retrievedOutline, equals(outline));
-      expect(retrievedHoles, equals(holes));
+      // Verify that geometry members are correctly captured in the tagged record set.
+      expect(map.containsKey('outline'), isTrue);
+      expect(map.containsKey('kml_holes'), isTrue);
       
-      // Assert: Verify internal storage in NodeProperties.
-      expect(node.properties.get<List<LatLng>>('outline'), equals(outline));
-      expect(node.properties.get<List<KMLHole>>('kml_holes'), equals(holes));
-    });
+      // Perform rehydration into a new node instance.
+      final newNode = KMLPolygonNode(
+        name: 'Blank',
+        styleManager: manager,
+        outline: [],
+      );
+      newNode.fromMap(map);
 
+      // Confirm that both identity and complex geometric structures are restored.
+      expect(newNode.name, 'Export Polygon');
+      expect(newNode.outline, equals(outline));
+      expect(newNode.holes, equals(holes));
+    });
   });
 }

@@ -28,29 +28,27 @@ void main() {
 
     test('should work with ConcreteLeafNode', () {
       // Arrange
-      final initialNode = ConcreteLeafNode(id: '0', name: 'Initial');
+      final initialNode = ConcreteLeafNode(name: 'Initial');
       final visitor = GenericSelectionVisitor<ConcreteLeafNode>(initialNode);
-      final newNode = ConcreteLeafNode(id: '1', name: 'New Node');
+      final newNode = ConcreteLeafNode(name: 'New Node');
 
       // Act
       visitor.visit(newNode);
 
       // Assert
       expect(visitor.value, newNode);
-      expect(visitor.value.properties.get<String>('name'), 'New Node');
+      expect(visitor.value.name, 'New Node');
     });
 
     test('should work with KMLPlacemarkNode', () {
       // Arrange
       final styleManager = KMLStyleManager();
       final initialNode = KMLPlacemarkNode(
-        id: 'p0',
         name: 'Initial Placemark',
         styleManager: styleManager,
       );
       final visitor = GenericSelectionVisitor<KMLPlacemarkNode>(initialNode);
       final newNode = KMLPlacemarkNode(
-        id: 'p1',
         name: 'New Placemark',
         styleManager: styleManager,
       );
@@ -60,7 +58,7 @@ void main() {
 
       // Assert
       expect(visitor.value, newNode);
-      expect(visitor.value.properties.get<String>('name'), 'New Placemark');
+      expect(visitor.value.name, 'New Placemark');
     });
 
     test('should work with complex types', () {

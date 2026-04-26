@@ -9,9 +9,9 @@ void main() {
 
     test('should serialize and deserialize a tree structure', () {
       // Arrange
-      final leaf1 = ConcreteLeafNode(id: 'leaf1', name: 'Leaf 1');
-      final leaf2 = ConcreteLeafNode(id: 'leaf2', name: 'Leaf 2');
-      final comp1 = ConcreteCompositeNode(id: 'comp1', name: 'Composite 1');
+      final leaf1 = ConcreteLeafNode(name: 'Leaf 1');
+      final leaf2 = ConcreteLeafNode(name: 'Leaf 2');
+      final comp1 = ConcreteCompositeNode(name: 'Composite 1');
       comp1.addChild(leaf2);
       final site1 = ConcreteTreeNode(
         id: 'site1',
@@ -30,17 +30,17 @@ void main() {
       expect(deserializedTree, isA<List<TreeNode>>());
       expect(deserializedTree.length, 1);
       final deserializedSite1 = deserializedTree.first;
-      expect(deserializedSite1.properties.get<String>('name'), 'Site 1');
+      expect(deserializedSite1.name, 'Site 1');
       expect((deserializedSite1 as CompositeNode).children.length, 2);
       final deserializedLeaf1 =
           (deserializedSite1 as CompositeNode).children.first;
-      expect(deserializedLeaf1.properties.get<String>('name'), 'Leaf 1');
+      expect(deserializedLeaf1.name, 'Leaf 1');
       final deserializedComp1 =
           (deserializedSite1 as CompositeNode).children.last as CompositeNode;
-      expect(deserializedComp1.properties.get<String>('name'), 'Composite 1');
+      expect(deserializedComp1.name, 'Composite 1');
       expect(deserializedComp1.children.length, 1);
       final deserializedLeaf2 = deserializedComp1.children.first;
-      expect(deserializedLeaf2.properties.get<String>('name'), 'Leaf 2');
+      expect(deserializedLeaf2.name, 'Leaf 2');
     });
 
     test('should throw FormatException when JSON is not a list', () {

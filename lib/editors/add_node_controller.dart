@@ -43,9 +43,9 @@ class AddNodeController extends Controller<CompositeNode> {
     // Create the node. The build will handle linking it to the parent (state)
     // and notifying the observers.
     if (mapInput['isGroup'] as bool) {
-      nodeBuilder.buildCompositeNode(id, name, state);
+      nodeBuilder.buildCompositeNode(name, state);
     } else {
-      nodeBuilder.buildLeafNode(id, name, state);
+      nodeBuilder.buildLeafNode(name, state);
     }
   }
 }

@@ -17,7 +17,6 @@ class KMLPlacemarkNode extends KmlStylableFeatureNode {
   /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
   /// [initialProperties]: Optional map of initial metadata for the node.
   KMLPlacemarkNode({
-    required super.id,
     required super.name,
     required super.styleManager,
     super.styleUrl,

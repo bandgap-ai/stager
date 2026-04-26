@@ -1,17 +1,12 @@
-// Flutter packages
 import 'package:flutter_test/flutter_test.dart';
-
-// External packages
-import 'package:latlong2/latlong.dart';
-
-// Project files
 import 'package:stager_platform/mapping/nodes/kml_path_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_geometry_node.dart';
 import 'package:stager_platform/mapping/style/kml_style_manager.dart';
+import 'package:stager_platform/system/point.dart';
+import 'package:stager_platform/system/typed_value.dart';
 
-/// Unit tests for the [KMLPathNode] class.
 void main() {
-  group('KMLPathNode', () {
+  group('KMLPathNode Tests', () {
     late KMLStyleManager manager;
 
     setUp(() {
@@ -19,63 +14,76 @@ void main() {
     });
 
     test('should correctly instantiate and inherit from KMLGeometryNode', () {
-      // Arrange & Act
+      // Create a node with an empty outline and verify its type and initial state.
       final node = KMLPathNode(
-        id: 'path1',
         name: 'My Path',
         styleManager: manager,
         outline: [],
       );
 
-      // Assert
       expect(node, isA<KMLGeometryNode>());
-      expect(node.properties.get<String>('id'), 'path1');
+      expect(node.name, 'My Path');
       expect(node.isComposite, isFalse);
     });
 
-    test('should initialize with the provided outline', () {
-      // Arrange
+    test('should initialize and retrieve outline as intrinsic member', () {
+      // Setup a set of coordinates using the new Point abstraction.
       final points = [
-        LatLng(40.0, -70.0),
-        LatLng(41.0, -71.0),
+        Point(coords: [-70.0, 40.0]),
+        Point(coords: [-71.0, 41.0]),
       ];
 
-      // Act
+      // Instantiate the node and verify that the points are stored as members.
       final node = KMLPathNode(
-        id: 'path_init',
         name: 'Initial Path',
         styleManager: manager,
         outline: points,
       );
 
-      // Assert
       expect(node.outline, equals(points));
     });
 
-    test('should retrieve outline via strongly-typed accessor', () {
-      // Arrange
-      final points = [
-        LatLng(40.0, -70.0),
-        LatLng(41.0, -71.0),
-      ];
+    test('should update outline via setter', () {
+       final node = KMLPathNode(
+        name: 'Update Path',
+        styleManager: manager,
+        outline: [],
+      );
+
+      final newPoints = [Point(coords: [1.0, 1.0])];
+      node.outline = newPoints;
+
+      expect(node.outline, equals(newPoints));
+    });
+
+    test('should export and rehydrate correctly via toMap and fromMap', () {
+      // Setup a node with specific path geometry.
+      final points = [Point(coords: [2.0, 3.0])];
       final node = KMLPathNode(
-        id: 'path2',
-        name: 'River Path',
+        name: 'Export Path',
         styleManager: manager,
         outline: points,
       );
 
-      // Act
-      final retrievedOutline = node.outline;
+      // Export to reified map.
+      final map = node.toMap();
 
-      // Assert: Verify via accessor.
-      expect(retrievedOutline, equals(points));
+      // Verify that the outline is exported as a reified list of points.
+      expect(map.containsKey('outline'), isTrue);
+      final reifiedOutline = map['outline']! as List<Object>;
+      expect(reifiedOutline.length, 1);
       
-      // Assert: Verify internal storage in NodeProperties.
-      final rawOutline = node.properties.get<List<LatLng>>('outline');
-      expect(rawOutline.length, 2);
-      expect(rawOutline[0], equals(points[0]));
-    });
+      // Perform rehydration from the map into a new node.
+      final newNode = KMLPathNode(
+        name: 'Blank',
+        styleManager: manager,
+        outline: [],
+      );
+      newNode.fromMap(map);
 
+      // Confirm that the geometry is faithfully restored.
+      expect(newNode.name, 'Export Path');
+      expect(newNode.outline, equals(points));
+    });
   });
 }

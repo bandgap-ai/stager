@@ -538,7 +538,7 @@ void main() {
 
         // Arrange: Select a node
         SelectionService selectionService = SelectionService();
-        selectionService.selection = Selection<ConcreteLeafNode>(ConcreteLeafNode(id: '1', name: 'Test Node'));
+        selectionService.selection = Selection<ConcreteLeafNode>(ConcreteLeafNode(name: 'Test Node'));
 
         // Act
         await pumpPropertiesWidget(tester);

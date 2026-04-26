@@ -5,12 +5,12 @@ import 'package:stager_platform/mapping/style/kml_style_manager.dart';
 
 // A mock visitor to verify visitation
 class MockVisitor implements NodeVisitor {
-  final List<String> visitedIds = [];
+  final List<String> visitedNames = [];
 
   @override
   void visit(Object node) {
     if (node is KMLPlacemarkNode) {
-      visitedIds.add(node.id.toString());
+      visitedNames.add(node.name.toString());
     }
   }
 }
@@ -19,7 +19,6 @@ void main() {
   test('KmlPlacemarkNode accepts NodeVisitor', () {
     final manager = KMLStyleManager();
     final placemark = KMLPlacemarkNode(
-      id: 'pm1',
       name: 'Test',
       styleManager: manager,
     );
@@ -27,6 +26,6 @@ void main() {
     final visitor = MockVisitor();
     placemark.accept(visitor);
 
-    expect(visitor.visitedIds, contains('pm1'));
+    expect(visitor.visitedNames, contains('Test'));
   });
 }

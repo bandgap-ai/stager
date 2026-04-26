@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'node_properties.dart';
 import 'observable_subject.dart';
 import 'node_visitor.dart';
-import 'point.dart';
+import '../system/point.dart';
 import '../system/typed_value.dart';
 
 
@@ -202,7 +202,7 @@ abstract class LeafNode implements ObservableSubject {
   bool containsProperty(String key);
 
   /// Returns the full set of intrinsic and generic properties as a map.
-  Map<String, TypedValue<Object>> toMap();
+  Map<String, Object> toMap();
 
   /// Loads the full set of intrinsic and generic properties from a map. The map
   /// should contain key-value pairs representing the properties already set by
@@ -219,7 +219,7 @@ abstract class LeafNode implements ObservableSubject {
   /// generic properties.
   ///
   /// [inputMap]: The map containing the properties to be loaded.
-  void fromMap(Map<String, TypedValue<Object>> inputMap);
+  void fromMap(Map<String, Object> inputMap);
 
   /// Accepts a visitor to perform some operation on the node.
   ///

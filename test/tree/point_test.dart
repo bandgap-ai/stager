@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/builders/stager_context.dart';
 import 'package:stager_platform/system/typed_value.dart';
-import 'package:stager_platform/tree/point.dart';
+import 'package:stager_platform/system/point.dart';
 
 void main() {
   group('Point Properties', () {
@@ -72,11 +72,16 @@ void main() {
     test('Test toMap()', () {
       Point point = Point(coords: [1.0, 2.0, 3.0], system: CoordinateSystem.grid);
       print(point.toMap());
-      final pointMap = point.toMap();
-      final coords = pointMap['coords'] as TypedValue<List<double>>;
-      expect(coords.value, [1.0, 2.0, 3.0]);
+      var pointMap = point.toMap();
+      final coords = pointMap['coords'] as List<double>;
+      expect(coords, [1.0, 2.0, 3.0]);
       expect(pointMap['system'] is String, true);
       expect(pointMap['system'], 'grid');
+      // Create another point with the default coordinate system and make sure
+      // that wgs84 doesn't show up in the map.
+      point = Point(coords: [1.0, 2.0, 3.0]);
+      pointMap = point.toMap();
+      expect(pointMap['system'] is String, false);
     });
 
     test('Test toString()',() {
@@ -89,8 +94,15 @@ void main() {
     test('Test the basic builder for the point',() {
       Point point = Point(coords: [1.0, 2.0, 3.0], system: CoordinateSystem.grid);
       StagerContext context = StagerContext(point.toMap());
-      Point builtPoint = buildStagerPoint(context);
+      Point builtPoint = buildPoint(context);
       expect(point.toString(), builtPoint.toString());
+      // Send a point with the default coordinate system and make sure that the
+      // build function automatically defaults to wgs84.
+      point = Point(coords: [1.0, 2.0, 3.0]);
+      context = StagerContext(point.toMap());
+      builtPoint = buildPoint(context);
+      expect(point.toString(), builtPoint.toString());
+      expect(builtPoint.system, CoordinateSystem.wgs84);
     });
   });
 }

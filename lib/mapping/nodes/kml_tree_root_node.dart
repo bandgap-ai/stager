@@ -2,10 +2,10 @@
 import 'dart:math' as math;
 
 // External packages
-import 'package:latlong2/latlong.dart';
 
 import '../../tree/node_summary.dart';
 import '../../tree/tree.dart';
+import '../../system/point.dart';
 import '../style/kml_style_manager.dart';
 import '../style/kml_stylable.dart';
 import 'kml_path_node.dart';
@@ -29,7 +29,6 @@ class KMLTreeRootNode extends ConcreteTreeNode with KMLStylable {
   /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
   /// [initialProperties]: Optional initial metadata for the node.
   KMLTreeRootNode({
-    required super.id,
     required super.name,
     required KMLStyleManager styleManager,
     String styleUrl = 'default',
@@ -43,7 +42,7 @@ class KMLTreeRootNode extends ConcreteTreeNode with KMLStylable {
   @override
   NodeSummary summarize() {
     final nodeCountsByLevel = <int, int>{};
-    final validCoordinates = <LatLng>[];
+    final validCoordinates = <Point>[];
     final allNodes = <LeafNode>[];
 
     // Iteratively traverse the entire tree starting from this root.
@@ -59,7 +58,7 @@ class KMLTreeRootNode extends ConcreteTreeNode with KMLStylable {
       // Geographic Extraction: Use the new strongly-typed node API.
       // Optimized Branch Order: Check for point geometries first.
       if (node is KMLPointNode) {
-        validCoordinates.add(node.location);
+        validCoordinates.add(node.position);
       } else if (node is KMLPathNode) {
         validCoordinates.addAll(node.outline);
       } else if (node is KMLPolygonNode) {
@@ -109,21 +108,21 @@ class KMLTreeRootNode extends ConcreteTreeNode with KMLStylable {
 
   /// Computes the geographic center point (centroid) of a set of coordinates.
   /// 
-  /// Returns a non-nullable [LatLng].
+  /// Returns a Point.
   /// 
   /// Throws a [StateError] if the [points] list is empty.
-  LatLng _computeCenterPoint(List<LatLng> points) {
-    late LatLng result;
+  Point _computeCenterPoint(List<Point> points) {
+    late Point result;
     if (points.isEmpty) {
       throw StateError('Cannot compute center point: no coordinates available.');
     } else {
       double sumLat = 0.0;
       double sumLng = 0.0;
       for (final point in points) {
-        sumLat += point.latitude;
-        sumLng += point.longitude;
+        sumLat += point.y;
+        sumLng += point.x;
       }
-      result = LatLng(sumLat / points.length, sumLng / points.length);
+      result = Point(coords: [sumLng / points.length, sumLat / points.length]);
     }
     return result;
   }
@@ -134,33 +133,33 @@ class KMLTreeRootNode extends ConcreteTreeNode with KMLStylable {
   /// all points in the set.
   /// 
   /// Throws a [StateError] if the [points] list is empty.
-  List<LatLng> _computeConvexHull(List<LatLng> points) {
-    late List<LatLng> result;
+  List<Point> _computeConvexHull(List<Point> points) {
+    late List<Point> result;
     if (points.isEmpty) {
       throw StateError('Cannot compute convex hull: no coordinates available.');
     } else if (points.length < 3) {
-      result = List<LatLng>.from(points);
+      result = List<Point>.from(points);
     } else {
       // Find the bottom-most point (lowest latitude).
-      LatLng start = points[0];
+      Point start = points[0];
       for (final point in points) {
-        if (point.latitude < start.latitude || 
-            (point.latitude == start.latitude && point.longitude < start.longitude)) {
+        if (point.y < start.y || 
+            (point.y == start.y && point.x < start.x)) {
           start = point;
         }
       }
 
       // Sort points by polar angle relative to the start point.
-      final sorted = List<LatLng>.from(points);
+      final sorted = List<Point>.from(points);
       sorted.remove(start);
       sorted.sort((a, b) {
-        final angleA = math.atan2(a.latitude - start.latitude, a.longitude - start.longitude);
-        final angleB = math.atan2(b.latitude - start.latitude, b.longitude - start.longitude);
+        final angleA = math.atan2(a.y - start.y, a.x - start.x);
+        final angleB = math.atan2(b.y - start.y, b.x - start.x);
         return angleA.compareTo(angleB);
       });
 
       // Perform the scan to build the hull.
-      final hull = <LatLng>[start];
+      final hull = <Point>[start];
       for (final point in sorted) {
         while (hull.length > 1 && 
                _crossProduct(hull[hull.length - 2], hull[hull.length - 1], point) <= 0) {
@@ -177,8 +176,8 @@ class KMLTreeRootNode extends ConcreteTreeNode with KMLStylable {
   /// 
   /// Returns a positive value for a counter-clockwise turn, negative for a 
   /// clockwise turn, and zero for collinear points.
-  double _crossProduct(LatLng p1, LatLng p2, LatLng p3) {
-    return (p2.longitude - p1.longitude) * (p3.latitude - p1.latitude) - 
-           (p2.latitude - p1.latitude) * (p3.longitude - p1.longitude);
+  double _crossProduct(Point p1, Point p2, Point p3) {
+    return (p2.x - p1.x) * (p3.y - p1.y) - 
+           (p2.y - p1.y) * (p3.x - p1.x);
   }
 }

@@ -21,7 +21,6 @@ class KMLFolderNode extends KMLFeatureNode {
   /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
   /// [initialProperties]: Optional map of initial metadata for the node.
   KMLFolderNode({
-    required super.id,
     required super.name,
     super.initialProperties,
   });

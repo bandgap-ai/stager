@@ -9,6 +9,7 @@ import 'package:stager_platform/mapping/kml_file.dart';
 import 'package:stager_platform/mapping/nodes/kml_tree_root_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_placemark_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_point_node.dart';
+import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/tree/node_visitor.dart';
 import 'kml_mock.dart';
 
@@ -24,12 +25,8 @@ class IntegrationTestVisitor extends NodeVisitor {
   void visit(Object node) {
     visitCount++;
     // Capture names from KML-specific nodes to verify identity.
-    if (node is KMLTreeRootNode) {
-      nodeNames.add(node.properties.get<String>('name'));
-    } else if (node is KMLPlacemarkNode) {
-      nodeNames.add(node.properties.get<String>('name'));
-    } else if (node is KMLPointNode) {
-      nodeNames.add(node.properties.get<String>('name'));
+    if (node is LeafNode) {
+      nodeNames.add(node.name);
     }
   }
 }
@@ -90,7 +87,7 @@ void main() {
 
         // 3. Assert: Basic verification of the parsed root.
         expect(root, isA<KMLTreeRootNode>());
-        expect(root.properties.get<String>('name'), 'KML Document');
+        expect(root.name, 'KML Document');
         
         // Refactored: Root contains 1 child (Placemark).
         expect(root.children.length, 1);
@@ -127,8 +124,8 @@ void main() {
         
         // Verify that the coordinates (Lat, Lon) match the Wikipedia 
         // example's input (Lon, Lat), proving the swap logic.
-        expect(summary.centerPoint?.latitude, closeTo(40.714172, 0.000001));
-        expect(summary.centerPoint?.longitude, closeTo(-74.006393, 0.000001));
+        expect(summary.centerPoint?.y, closeTo(40.714172, 0.000001));
+        expect(summary.centerPoint?.x, closeTo(-74.006393, 0.000001));
         
         // Print results to console, as indicated in the plan's example.
         print('Map center: ${summary.centerPoint}');

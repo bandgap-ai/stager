@@ -56,6 +56,24 @@ of factory constructors. Finally, it allows us to construct classes via a
 lookup table created by the Dart code generator instead of hard-wiring the
 necessary logic everywhere.
 
+### toMap() and fromMap()
+
+Many Stager data classes offer `toMap()` and `fromMap()` utility functions.
+There are several important notes to keep in mind when implementing these
+methods on subclasses:
+1. In `toMap()` implementations, call `super.toMap()`, if it exists, FIRST and 
+add the values of any other items to that map instead of trying to create it 
+from scratch. This ensures all the base class properties are captured 
+correctly.
+2. In `fromMap()` implementations, call `super.fromMap(map)`, if it exists, 
+AFTER removing all of the values for any local (`this`) properties. This
+ensures that the base class does not try to read these properties.
+3. If a class has a well-typed member, use its own `toMap()` and `fromMap()`
+routines to write it and read it from the map directly.
+4. If a class has an ambiguous type, is a collection of multiple type ("bag of
+types"), or is generally ornery when serialized, wrap it in a 
+[`TypedValue`](lib/system/typed_value.dart).
+
 ## Developer Workflow
 
 Development on the Stager Platform is primarily driven through the included

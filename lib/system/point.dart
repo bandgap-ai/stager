@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:latlong2/latlong.dart';
 import '../builders/basic_builder.dart';
 import '../builders/stager_context.dart';
-import '../system/typed_value.dart';
+import 'typed_value.dart';
 
 /// Supported coordinate reference systems within the Stager Platform.
 enum CoordinateSystem {
@@ -31,10 +31,11 @@ class PointConversionException implements Exception {
 /// This builder fulfills the requirement to register complex types with the
 /// platform's dynamic factory system.
 @BasicBuilder(name: 'Point')
-Point buildStagerPoint(StagerContext context) {
+Point buildPoint(StagerContext context) {
   // Extract the raw value map from the context.
-  final coords = context.get<TypedValue<List<double>>>('coords').value;
-  final system = CoordinateSystem.values.byName(context.get<String>('system'));
+  final coords = context.get<List<double>>('coords');
+  final system = CoordinateSystem.values.byName(
+      context.getOrDefault<String>('system','wgs84'));
 
   return Point(coords: coords, system: system);
 }
@@ -82,7 +83,7 @@ class Point {
   /// [coords]: The coordinate values. Defaults to [0.0, 0.0, 0.0].
   /// [system]: The CRS used. Defaults to [CoordinateSystem.wgs84].
   /// [converter]: Function to resolve [LatLng]. Defaults to [defaultConverter].
-  Point({
+  const Point({
     this.coords = const [0.0, 0.0, 0.0],
     this.system = CoordinateSystem.wgs84,
     this.converter = _basicWGS84ToLatLng,
@@ -122,13 +123,14 @@ class Point {
   /// Exports the point state to a map structure for persistence or similar
   /// manipulation.
   ///
-  /// Includes a [TypedValue] for coordinates and a raw string for the system.
+  /// Includes a [TypedValue] for coordinates and a raw string for the system if
+  /// the system is not [CoordinateSystem.wgs84], which is the default value.
   ///
   /// Returns a map.
   Map<String, Object> toMap() {
     return {
-      'coords': TypedValue<List<double>>(coords),
-      'system': system.name,
+      'coords': coords,
+      if (system != CoordinateSystem.wgs84) 'system': system.name,
     };
   }
 

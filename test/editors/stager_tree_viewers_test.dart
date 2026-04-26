@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/node_properties_view.dart';
 import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/system/point.dart';
 import 'package:stager_platform/editors/stager_tree_viewers.dart';
 import 'package:stager_platform/editors/tree_icon_provider.dart';
 
@@ -18,12 +19,8 @@ void main() {
     late NodeProperties testProperties;
 
     setUp(() {
-      node = ConcreteLeafNode(id: 'test_id', name: 'Test Node');
-      testProperties = node.properties;
-      testProperties.set<String>('id', 'test_id');
-      testProperties.set<String>('name', 'Test Node');
-      testProperties.set<double>('latitude', 36.73444);
-      testProperties.set<double>('longitude', -81.86052);
+      node = ConcreteLeafNode(name: 'Test Node');
+      node.position = Point(coords: [-81.86052, 36.73444]);
     });
 
     testWidgets('should display node properties correctly', (WidgetTester tester) async {
@@ -82,7 +79,7 @@ void main() {
       expect(find.text('Test Node'), findsOneWidget);
 
       // Update property
-      testProperties.set<String>('name', 'Updated Node');
+      node.name = 'Updated Node';
       await tester.pump();
 
       // Verify update
@@ -110,7 +107,7 @@ void main() {
     late TreeIconProvider iconProvider;
 
     setUp(() {
-      testLeafNode = ConcreteLeafNode(id: 'leaf1', name: 'Test Leaf');
+      testLeafNode = ConcreteLeafNode(name: 'Test Leaf');
       iconProvider = TreeIconProvider();
     });
 
@@ -187,9 +184,9 @@ void main() {
     late TreeIconProvider iconProvider;
 
     setUp(() {
-      testCompositeNode = ConcreteCompositeNode(id: 'comp1', name: 'Test Composite');
-      final child1 = ConcreteLeafNode(id: 'leaf1', name: 'Child 1');
-      final child2 = ConcreteLeafNode(id: 'leaf2', name: 'Child 2');
+      testCompositeNode = ConcreteCompositeNode(name: 'Test Composite');
+      final child1 = ConcreteLeafNode(name: 'Child 1');
+      final child2 = ConcreteLeafNode(name: 'Child 2');
       testCompositeNode.addChild(child1);
       testCompositeNode.addChild(child2);
       iconProvider = TreeIconProvider();

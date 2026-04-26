@@ -2,21 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/leaf_node_editor.dart';
 import 'package:stager_platform/editors/single_point_map_editor.dart';
+import 'package:stager_platform/system/typed_value.dart';
+import 'package:stager_platform/system/point.dart';
 import 'package:stager_platform/tree/tree.dart';
 
 void main() {
   late ConcreteLeafNode node;
-  late NodeProperties testProperties;
 
   setUp(() {
-    node = ConcreteLeafNode(id: 'test_id', name: 'Test Node');
-    testProperties = node.properties;
+    node = ConcreteLeafNode(name: 'Test Node');
   });
 
   group('LeafNodeEditor Tests', () {
     testWidgets('LeafNodeEditor displays title and content', (WidgetTester tester) async {
-      testProperties.set('name', 'Test Node');
-      testProperties.set('description', 'Some description');
+      node.setProperty('description', TypedValue<String>('Some description'));
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
           body: LeafNodeEditor(state:node),
@@ -30,8 +29,7 @@ void main() {
     });
 
     testWidgets('LeafNodeEditor displays latitude and longitude', (WidgetTester tester) async {
-      testProperties.set('latitude', 10.0);
-      testProperties.set('longitude', 20.0);
+      node.position = Point(coords: [20.0, 10.0]);
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
           body: LeafNodeEditor(state: node),
@@ -45,10 +43,9 @@ void main() {
     });
 
     testWidgets('LeafNodeEditor returns updated properties on Save', (WidgetTester tester) async {
-      testProperties.set('name', 'Old Name');
-      testProperties.set('description', 'Old Description');
-      testProperties.set('latitude', 1.0);
-      testProperties.set('longitude', 2.0);
+      node.name = 'Old Name';
+      node.setProperty('description', TypedValue<String>('Old Description'));
+      node.position = Point(coords: [2.0, 1.0]);
 
       Map<String, dynamic>? result;
 
@@ -89,8 +86,7 @@ void main() {
     });
 
     testWidgets('LeafNodeEditor displays position method widget and switches editors', (WidgetTester tester) async {
-      testProperties.set('latitude', 10.0);
-      testProperties.set('longitude', 20.0);
+      node.position = Point(coords: [20.0, 10.0]);
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(

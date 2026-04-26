@@ -71,7 +71,6 @@ class SiteState implements ObservableSubject {
   /// [treeData]. All observers are then notified of the change.
   TreeNode addSite(String name) {
     final newSite = ConcreteTreeNode(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,
     );
     _treeData.add(newSite);

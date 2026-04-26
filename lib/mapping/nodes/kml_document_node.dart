@@ -15,7 +15,6 @@ class KMLDocumentNode extends KmlStylableFeatureNode {
   /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
   /// [initialProperties]: Optional initial metadata.
   KMLDocumentNode({
-    required super.id,
     required super.name,
     required super.styleManager,
     super.styleUrl = 'default',

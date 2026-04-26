@@ -117,7 +117,7 @@ class _MapEditorState extends State<MapEditor> {
     if (mounted && selectionService.isSet()) {
       setState(() {
         selectionService.selection.accept(globalSelectionHandler);
-        _moveToPoint(globalSelectionHandler.location);
+        _moveToPoint(globalSelectionHandler.location.toLatLng());
       });
     }
   }

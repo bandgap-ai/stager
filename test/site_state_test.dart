@@ -43,7 +43,7 @@ void main() {
       // Arrange
       final siteState = SiteState();
       final observer = MockSiteStateObserver();
-      final testNode = ConcreteTreeNode(id: '1', name: 'Test');
+      final testNode = ConcreteTreeNode(name: 'Test');
       siteState.attach(observer);
 
       // Act
@@ -59,7 +59,7 @@ void main() {
       // Arrange
       final siteState = SiteState();
       final observer = MockSiteStateObserver();
-      final testNode = ConcreteTreeNode(id: '1', name: 'Test');
+      final testNode = ConcreteTreeNode(name: 'Test');
       siteState.selectedNode = testNode; // Initial selection
       siteState.attach(observer);
 
@@ -113,7 +113,7 @@ void main() {
 
       // Assert
       expect(siteState.treeData.length, initialTreeCount + 1);
-      expect(siteState.treeData.last.properties.get<String>("name"), 'New Site');
+      expect(siteState.treeData.last.name, 'New Site');
       expect(observer.wasUpdated, isTrue);
     });
   });

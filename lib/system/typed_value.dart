@@ -74,6 +74,12 @@ TypedValue<double> _convertToDouble(Object input) {
 TypedValue<bool> _convertToBool(Object input) =>
     TypedValue<bool>(_rehydrate<bool>(input, bool.parse));
 
+/// Rehydrates an [Object] value into a [TypedValue].
+TypedValue<Object> _convertToObject(Object input) {
+  // Everything is an object, so we just wrap it.
+  return TypedValue<Object>(input);
+}
+
 /// Rehydrates a [List<T>] of primitives by delegating to the generic helper.
 TypedValue<List<T>> _convertToList<T>(Object input, T Function(String) parser) {
   late final TypedValue<List<T>> result;
@@ -88,6 +94,21 @@ TypedValue<List<T>> _convertToList<T>(Object input, T Function(String) parser) {
     } on Exception catch (e) {
       throw TypedValueRehydrationException('Failed to rehydrate List<$T>: $e');
     }
+  } else {
+    throw TypedValueRehydrationException('Input is not an iterable: $input');
+  }
+
+  return result;
+}
+
+/// Rehydrates a [List<Object>] value into a [TypedValue].
+TypedValue<List<Object>> _convertToListObject(Object input) {
+  late final TypedValue<List<Object>> result;
+
+  if (input is List<Object>) {
+    result = TypedValue<List<Object>>(input);
+  } else if (input is Iterable) {
+    result = TypedValue<List<Object>>(input.cast<Object>().toList());
   } else {
     throw TypedValueRehydrationException('Input is not an iterable: $input');
   }
@@ -124,24 +145,42 @@ TypedValue<Map<K, V>> _convertToMap<K, V>(
   return result;
 }
 
+/// Rehydrates a [Map<String, Object>] value into a [TypedValue].
+TypedValue<Map<String, Object>> _convertToMapStringObject(Object input) {
+  late final TypedValue<Map<String, Object>> result;
+
+  if (input is Map<String, Object>) {
+    result = TypedValue<Map<String, Object>>(input);
+  } else if (input is Map) {
+    result = TypedValue<Map<String, Object>>(input.cast<String, Object>());
+  } else {
+    throw TypedValueRehydrationException('Input is not a map structure: $input');
+  }
+
+  return result;
+}
+
 // Internal registry of rehydrator delegates.
 final Map<String, TypedValue<Object> Function(Object)> _typeMap = {
   "String": _convertToString,
   "int": _convertToInt,
   "double": _convertToDouble,
   "bool": _convertToBool,
+  "Object": _convertToObject,
 
   // List Rehydrators
   "List<String>": (input) => _convertToList<String>(input, (s) => s),
   "List<int>": (input) => _convertToList<int>(input, int.parse),
   "List<double>": (input) => _convertToList<double>(input, double.parse),
   "List<bool>": (input) => _convertToList<bool>(input, bool.parse),
+  "List<Object>": _convertToListObject,
 
   // Map<String, T> Rehydrators
   "Map<String, String>": (input) => _convertToMap<String, String>(input, (s) => s, (s) => s),
   "Map<String, int>": (input) => _convertToMap<String, int>(input, (s) => s, int.parse),
   "Map<String, double>": (input) => _convertToMap<String, double>(input, (s) => s, double.parse),
   "Map<String, bool>": (input) => _convertToMap<String, bool>(input, (s) => s, bool.parse),
+  "Map<String, Object>": _convertToMapStringObject,
 
   // Map<int, T> Rehydrators
   "Map<int, String>": (input) => _convertToMap<int, String>(input, int.parse, (s) => s),
@@ -157,15 +196,29 @@ final Map<String, TypedValue<Object> Function(Object)> _typeMap = {
 
 /// A specialized builder for [TypedValue].
 ///
-/// [context]: The context for building the [TypedValue].
+/// [context]: The context for building the [TypedValue]. It expects the
+/// context to include a "value" key that provides a tuple for a value where
+/// the first element is the reified type name and the second element is the
+/// value. For example:
+/// `context.get<List<Object>("value") = ["String","Perfect"];`
+///
 /// Returns a [TypedValue] instance.
 @BasicBuilder(name: 'TypedValue')
 TypedValue<Object> buildTypedValue(StagerContext context) {
   late final TypedValue<Object> result;
+  late String typeName;
+  late Object rawValue;
 
   try {
-    final String typeName = context.get<String>("type");
-    final Object rawValue = context.get<Object>("value");
+    final List<Object> tuple = context.getOrDefault<List<Object>>('value',
+        []);
+
+    if (tuple.length >= 2) {
+      typeName = tuple[0].toString();
+      rawValue = tuple[1];
+    } else {
+      throw StagerContextException('Malformed value tuple: $tuple');
+    }
 
     if (_typeMap.containsKey(typeName)) {
       result = _typeMap[typeName]!(rawValue);
@@ -210,15 +263,8 @@ class TypedValue<T extends Object> {
   ///
   /// Returns a [Map<String, Object>] containing the string representation of 
   /// the [type] and the [value] itself.
-  Map<String, Object> toMap() {
-    late final Map<String, Object> result;
-
-    result = {
-      'type': type.toString(),
-      'value': value as Object,
-    };
-
-    return result;
+  List<Object> toTuple() {
+    return [type.toString(), value as Object];
   }
 
   @override
@@ -239,10 +285,10 @@ class TypedValue<T extends Object> {
 
   @override
   String toString() {
-    return toMap().toString();
+    return toTuple().toString();
   }
 
-  Map<String,dynamic> toJson() {
-    return toMap();
+  Object toJson() {
+    return toTuple();
   }
 }

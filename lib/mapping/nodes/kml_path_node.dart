@@ -1,7 +1,6 @@
-// External packages
-import 'package:latlong2/latlong.dart';
-
-// Project files
+import '../../builders/stager_context.dart';
+import '../../system/point.dart';
+import '../../system/typed_value.dart';
 import 'kml_geometry_node.dart';
 
 /// A concrete [KMLGeometryNode] representing a KML LineString (Path).
@@ -12,35 +11,62 @@ import 'kml_geometry_node.dart';
 /// 
 /// Once created, the geographic coordinates cannot be modified.
 class KMLPathNode extends KMLGeometryNode {
-  /// Internal key for storing the path coordinates.
-  static const String outlineKey = 'outline';
+
+  /// The list of coordinates defining the path.
+  List<Point> _outline = [];
 
   /// Creates a [KMLPathNode] instance.
   ///
-  /// [id]: The unique identifier for the node.
   /// [name]: The display name of the path.
   /// [styleManager]: The manager used to resolve shared styles.
   /// [outline]: The fixed list of coordinates defining the path.
   /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
   /// [initialProperties]: Optional initial metadata.
   KMLPathNode({
-    required super.id,
     required super.name,
     required super.styleManager,
-    required List<LatLng> outline,
+    required List<Point> outline,
     super.styleUrl = 'default',
     super.initialProperties,
-  }) {
-    // Storing the provided outline directly in the property map.
-    properties.set<List<LatLng>>(outlineKey, outline);
-  }
+  }) : _outline = outline;
 
   /// The list of geographic coordinates defining the path.
-  /// 
-  /// Returns a non-nullable [List<LatLng>].
-  /// 
-  /// Throws a [StateError] if [hasOutline] is false.
-  List<LatLng> get outline {
-    return List<LatLng>.from(properties.get<List<LatLng>>(outlineKey));
+  List<Point> get outline {
+    return List<Point>.from(_outline);
+  }
+
+  /// Sets the list of geographic coordinates defining the path.
+  set outline(List<Point> newOutline) {
+    _outline = newOutline;
+    notify();
+  }
+
+  @override
+  Map<String, Object> toMap() {
+    // Add the outline to the map.
+    final map = super.toMap();
+    map.addAll({
+      'outline' : TypedValue<List<Object>>(
+          _outline.map((p) => p.toMap()).toList()),
+    });
+    return map;
+  }
+
+  @override
+  void fromMap(Map<String, Object> inputMap) {
+    var map = Map.of(inputMap);
+
+    // Pull the outline from the map.
+    if (map.containsKey('outline')) {
+      final List<Object> rawList = map['outline']! as List<Object>;
+      _outline = rawList.map((e) => buildPoint(
+          StagerContext(e as Map<String, Object>))).toList();
+      map.remove('outline');
+    }
+
+    // Let the base class handle the rest.
+    super.fromMap(map);
+
+    return;
   }
 }

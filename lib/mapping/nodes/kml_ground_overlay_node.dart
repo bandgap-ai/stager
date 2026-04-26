@@ -1,3 +1,4 @@
+import '../../system/typed_value.dart';
 import '../kml_icon.dart';
 import '../lat_lon_box.dart';
 import 'kml_geometry_node.dart';
@@ -7,18 +8,16 @@ import 'kml_geometry_node.dart';
 /// This class behaves like a Record, encapsulating a terminal geographic 
 /// data node that anchors a fixed image (icon) to a specific geographic 
 /// bounding box (LatLonBox) defined at instantiation.
-/// 
-/// Once created, the icon and bounding box cannot be modified.
 class KMLGroundOverlayNode extends KMLGeometryNode {
-  /// Internal key for storing the icon property.
-  static const String iconKey = 'kml_icon';
 
-  /// Internal key for storing the LatLonBox property.
-  static const String latLonBoxKey = 'kml_latlonbox';
+  /// The icon (image) to be overlaid on the map.
+  KMLIcon _icon;
+
+  /// The geographic bounding box where the icon is rendered.
+  LatLonBox _latLonBox;
 
   /// Creates a [KMLGroundOverlayNode] instance.
   ///
-  /// [id]: The unique identifier for the node.
   /// [name]: The display name of the overlay.
   /// [styleManager]: The manager used to resolve shared styles.
   /// [icon]: The fixed image to be overlaid.
@@ -26,34 +25,65 @@ class KMLGroundOverlayNode extends KMLGeometryNode {
   /// [styleUrl]: The ID of a shared style to apply. Defaults to 'default'.
   /// [initialProperties]: Optional initial metadata for the node.
   KMLGroundOverlayNode({
-    required super.id,
     required super.name,
     required super.styleManager,
     required KMLIcon icon,
     required LatLonBox latLonBox,
     super.styleUrl = 'default',
     super.initialProperties,
-  }) {
-    // Storing the provided overlay data directly in the property map.
-    properties.set<KMLIcon>(iconKey, icon);
-    properties.set<LatLonBox>(latLonBoxKey, latLonBox);
-  }
+  }) : _icon = icon, _latLonBox = latLonBox;
 
   /// The icon (image) to be overlaid on the map.
-  /// 
-  /// Returns a non-nullable [KMLIcon].
-  /// 
-  /// Throws a [StateError] if [hasIcon] is false.
-  KMLIcon get icon {
-    return properties.get<KMLIcon>(iconKey);
+  KMLIcon get icon => _icon;
+
+  /// Sets the icon (image) to be overlaid on the map.
+  set icon(KMLIcon value) {
+    _icon = value;
+    notify();
   }
 
   /// The geographic bounding box where the icon is rendered.
-  /// 
-  /// Returns a non-nullable [LatLonBox].
-  /// 
-  /// Throws a [StateError] if [hasLatLonBox] is false.
-  LatLonBox get latLonBox {
-    return properties.get<LatLonBox>(latLonBoxKey);
+  LatLonBox get latLonBox => _latLonBox;
+
+  /// Sets the geographic bounding box where the icon is rendered.
+  set latLonBox(LatLonBox value) {
+    _latLonBox = value;
+    notify();
+  }
+
+  @override
+  Map<String, Object> toMap() {
+    // Start with the base node export.
+    final map = super.toMap();
+
+    // Harvest overlay-specific members and add them to the tagged record set.
+    map.addAll({
+      'kml_icon': _icon.toMap(),
+      'kml_latlonbox': _latLonBox.toMap(),
+    });
+
+    return map;
+  }
+
+  @override
+  void fromMap(Map<String, Object> inputMap) {
+    // Create a mutable copy to pluck overlay attributes.
+    final map = Map<String, TypedValue<Object>>.from(inputMap);
+
+    // Rehydrate icon member.
+    if (map.containsKey('kml_icon')) {
+      _icon = KMLIcon.fromMap(map['kml_icon']!.value as Map<String, Object>);
+      map.remove('kml_icon');
+    }
+
+    // Rehydrate latLonBox member.
+    if (map.containsKey('kml_latlonbox')) {
+      final boxData = map['kml_latlonbox']!.value as Map<String, Object>;
+      _latLonBox = LatLonBox.fromMap(boxData.cast<String, TypedValue<Object>>());
+      map.remove('kml_latlonbox');
+    }
+
+    // Delegate the remaining data to the base class.
+    super.fromMap(map);
   }
 }

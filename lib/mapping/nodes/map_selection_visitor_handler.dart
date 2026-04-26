@@ -1,50 +1,35 @@
-import 'package:latlong2/latlong.dart';
 import 'package:logger/logger.dart';
 import '../../system/basic_selection_visitor_handler.dart';
+import '../../system/point.dart';
 import '../../tree/concrete_composite_node.dart';
 import '../../tree/concrete_leaf_node.dart';
 import '../../tree/concrete_tree_node.dart';
+import '../../tree/leaf_node.dart';
 import '../../tree/node_properties.dart';
 import '../../system/callable_selection_visitor.dart';
 
 class MapSelectionVisitorHandler extends BasicSelectionVisitorHandler {
   final Logger _mappableNodeLogger = Logger();
-  LatLng location = LatLng(0.0, 0.0);
+  Point location = Point();
 
-  // Private function for mapping a basic node to a LatLng location.
-  void _getNodeLocation(NodeProperties props) {
-
-    // Check that the latitude and longitude properties are set
-    if (props.contains("latitude") &&
-        props.contains("longitude")) {
-      location = LatLng(
-        // This is not a nice way to get the position. Need to update those classes.
-        props.get<double>("latitude"),
-        props.get<double>("longitude"),
-      );
-    } else {
-      // If not, complain and bounce the location to the middle of the ocean.
-      location = LatLng(0.0, 0.0);
-      final String msg =
-          "Unable to get location from node properties. The node "
-          "has been mapped to LatLng(0.0,0.0). Have fun swimming in the ocean.";
-      _mappableNodeLogger.w(msg);
-    }
+  // Private function for mapping a basic node to a Point location.
+  void _getNodeLocation(LeafNode node) {
+    location = node.position;
   }
 
   // Private function to get the position of a leaf node
   void _getLeafNodeLocation(ConcreteLeafNode node) {
-    _getNodeLocation(node.properties);
+    _getNodeLocation(node);
   }
 
   // Private function to get the position of a composite node
   void _getCompositeNodeLocation(ConcreteCompositeNode node) {
-    _getNodeLocation(node.properties);
+    _getNodeLocation(node);
   }
 
   // Private function to get the position of a tree node
   void _getTreeNodeLocation(ConcreteTreeNode node) {
-    _getNodeLocation(node.properties);
+    _getNodeLocation(node);
   }
 
   /// Visitor for basic leaf nodes
@@ -60,19 +45,19 @@ class MapSelectionVisitorHandler extends BasicSelectionVisitorHandler {
   MapSelectionVisitorHandler() {
     /// Visitor for basic leaf nodes
     leafNodeVisitor = CallableSelectionVisitor(
-      ConcreteLeafNode(id: '', name: ''),
+      ConcreteLeafNode(name: ''),
       _getLeafNodeLocation,
     );
 
     /// Visitor for basic composite nodes
     compositeNodeVisitor = CallableSelectionVisitor(
-      ConcreteCompositeNode(id: '', name: ''),
+      ConcreteCompositeNode(name: ''),
       _getCompositeNodeLocation,
     );
 
     /// Visitor for basic tree nodes
     treeNodeVisitor = CallableSelectionVisitor(
-      ConcreteTreeNode(id: '', name: ''),
+      ConcreteTreeNode(name: ''),
       _getTreeNodeLocation,
     );
 

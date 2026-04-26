@@ -19,7 +19,7 @@ void main() {
   setUp(() {
     SiteState state = SiteState();
 
-    parent = ConcreteCompositeNode(id: "1", name: "Parent");
+    parent = ConcreteCompositeNode(name: "Parent");
     parent.attach(observer = MockCompositeNodeObserver());
     editorFactory = MockEditorFactory(state);
     controller = EditNodeController(parent, editorFactory);
@@ -81,7 +81,7 @@ void main() {
       controller.process(results);
 
       // Get and check the properties.
-      expect(parent.properties.get<String>('name'), 'Updated Name');
+      expect(parent.name, 'Updated Name');
       expect(parent.properties.get<int>('value'), 456);
       expect(parent.properties.get<bool>('is_active'), false);
       // There should now be 4 properties

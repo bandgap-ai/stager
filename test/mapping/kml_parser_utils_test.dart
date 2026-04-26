@@ -11,10 +11,11 @@ import 'package:stager_platform/mapping/nodes/kml_point_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_path_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_polygon_node.dart';
 import 'package:stager_platform/mapping/style/kml_style_manager.dart';
+import 'package:stager_platform/system/point.dart';
 
 /// Unit tests for the [KMLParserUtils] class.
 void main() {
-  group('KMLParserUtils', () {
+  group('KMLParserUtils Tests', () {
     late KMLStyleManager manager;
 
     setUp(() {
@@ -27,21 +28,20 @@ void main() {
       setUp(() {
         manager = KMLStyleManager();
         placemark = KMLPlacemarkNode(
-          id: 'pm1',
           name: 'Test Placemark',
           styleManager: manager,
         );
       });
 
       test('throws FormatException if a Point geometry is invalid', () {
-        // Arrange
+        // Create an empty Point element to trigger a parsing failure.
         final xml = XmlDocument.parse('''
           <Placemark>
             <Point></Point>
           </Placemark>
         ''');
 
-        // Act & Assert
+        // Verify that the parser enforces coordinate presence.
         expect(
           () => KMLParserUtils.parseGeometries(
             xml.rootElement,
@@ -53,14 +53,14 @@ void main() {
       });
 
       test('throws FormatException if a LineString geometry is invalid', () {
-        // Arrange
+        // Create a LineString element with empty coordinates.
         final xml = XmlDocument.parse('''
           <Placemark>
             <LineString><coordinates></coordinates></LineString>
           </Placemark>
         ''');
 
-        // Act & Assert
+        // Verify that empty coordinate lists are treated as invalid.
         expect(
           () => KMLParserUtils.parseGeometries(
             xml.rootElement,
@@ -72,14 +72,14 @@ void main() {
       });
 
       test('throws FormatException if a Polygon geometry is invalid', () {
-        // Arrange
+        // Create a Polygon missing its mandatory boundary tags.
         final xml = XmlDocument.parse('''
           <Placemark>
             <Polygon></Polygon>
           </Placemark>
         ''');
 
-        // Act & Assert
+        // Verify that structural requirements for polygons are enforced.
         expect(
           () => KMLParserUtils.parseGeometries(
             xml.rootElement,
@@ -91,7 +91,7 @@ void main() {
       });
 
       test('successfully parses valid geometries', () {
-        // Arrange
+        // Construct a placemark containing both a point and a line string.
         final xml = XmlDocument.parse('''
           <Placemark>
             <Point><coordinates>1,2</coordinates></Point>
@@ -99,10 +99,10 @@ void main() {
           </Placemark>
         ''');
 
-        // Act
+        // Execute parsing logic.
         KMLParserUtils.parseGeometries(xml.rootElement, placemark, manager);
 
-        // Assert
+        // Verify that the child nodes are correctly instantiated and typed.
         expect(placemark.children.length, 2);
         expect(placemark.children[0], isA<KMLPointNode>());
         expect(placemark.children[1], isA<KMLPathNode>());
@@ -110,65 +110,48 @@ void main() {
     });
 
     group('Geometry Parsing', () {
-      test('parsePointGeometry returns KMLPointNode for valid XML', () {
-        // Arrange
+      test('parsePointGeometry returns KMLPointNode with correct Point', () {
+        // Define a coordinate string (lon=10, lat=20).
         final xml =
             XmlDocument.parse('<Point><coordinates>10,20</coordinates></Point>');
 
-        // Act
+        // Rehydrate the node from XML.
         final node = KMLParserUtils.parsePointGeometry(xml.rootElement, manager);
 
-        // Assert
+        // Confirm reification to the Point class with correct coordinate mapping.
         expect(node, isA<KMLPointNode>());
-        final location = node.location;
-        expect(location.latitude, 20.0);
-        expect(location.longitude, 10.0);
+        expect(node.position.x, 10.0); // longitude
+        expect(node.position.y, 20.0); // latitude
       });
 
       test('parsePointGeometry throws FormatException for missing coordinates',
           () {
-        // Arrange
         final xml = XmlDocument.parse('<Point></Point>');
 
-        // Act & Assert
         expect(
           () => KMLParserUtils.parsePointGeometry(xml.rootElement, manager),
           throwsA(isA<FormatException>()),
         );
       });
 
-      test('parseLineStringGeometry returns KMLPathNode for valid XML', () {
-        // Arrange
+      test('parseLineStringGeometry returns KMLPathNode with correct Points', () {
+        // Define a LineString with multiple coordinate pairs.
         final xml = XmlDocument.parse(
             '<LineString><coordinates>10,20 30,40</coordinates></LineString>');
 
-        // Act
+        // Execute rehydration.
         final node =
             KMLParserUtils.parseLineStringGeometry(xml.rootElement, manager);
 
-        // Assert
+        // Verify that the outline member contains the reified points.
         expect(node, isA<KMLPathNode>());
         expect(node.outline.length, 2);
-        expect(node.outline[0].latitude, 20.0);
+        expect(node.outline[0].x, 10.0);
+        expect(node.outline[0].y, 20.0);
       });
 
-      test(
-          'parseLineStringGeometry throws FormatException for empty coordinates',
-          () {
-        // Arrange
-        final xml = XmlDocument.parse(
-            '<LineString><coordinates></coordinates></LineString>');
-
-        // Act & Assert
-        expect(
-          () =>
-              KMLParserUtils.parseLineStringGeometry(xml.rootElement, manager),
-          throwsA(isA<FormatException>()),
-        );
-      });
-
-      test('parsePolygonGeometry returns KMLPolygonNode for valid XML', () {
-        // Arrange
+      test('parsePolygonGeometry returns KMLPolygonNode with correct geometry', () {
+        // Construct a polygon with an outer boundary and one inner hole.
         final xml = XmlDocument.parse('''
           <Polygon>
             <outerBoundaryIs>
@@ -184,28 +167,46 @@ void main() {
           </Polygon>
         ''');
 
-        // Act
+        // Execute rehydration.
         final node =
             KMLParserUtils.parsePolygonGeometry(xml.rootElement, manager);
 
-        // Assert
+        // Confirm reification of both outer and inner geometric boundaries.
         expect(node, isA<KMLPolygonNode>());
         expect(node.outline.length, 3);
+        expect(node.outline[0].x, 10.0);
         expect(node.holes.length, 1);
         expect(node.holes[0].points.length, 3);
+        expect(node.holes[0].points[0].x, 15.0);
+      });
+    });
+
+    group('Coordinate Parsing', () {
+      test('parseCoordinate handles 2D and 3D strings', () {
+        // Verify parsing for standard 2D coordinates.
+        final p2d = KMLParserUtils.parseCoordinate('1.1,2.2');
+        expect(p2d.x, 1.1);
+        expect(p2d.y, 2.2);
+        expect(p2d.z, 0.0);
+        
+        // Verify parsing for 3D coordinates (with altitude).
+        final p3d = KMLParserUtils.parseCoordinate('10,20,30');
+        expect(p3d.x, 10.0);
+        expect(p3d.y, 20.0);
+        expect(p3d.z, 30.0);
       });
 
-      test(
-          'parsePolygonGeometry throws FormatException for missing outer boundary',
-          () {
-        // Arrange
-        final xml = XmlDocument.parse('<Polygon></Polygon>');
+      test('parseCoordinateList handles whitespace and newlines', () {
+        // Define a list of coordinates with varied spacing.
+        const raw = '1,2 3,4\n5,6';
 
-        // Act & Assert
-        expect(
-          () => KMLParserUtils.parsePolygonGeometry(xml.rootElement, manager),
-          throwsA(isA<FormatException>()),
-        );
+        // Rehydrate the coordinate list.
+        final points = KMLParserUtils.parseCoordinateList(raw);
+
+        // Verify count and individual mapping integrity.
+        expect(points.length, 3);
+        expect(points[2].x, 5.0);
+        expect(points[2].y, 6.0);
       });
     });
   });

@@ -19,7 +19,7 @@ class MockEditorFactory extends EditorFactory {
 
   MockEditorFactory(SiteState state) {
     mockSiteEditor = MockSiteEditor(state: state);
-    ConcreteCompositeNode node = ConcreteCompositeNode(id: '1', name: 'Test Node');
+    ConcreteCompositeNode node = ConcreteCompositeNode(name: 'Test Node');
     mockCompositeNodeEditor = MockCompositeNodeEditor(state: node);
   }
 

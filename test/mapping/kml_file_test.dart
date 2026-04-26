@@ -138,7 +138,7 @@ void main() {
       
       // Assert: Verify the root node and its hierarchical children.
       expect(root, isA<KMLTreeRootNode>());
-      expect(root.properties.get<String>('name'), 'Integration Doc');
+      expect(root.name, 'Integration Doc');
       expect(root.children.length, 1); 
       
       // Cleanup

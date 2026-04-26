@@ -8,7 +8,7 @@ import 'package:stager_platform/editors/edit_node_dialog.dart';
 
 void main() {
   group('EditNodeDialog Widget Tests', () {
-    final testNode = ConcreteLeafNode(id: 'test_id', name: 'Initial Name');
+    final testNode = ConcreteLeafNode(name: 'Initial Name');
 
     testWidgets('should be pre-filled with the node name', (WidgetTester tester) async {
       await tester.pumpWidget(

@@ -1,3 +1,4 @@
+import '../../system/typed_value.dart';
 import '../../tree/concrete_composite_node.dart';
 
 /// This is a custom exception for KMLFeatureNodes.
@@ -47,6 +48,7 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
   /// Maps to the `<visibility>` element in the KML specification.
   set visibility(bool value) {
     _visibility = value;
+    notify();
   }
 
   /// Returns `true` if this feature has a snippet description.
@@ -73,6 +75,7 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
   set snippet(String value) {
     if (value.isNotEmpty) {
       _snippet = value;
+      notify();
     } else {
       throw KMLFeatureNodeException('Snippet cannot be empty.');
     }
@@ -98,5 +101,44 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
 
   set extendedData(Map<String, Object> value) {
     _extendedData = value;
+    notify();
   }
+
+  @override
+  Map<String, Object> toMap() {
+    // Add visibility, snippet, and extended data to the map
+    final map = super.toMap();
+    map.addAll({
+      'visibility' : visibility,
+      'snippet' : _snippet,
+      'extendedData' : TypedValue<Map<String, Object>>(_extendedData),
+    });
+    return map;
+  }
+
+  @override
+  void fromMap(Map<String, Object> inputMap) {
+
+    var map = Map.of(inputMap);
+
+    // Pull the visibility, snippet and extended data from the map
+    if (map.containsKey('visibility')) {
+      _visibility = map['visibility']! as bool;
+      map.remove('visibility');
+    }
+    if (map.containsKey('snippet')) {
+      _snippet = map['snippet'] as String;
+      map.remove('snippet');
+    }
+    if (map.containsKey('extendedData')) {
+      _extendedData = (map['extendedData']!
+        as TypedValue<Map<String, Object>>).value;
+      map.remove('extendedData');
+    }
+    // Let the base class handle the rest
+    super.fromMap(map);
+
+    return;
+  }
+
 }

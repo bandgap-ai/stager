@@ -1,7 +1,6 @@
-// External packages
-import 'package:latlong2/latlong.dart';
-
-// Project files
+import '../../builders/stager_context.dart';
+import '../../system/point.dart';
+import '../../system/typed_value.dart';
 import '../kml_hole.dart';
 import 'kml_geometry_node.dart';
 
@@ -13,15 +12,15 @@ import 'kml_geometry_node.dart';
 /// 
 /// Once created, the geographic coordinates cannot be modified.
 class KMLPolygonNode extends KMLGeometryNode {
-  /// Internal key for storing the outer boundary coordinates.
-  static const String outlineKey = 'outline';
 
-  /// Internal key for storing the list of inner holes.
-  static const String holesKey = 'kml_holes';
+  /// The list of coordinates defining the outer boundary.
+  List<Point> _outline = [];
+
+  /// The list of [KMLHole] objects defining inner cutout regions.
+  List<KMLHole> _holes = [];
 
   /// Creates a [KMLPolygonNode] instance.
   ///
-  /// [id]: The unique identifier for the node.
   /// [name]: The display name of the polygon.
   /// [styleManager]: The manager used to resolve shared styles.
   /// [outline]: The fixed list of coordinates defining the outer boundary.
@@ -32,31 +31,72 @@ class KMLPolygonNode extends KMLGeometryNode {
   KMLPolygonNode({
     required super.name,
     required super.styleManager,
-    required List<LatLng> outline,
+    required List<Point> outline,
     List<KMLHole> holes = const [],
     super.styleUrl = 'default',
     super.initialProperties,
-  }) {
-    // Storing the provided geometry data directly in the property map.
-    properties.set<List<LatLng>>(outlineKey, outline);
-    properties.set<List<KMLHole>>(holesKey, holes);
-  }
+  }) : _outline = outline, _holes = holes;
 
   /// The list of geographic coordinates defining the outer boundary.
-  /// 
-  /// Returns a non-nullable [List<LatLng>].
-  /// 
-  /// Throws a [StateError] if [hasOutline] is false.
-  List<LatLng> get outline {
-    return List<LatLng>.from(properties.get<List<LatLng>>(outlineKey));
+  List<Point> get outline {
+    return List<Point>.from(_outline);
+  }
+
+  /// Sets the list of geographic coordinates defining the outer boundary.
+  set outline(List<Point> newOutline) {
+    _outline = newOutline;
+    notify();
   }
 
   /// The list of [KMLHole] objects defining inner cutout regions.
-  /// 
-  /// Returns a non-nullable [List<KMLHole>].
-  /// 
-  /// Throws a [StateError] if [hasHoles] is false.
   List<KMLHole> get holes {
-    return List<KMLHole>.from(properties.get<List<KMLHole>>(holesKey));
+    return List<KMLHole>.from(_holes);
+  }
+
+  /// Sets the list of [KMLHole] objects defining inner cutout regions.
+  set holes(List<KMLHole> newHoles) {
+    _holes = newHoles;
+    notify();
+  }
+
+  @override
+  Map<String, Object> toMap() {
+    // Start with the base node state.
+    final map = super.toMap();
+
+    // Harvest polygon-specific members.
+    map.addAll({
+      // Map the elements from lists of objects to lists of maps created by
+      // object.toMap().
+      'outline' :  _outline.map((p) => p.toMap()).toList(),
+      'holes' : _holes.map((h) => h.toMap()).toList(),
+    });
+
+    return map;
+  }
+
+  @override
+  void fromMap(Map<String, Object> inputMap) {
+    final map = Map<String, TypedValue<Object>>.from(inputMap);
+
+    // Rehydrate outline member.
+    if (map.containsKey('outline')) {
+      final List<Object> rawList = map['outline']! as List<Object>;
+      // FIXME - We could clean this up with the registry when it is complete.
+      _outline = rawList.map((e) => buildPoint(
+          StagerContext(e as Map<String, Object>))).toList();
+      map.remove('outline');
+    }
+
+    // Rehydrate holes member.
+    if (map.containsKey('kml_holes')) {
+      final List<Object> rawList = map['kml_holes']! as List<Object>;
+      _holes = rawList.map((e) => KMLHole.fromMap(
+          e as Map<String, Object>)).toList();
+      map.remove('holes');
+    }
+
+    // Delegate the remaining data to the base class.
+    super.fromMap(map);
   }
 }

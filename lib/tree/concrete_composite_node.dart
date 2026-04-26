@@ -56,4 +56,16 @@ class ConcreteCompositeNode extends ConcreteLeafNode implements CompositeNode {
       child.detach(observer);
     }
   }
+
+  @override
+  void fromMap(Map<String, Object> inputMap) {
+    // TODO: implement fromMap
+    super.fromMap(inputMap);
+  }
+
+  @override
+  Map<String, Object> toMap() {
+    // TODO: implement toMap
+    return super.toMap();
+  }
 }

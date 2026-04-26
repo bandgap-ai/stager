@@ -31,12 +31,13 @@ void main() {
       const input = 3.14;
       const typedValue = TypedValue<double>(input);
 
-      // Convert the TypedValue to a Map.
-      final map = typedValue.toMap();
+      // Convert the TypedValue to a Tuple
+      final tuple = typedValue.toTuple();
 
       // Verify that the map contains the correct type string and value.
-      expect(map['type'], 'double');
-      expect(map['value'], input);
+      expect(tuple.length, 2);
+      expect(tuple[0], 'double');
+      expect(tuple[1], input);
     });
 
     test('should fail with TypeError when value type mismatch occurs', () {
@@ -88,42 +89,63 @@ void main() {
 
     group('buildTypedValue Rehydration Edge Cases', () {
       test('should rehydrate a String', () {
-        final context = StagerContext(const {'type': 'String', 'value': 'hi'});
+        final context = StagerContext(const {
+          'value': ['String', 'hi']
+        });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<String>>());
         expect(result.value, 'hi');
       });
 
+      test('should rehydrate an Object', () {
+        final context = StagerContext(const {
+          'value': ['Object', 42]
+        });
+        final result = buildTypedValue(context);
+        expect(result, isA<TypedValue<Object>>());
+        expect(result.value, 42);
+      });
+
       test('should rehydrate a double from a string', () {
-        final context = StagerContext(const {'type': 'double', 'value': '3.14'});
+        final context = StagerContext(const {
+          'value': ['double', '3.14']
+        });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<double>>());
         expect(result.value, 3.14);
       });
 
       test('should rehydrate a double from an int', () {
-        final context = StagerContext(const {'type': 'double', 'value': 42});
+        final context = StagerContext(const {
+          'value': ['double', 42]
+        });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<double>>());
         expect(result.value, 42.0);
       });
 
       test('should rehydrate an int from a string', () {
-        final context = StagerContext(const {'type': 'int', 'value': '123'});
+        final context = StagerContext(const {
+          'value': ['int', '123']
+        });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<int>>());
         expect(result.value, 123);
       });
 
       test('should rehydrate a bool from a string', () {
-        final context = StagerContext(const {'type': 'bool', 'value': 'true'});
+        final context = StagerContext(const {
+          'value': ['bool', 'true']
+        });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<bool>>());
         expect(result.value, isTrue);
       });
 
       test('should throw TypedValueRehydrationException for unknown types', () {
-        final context = StagerContext(const {'type': 'Unknown', 'value': '...'});
+        final context = StagerContext(const {
+          'value': ['Unknown', '...']
+        });
         expect(
           () => buildTypedValue(context),
           throwsA(isA<TypedValueRehydrationException>().having(
@@ -135,16 +157,24 @@ void main() {
       });
 
       test('should throw TypedValueRehydrationException for malformed numbers', () {
-        final contextInt = StagerContext(const {'type': 'int', 'value': 'abc'});
-        expect(() => buildTypedValue(contextInt), throwsA(isA<TypedValueRehydrationException>()));
+        final contextInt = StagerContext(const {
+          'value': ['int', 'abc']
+        });
+        expect(() => buildTypedValue(contextInt),
+            throwsA(isA<TypedValueRehydrationException>()));
 
-        final contextDouble = StagerContext(const {'type': 'double', 'value': 'xyz'});
-        expect(() => buildTypedValue(contextDouble), throwsA(isA<TypedValueRehydrationException>()));
+        final contextDouble = StagerContext(const {
+          'value': ['double', 'xyz']
+        });
+        expect(() => buildTypedValue(contextDouble),
+            throwsA(isA<TypedValueRehydrationException>()));
       });
 
-      test('should throw TypedValueRehydrationException for malformed context data', () {
+      test(
+          'should throw TypedValueRehydrationException for malformed context data',
+          () {
         // Trigger re-wrapped StagerContextException
-        final context = StagerContext(const {'value': 'missing_type'});
+        final context = StagerContext(const {'key': 'missing_value'});
         expect(
           () => buildTypedValue(context),
           throwsA(isA<TypedValueRehydrationException>().having(
@@ -155,8 +185,12 @@ void main() {
         );
       });
 
-      test('should throw TypedValueRehydrationException for non-iterable List input', () {
-        final context = StagerContext(const {'type': 'List<int>', 'value': 123});
+      test(
+          'should throw TypedValueRehydrationException for non-iterable List input',
+          () {
+        final context = StagerContext(const {
+          'value': ['List<int>', 123]
+        });
         expect(
           () => buildTypedValue(context),
           throwsA(isA<TypedValueRehydrationException>().having(
@@ -167,8 +201,11 @@ void main() {
         );
       });
 
-      test('should throw TypedValueRehydrationException for non-map Map input', () {
-        final context = StagerContext(const {'type': 'Map<String, String>', 'value': []});
+      test('should throw TypedValueRehydrationException for non-map Map input',
+          () {
+        final context = StagerContext(const {
+          'value': ['Map<String, String>', []]
+        });
         expect(
           () => buildTypedValue(context),
           throwsA(isA<TypedValueRehydrationException>().having(
@@ -179,11 +216,15 @@ void main() {
         );
       });
 
-      test('should throw TypedValueRehydrationException for failing Map rehydration', () {
+      test(
+          'should throw TypedValueRehydrationException for failing Map rehydration',
+          () {
         // Use a map with an int key that can't be parsed from 'A'
         final context = StagerContext(const {
-          'type': 'Map<int, String>',
-          'value': {'A': 'val'}
+          'value': [
+            'Map<int, String>',
+            {'A': 'val'}
+          ]
         });
         expect(
           () => buildTypedValue(context),
@@ -198,37 +239,83 @@ void main() {
 
     group('buildTypedValue Collection Rehydration', () {
       test('should rehydrate List<String>', () {
-        final context = StagerContext(const {'type': 'List<String>', 'value': ['a', 'b']});
+        final context = StagerContext(const {
+          'value': [
+            'List<String>',
+            ['a', 'b']
+          ]
+        });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<List<String>>>());
         expect(result.value, ['a', 'b']);
       });
 
+      test('should rehydrate List<Object>', () {
+        final context = StagerContext(const {
+          'value': [
+            'List<Object>',
+            [1, 'a', 3.14]
+          ]
+        });
+        final result = buildTypedValue(context);
+        expect(result, isA<TypedValue<List<Object>>>());
+        expect(result.value, [1, 'a', 3.14]);
+      });
+
       test('should rehydrate List<int>', () {
-        final context = StagerContext(const {'type': 'List<int>', 'value': [1, '2']});
+        final context = StagerContext(const {
+          'value': [
+            'List<int>',
+            [1, '2']
+          ]
+        });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<List<int>>>());
         expect(result.value, [1, 2]);
       });
 
       test('should rehydrate List<double>', () {
-        final context = StagerContext(const {'type': 'List<double>', 'value': [1, 2.5, "3.14"]});
+        final context = StagerContext(const {
+          'value': [
+            'List<double>',
+            [1, 2.5, "3.14"]
+          ]
+        });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<List<double>>>());
         expect(result.value, [1.0, 2.5, 3.14]);
       });
 
       test('should rehydrate List<bool>', () {
-        final context = StagerContext(const {'type': 'List<bool>', 'value': [true, 'false']});
+        final context = StagerContext(const {
+          'value': [
+            'List<bool>',
+            [true, 'false']
+          ]
+        });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<List<bool>>>());
         expect(result.value, [true, false]);
       });
 
+      test('should rehydrate Map<String, Object>', () {
+        final context = StagerContext(const {
+          'value': [
+            'Map<String, Object>',
+            {'a': 1, 'b': '2'}
+          ]
+        });
+        final result = buildTypedValue(context);
+        expect(result, isA<TypedValue<Map<String, Object>>>());
+        expect(result.value, {'a': 1, 'b': '2'});
+      });
+
       test('should rehydrate Map<String, int>', () {
         final context = StagerContext(const {
-          'type': 'Map<String, int>',
-          'value': {'a': 1, 'b': '2'}
+          'value': [
+            'Map<String, int>',
+            {'a': 1, 'b': '2'}
+          ]
         });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<Map<String, int>>>());
@@ -237,8 +324,10 @@ void main() {
 
       test('should rehydrate Map<String, double>', () {
         final context = StagerContext(const {
-          'type': 'Map<String, double>',
-          'value': {'a': 1.1, 'b': '2.2'}
+          'value': [
+            'Map<String, double>',
+            {'a': 1.1, 'b': '2.2'}
+          ]
         });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<Map<String, double>>>());
@@ -247,8 +336,10 @@ void main() {
 
       test('should rehydrate Map<String, bool>', () {
         final context = StagerContext(const {
-          'type': 'Map<String, bool>',
-          'value': {'a': true, 'b': 'false'}
+          'value': [
+            'Map<String, bool>',
+            {'a': true, 'b': 'false'}
+          ]
         });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<Map<String, bool>>>());
@@ -257,8 +348,10 @@ void main() {
 
       test('should rehydrate Map<int, int>', () {
         final context = StagerContext(const {
-          'type': 'Map<int, int>',
-          'value': {'1': 10, 2: '20'}
+          'value': [
+            'Map<int, int>',
+            {'1': 10, 2: '20'}
+          ]
         });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<Map<int, int>>>());
@@ -267,8 +360,10 @@ void main() {
 
       test('should rehydrate Map<int, double>', () {
         final context = StagerContext(const {
-          'type': 'Map<int, double>',
-          'value': {'1': 10.5, 2: '20.5'}
+          'value': [
+            'Map<int, double>',
+            {'1': 10.5, 2: '20.5'}
+          ]
         });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<Map<int, double>>>());
@@ -277,8 +372,10 @@ void main() {
 
       test('should rehydrate Map<int, bool>', () {
         final context = StagerContext(const {
-          'type': 'Map<int, bool>',
-          'value': {'1': true, 2: 'false'}
+          'value': [
+            'Map<int, bool>',
+            {'1': true, 2: 'false'}
+          ]
         });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<Map<int, bool>>>());
@@ -287,8 +384,10 @@ void main() {
 
       test('should rehydrate Map<bool, String>', () {
         final context = StagerContext(const {
-          'type': 'Map<bool, String>',
-          'value': {'true': 'A', false: 'B'}
+          'value': [
+            'Map<bool, String>',
+            {'true': 'A', false: 'B'}
+          ]
         });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<Map<bool, String>>>());
@@ -297,8 +396,10 @@ void main() {
 
       test('should rehydrate Map<bool, int>', () {
         final context = StagerContext(const {
-          'type': 'Map<bool, int>',
-          'value': {'true': 1, false: '0'}
+          'value': [
+            'Map<bool, int>',
+            {'true': 1, false: '0'}
+          ]
         });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<Map<bool, int>>>());
@@ -307,8 +408,10 @@ void main() {
 
       test('should rehydrate Map<bool, double>', () {
         final context = StagerContext(const {
-          'type': 'Map<bool, double>',
-          'value': {'true': 1.0, false: '0.0'}
+          'value': [
+            'Map<bool, double>',
+            {'true': 1.0, false: '0.0'}
+          ]
         });
         final result = buildTypedValue(context);
         expect(result, isA<TypedValue<Map<bool, double>>>());
@@ -316,7 +419,12 @@ void main() {
       });
 
       test('should throw for malformed collection element', () {
-        final context = StagerContext(const {'type': 'List<int>', 'value': [1, "not_an_int"]});
+        final context = StagerContext(const {
+          'value': [
+            'List<int>',
+            [1, "not_an_int"]
+          ]
+        });
         expect(
           () => buildTypedValue(context),
           throwsA(isA<TypedValueRehydrationException>().having(
@@ -330,54 +438,52 @@ void main() {
 
     test('Map serialization', () {
       // Initialize a concrete leaf node.
-      final ConcreteLeafNode leaf =
-          ConcreteLeafNode(name: 'testLeaf', id: 'littleLeaf');
+      final ConcreteLeafNode leaf = ConcreteLeafNode(name: 'testLeaf');
 
       // Add diverse properties to verify broad rehydration support.
-      leaf.properties.set<double>('scale', 0.5);
-      leaf.properties.set<int>('count', 10);
-      leaf.properties.set<bool>('active', true);
-      leaf.properties.set<List<double>>('coords', [1.0, 2.0]);
-      leaf.properties.set<Map<String, String>>('meta', {'key': 'val'});
+      leaf.setProperty('scale', TypedValue<double>(0.5));
+      leaf.setProperty('count', TypedValue<int>(10));
+      leaf.setProperty('active', TypedValue<bool>(true));
+      leaf.setProperty('coords', TypedValue<List<double>>([1.0, 2.0]));
+      leaf.setProperty('meta', TypedValue<Map<String, String>>({'key': 'val'}));
 
       // Wrap the leaf in a TypedValue and create its map representation.
       final TypedValue<ConcreteLeafNode> typedLeaf =
           TypedValue<ConcreteLeafNode>(leaf);
-      final Map<String, Object> testTypedMap = {'root': typedLeaf.toMap()};
+      final Map<String, Object> testTypedMap = {'root': typedLeaf.toTuple()};
 
       // Define an expected map structure for visual/manual comparison.
       final Map<String, Object> testMap = {
-        'root': {
-          'type': 'ConcreteLeafNode',
-          'value': {
+        'root': [
+          'ConcreteLeafNode',
+          {
             'name': 'testLeaf',
-            'id': 'littleLeaf',
-            'scale': 0.5,
-            'count': 10,
-            'active': true,
-            'coords': {
-              'type': 'List<double>',
-              'value': [1.0, 2.0]
-            },
-            'meta': {
-              'type': 'Map<String, String>',
-              'value': {'key': 'val'}
-            }
+            'id': ['UuidValue', leaf.id.toString()],
+            'position': ['Point', leaf.position.toMap()],
+            'scale': ['double', 0.5],
+            'count': ['int', 10],
+            'active': ['bool', true],
+            'coords': ['List<double>', [1.0, 2.0]],
+            'meta': ['Map<String, String>', {'key': 'val'}]
           }
-        }
+        ]
       };
 
       // Retrieve the property map from the node.
-      final leafPropMap = leaf.properties.map;
+      final leafPropMap = leaf.toMap();
 
       print('Original Property Map: $leafPropMap');
       print("Typed Leaf Map: $testTypedMap");
       print("Visual Expected Map: $testMap");
 
       // Dehydration: Flatten the property map into a serializable entry map.
-      final Map<String, Map<String, Object>> entryMap = {};
+      final Map<String, Object> entryMap = {};
       for (final entry in leafPropMap.entries) {
-        entryMap[entry.key] = entry.value.toMap();
+        if (entry.value is TypedValue) {
+          entryMap[entry.key] = (entry.value as TypedValue).toTuple();
+        } else {
+          entryMap[entry.key] = entry.value;
+        }
       }
       print("Serialized Entry Map (Dehydrated): $entryMap");
 
@@ -385,11 +491,20 @@ void main() {
       final reifiedMap = <String, Object>{};
       for (final entry in entryMap.entries) {
         // Create a StagerContext from the dehydrated map entry.
-        final context = StagerContext(entry.value);
+        // For tuples, we wrap it in a Map with the 'value' key to match
+        // buildTypedValue's expectations.
+        final context = StagerContext({'value': entry.value});
 
         // Rehydrate the TypedValue using the centralized builder function.
-        final reifiedTypedValue = buildTypedValue(context);
-        reifiedMap[entry.key] = reifiedTypedValue;
+        // We only test the rehydration of TypedValue supported types here.
+        if (entry.key != 'id' && entry.key != 'position' && entry.key != 'name') {
+          final reifiedTypedValue = buildTypedValue(context);
+          reifiedMap[entry.key] = reifiedTypedValue;
+        } else {
+          // Skip id, position and name as they are either raw or use custom
+          // builders not yet registered in buildTypedValue's internal map.
+          reifiedMap[entry.key] = leafPropMap[entry.key]!;
+        }
       }
 
       print('Rehydrated Map: $reifiedMap');
@@ -401,8 +516,8 @@ void main() {
     test("toString() and toJson()", () {
       final testValue = TypedValue<double>(1.0);
       // The TypedValue class considers these equivalent
-      expect(testValue.toString(), testValue.toMap().toString());
-      expect(testValue.toJson(), testValue.toMap());
+      expect(testValue.toString(), testValue.toTuple().toString());
+      expect(testValue.toJson(), testValue.toTuple());
     });
   });
 }

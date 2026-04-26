@@ -1,8 +1,9 @@
 // External packages
-import 'package:latlong2/latlong.dart';
 import 'package:xml/xml.dart';
 
 // Project files
+import '../system/point.dart';
+import '../system/typed_value.dart';
 import 'nodes/kml_document_node.dart';
 import 'nodes/kml_folder_node.dart';
 import 'nodes/kml_placemark_node.dart';
@@ -74,12 +75,10 @@ class KMLParserUtils {
     XmlElement element, 
     KMLStyleManager styleManager,
   ) {
-    final id = element.getAttribute('id') ?? 'doc_${element.hashCode}';
     final name = element.getElement('name')?.innerText ?? 'Unnamed Document';
     final styleUrl = element.getElement('styleUrl')?.innerText ?? 'default';
 
     return KMLDocumentNode(
-      id: id,
       name: name,
       styleManager: styleManager,
       styleUrl: styleUrl,
@@ -91,11 +90,9 @@ class KMLParserUtils {
     XmlElement element, 
     KMLStyleManager styleManager,
   ) {
-    final id = element.getAttribute('id') ?? 'folder_${element.hashCode}';
     final name = element.getElement('name')?.innerText ?? 'Unnamed Folder';
 
     return KMLFolderNode(
-      id: id,
       name: name
     );
   }
@@ -105,12 +102,10 @@ class KMLParserUtils {
     XmlElement element, 
     KMLStyleManager styleManager,
   ) {
-    final id = element.getAttribute('id') ?? 'pm_${element.hashCode}';
     final name = element.getElement('name')?.innerText ?? 'Unnamed Placemark';
     final styleUrl = element.getElement('styleUrl')?.innerText ?? 'default';
 
     final node = KMLPlacemarkNode(
-      id: id,
       name: name,
       styleManager: styleManager,
       styleUrl: styleUrl,
@@ -119,7 +114,7 @@ class KMLParserUtils {
     // Capture feature attributes.
     final desc = element.getElement('description')?.innerText;
     if (desc != null) {
-      node.properties.set('description', desc);
+      node.setProperty('description', TypedValue<String>(desc));
     }
 
     return node;
@@ -171,13 +166,12 @@ class KMLParserUtils {
     final coords = element.getElement('coordinates')?.innerText;
     
     if (coords != null) {
-      final latLng = parseCoordinate(coords);
+      final point = parseCoordinate(coords);
       node = KMLPointNode(
-        id: 'pt_${element.hashCode}',
         name: 'Point',
-        location: latLng,
         styleManager: styleManager,
       );
+      node.position = point;
     } else {
       throw const FormatException('KML Point missing coordinates');
     }
@@ -204,7 +198,6 @@ class KMLParserUtils {
       final points = parseCoordinateList(coords);
       if (points.isNotEmpty) {
         node = KMLPathNode(
-          id: 'path_${element.hashCode}',
           name: 'Path',
           outline: points,
           styleManager: styleManager
@@ -255,7 +248,6 @@ class KMLParserUtils {
 
         // Create the node
         node = KMLPolygonNode(
-            id: 'poly_${element.hashCode}',
             name: 'Polygon',
             styleManager: styleManager,
             outline: points,
@@ -272,26 +264,27 @@ class KMLParserUtils {
     return node;
   }
 
-  /// Parses a single KML coordinate string into a [LatLng] object.
+  /// Parses a single KML coordinate string into a [Point] object.
   ///
   /// [raw]: A coordinate string in the format "longitude,latitude[,altitude]".
   ///
-  /// Returns a non-nullable [LatLng] with values correctly swapped to 
-  /// (latitude, longitude).
+  /// Returns a non-nullable [Point] with values correctly mapped to 
+  /// (longitude, latitude, [altitude]).
   ///
   /// Throws [FormatException] if the input string is invalid or malformed.
-  static LatLng parseCoordinate(String raw) {
-    late LatLng result;
+  static Point parseCoordinate(String raw) {
+    late Point result;
     // KML standard is lon,lat,alt. We must trim and split.
     final parts = raw.trim().split(',');
     
     if (parts.length >= 2) {
       final lon = double.tryParse(parts[0]);
       final lat = double.tryParse(parts[1]);
+      final alt = parts.length >= 3 ? (double.tryParse(parts[2]) ?? 0.0) : 0.0;
       
       if (lon != null && lat != null) {
-        // Crucial Swap: KML is Lon,Lat; Stager/Leaflet is Lat,Lon.
-        result = LatLng(lat, lon);
+        // KML is Lon,Lat,Alt. Point convention is x=lon, y=lat, z=alt.
+        result = Point(coords: [lon, lat, alt]);
       } else {
         throw FormatException('KML coordinate contains non-numeric values: $raw');
       }
@@ -306,11 +299,11 @@ class KMLParserUtils {
   ///
   /// [raw]: A string containing multiple coordinate tuples.
   ///
-  /// Returns a [List] of [LatLng] objects.
-  static List<LatLng> parseCoordinateList(String raw) {
+  /// Returns a [List] of [Point] objects.
+  static List<Point> parseCoordinateList(String raw) {
      // Coordinates in KML lists are separated by whitespace.
      final tuples = raw.trim().split(RegExp(r'\s+'));
-     final points = <LatLng>[];
+     final points = <Point>[];
      for (final tuple in tuples) {
        try {
          points.add(parseCoordinate(tuple));

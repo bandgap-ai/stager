@@ -5,10 +5,11 @@ library;
 
 import 'package:uuid/uuid.dart';
 
+import '../builders/stager_context.dart';
 import 'node_visitor.dart';
 import 'tree.dart';
 import 'node_observer.dart';
-import 'point.dart';
+import '../system/point.dart';
 import '../system/typed_value.dart';
 
 /// A concrete implementation of a [LeafNode] that provides basic functionality.
@@ -72,42 +73,50 @@ class ConcreteLeafNode extends LeafNode {
   }
 
   @override
-  Map<String, TypedValue<Object>> toMap() {
+  Map<String, Object> toMap() {
 
     // Add the name and id to the map as well as the node properties
-    return <String,TypedValue<Object>>{
-      'name' : TypedValue<String>(name),
-      'id' : TypedValue<UuidValue>(id),
-      'position' : TypedValue<Point>(position),
+    return <String,Object>{
+      'name' : name,
+      'id' : id.toString(),
+      'position' : position.toMap(),
       ..._properties.map
     };
 
   }
 
   @override
-  void fromMap(Map<String, TypedValue<Object>> inputMap) {
+  void fromMap(Map<String, Object> inputMap) {
 
     // Make a copy so we can do what we want
     var map = Map.of(inputMap);
 
     // Pull the name and id from the map, if it has it.
     if (map.containsKey('name')) {
-      name = map['name']!.value.toString();
+      name = map['name'].toString();
       map.remove('name');
     }
     if (map.containsKey('id')) {
-      id = map['id']!.value as UuidValue;
+      id = UuidValue.fromString(map['id'].toString());
       map.remove('id');
     }
     // Grab the position
     if (map.containsKey('position')) {
-      position = map['position']!.value as Point;
+      position = buildPoint(StagerContext(
+          map['position']! as Map<String,Object>));
       map.remove('position');
     }
 
-    // Load all the properties
-    final tempProps = ConcreteNodeProperties(map);
-    // Merge everything
+    // Load all the generic properties from what remains in the map.
+    // We map every entry to a rehydrated TypedValue by passing the raw map 
+    // data to the centralized buildTypedValue factory.
+    final Map<String, TypedValue<Object>> rehydratedMap = map.map((key, value) =>
+        MapEntry(key, buildTypedValue(
+            StagerContext({'value': value as List<Object>}))));
+
+    final tempProps = ConcreteNodeProperties(rehydratedMap);
+    
+    // Merge the rehydrated properties into the node's bag.
     _properties.merge(tempProps);
 
     // Notify observers about the change in properties

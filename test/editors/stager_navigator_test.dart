@@ -42,7 +42,7 @@ void main() {
     }
 
     testWidgets('should display the label from SiteState', (WidgetTester tester) async {
-      selectionService.selection = Selection<LeafNode>(ConcreteLeafNode(id: '1', name: 'Test Node'));
+      selectionService.selection = Selection<LeafNode>(ConcreteLeafNode(name: 'Test Node'));
       await pumpWidget(tester);
       expect(find.text('Sites'), findsOneWidget);
     });
@@ -56,7 +56,7 @@ void main() {
     testWidgets('should display editor button when a node is selected', (WidgetTester tester) async {
 
       // Add a node
-      final node = ConcreteLeafNode(id: '1', name: 'Test Node');
+      final node = ConcreteLeafNode(name: 'Test Node');
       siteState.selectedNode = node;
       final TreeNode parent = siteState.addSite("Test Site");
       parent.addChild(node);
@@ -157,7 +157,7 @@ void main() {
       final treeFinder = find.byType(TreeView);
       final nodeViewFinder = find.descendant(
         of: treeFinder,
-        matching: find.text(nodeToDelete.properties.get<String>('name')),
+        matching: find.text(nodeToDelete.name),
       );
       expect(nodeViewFinder, findsOneWidget);
       await tester.tap(nodeViewFinder);
@@ -209,7 +209,7 @@ void main() {
 
       // Find the parent in the TreeView
       final parentFinder = find.descendant( of: treeFinder,
-          matching: find.text(parent.properties.get<String>('name')));
+          matching: find.text(parent.name));
       // Tap the parent to expand the list of children
       await tester.ensureVisible(parentFinder);
       await tester.tap(parentFinder);
@@ -222,7 +222,7 @@ void main() {
       // items in the list view are children of the TreeView.
       final nodeFinder = find.descendant(
           of: treeFinder,
-          matching: find.text(nodeToDelete.properties.get<String>('name')));
+          matching: find.text(nodeToDelete.name));
       await tester.ensureVisible(nodeFinder);
       await tester.tap(nodeFinder);
       await tester.pumpAndSettle();
@@ -252,7 +252,7 @@ void main() {
       final treeFinder = find.byType(TreeView);
       final nodeViewFinder = find.descendant(
         of: treeFinder,
-        matching: find.text(nodeToTest.properties.get<String>('name')),
+        matching: find.text(nodeToTest.name),
       );
       expect(nodeViewFinder, findsOneWidget);
       await tester.tap(nodeViewFinder);
@@ -285,7 +285,7 @@ void main() {
 
     testWidgets('tapping import button calls import on FileHandler and adds nodes', (WidgetTester tester) async {
       // Arrange
-      final nodesToImport = [ConcreteTreeNode(id: 'imported', name: 'Imported Node')];
+      final nodesToImport = [ConcreteTreeNode(name: 'Imported Node')];
       mockFileHandler.nodesToImport = nodesToImport;
       final initialSiteCount = siteState.treeData.length;
       await pumpWidget(tester);

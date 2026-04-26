@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../system/selection_service.dart';
+import '../../system/point.dart';
 import '../../tree/leaf_node.dart';
 import '../nodes/kml_polygon_node.dart';
 
@@ -24,19 +25,25 @@ class PolygonLayerAdapter {
   PolygonLayerAdapter(this.entries, this.onPolygonTap);
 
   /// Creates a [Polygon] from a list of points and a node.
-  Polygon _makePolygon(List<LatLng> points, LeafNode node) {
+  Polygon _makePolygon(List<Point> points, LeafNode node) {
     late final Polygon result;
 
     // See if this is the selected node.
     final bool isSelected =
         selectionService.isSet() ? (selectionService.selection.value == node) : false;
 
+    // Convert the points list to a list of LatLng
+    final List<LatLng> latLngPoints = [];
+    for (final point in points) {
+      latLngPoints.add(LatLng(point.y, point.x));
+    }
+
     // FIXME: Polygon in flutter_map does not have an onTap or a child widget
     // like Marker does. Taps on polygons are handled via MapEvents or
     // specialized layers. For now, we follow the structural pattern of
     // MarkerLayerAdapter.
     result = Polygon(
-      points: points,
+      points: latLngPoints,
       color: isSelected
           ? const Color(0x7F2196F3) // Colors.blue.withOpacity(0.5)
           : const Color(0x4D2196F3), // Colors.blue.withOpacity(0.3)
@@ -53,10 +60,9 @@ class PolygonLayerAdapter {
 
     for (final entry in entries) {
       for (final node in entry.value) {
-        // We look for an "outline" property which should be a List<LatLng>.
-        final outline =
-            node.properties.get<List<LatLng>>(KMLPolygonNode.outlineKey);
-        polygons.add(_makePolygon(outline, node));
+        if (node is KMLPolygonNode) {
+          polygons.add(_makePolygon(node.outline, node));
+        }
       }
     }
 

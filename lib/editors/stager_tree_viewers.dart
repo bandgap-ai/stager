@@ -64,7 +64,7 @@ class _LeafNodeViewState extends State<LeafNodeView> implements LeafNodeObserver
 
     return ListTile(
       contentPadding: EdgeInsets.only(left: 16.0 + widget.level * 20.0),
-      title: Text(widget.node.properties.get<String>('name')),
+      title: Text(widget.node.name),
       leading: Icon(iconData),
       selected: isSelected,
       onTap: () => widget.onNodeTap(widget.node),
@@ -137,7 +137,7 @@ class _CompositeNodeViewState extends State<CompositeNodeView>
 
     return ExpansionTile(
       tilePadding: EdgeInsets.only(left: 16.0 + widget.level * 20.0),
-      title: Text(widget.node.properties.get<String>('name')),
+      title: Text(widget.node.name),
       leading: Icon(iconData),
       initiallyExpanded: isSelected,
       backgroundColor:

@@ -53,7 +53,7 @@ void main() {
 
     test('writeToFile should save a file with the correct content', () async {
       // Arrange
-      final nodes = [ConcreteTreeNode(id: '1', name: 'Test Node')];
+      final nodes = [ConcreteTreeNode(name: 'Test Node')];
       final filePath = '${testDir.path}/export_test.json';
 
       // Act
@@ -78,7 +78,7 @@ void main() {
       // Assert
       expect(importedNodes, isNotNull);
       expect(importedNodes!.length, 1);
-      expect(importedNodes.first.properties.get<String>('name'), 'Test Node');
+      expect(importedNodes.first.name, 'Test Node');
     });
   });
 
@@ -124,8 +124,8 @@ void main() {
         // In this case, 'parentId' would be part of their 'properties' or a dedicated field
         // that your toJson/fromJson logic handles.
         // For ConcreteTreeNode, if parentId is managed via properties:
-        final node1 = ConcreteTreeNode(id: '1', name: 'Node One', initialProperties: {'type': TypedValue<String>('root')});
-        final node2 = ConcreteTreeNode(id: '2', name: 'Node Two', initialProperties: {'type': TypedValue<String>('child'), 'parentId': TypedValue<String>('1')});
+        final node1 = ConcreteTreeNode(name: 'Node One', initialProperties: {'type': TypedValue<String>('root')});
+        final node2 = ConcreteTreeNode(name: 'Node Two', initialProperties: {'type': TypedValue<String>('child'), 'parentId': TypedValue<String>('1')});
 
         // For this test, let's assume 'parentId' is a property that gets serialized if present.
         // The toJson() method of ConcreteTreeNode is responsible for what gets written.
@@ -226,8 +226,8 @@ void main() {
         final file = File(filePath);
         // Prepare a file with valid JSON content
         final nodesToSave = [
-          ConcreteTreeNode(id: 'node1', name: 'First Node'),
-          ConcreteTreeNode(id: 'node2', name: 'Second Node', initialProperties: {'custom': TypedValue<String>('value')}),
+          ConcreteTreeNode(name: 'First Node'),
+          ConcreteTreeNode(name: 'Second Node', initialProperties: {'custom': TypedValue<String>('value')}),
         ];
         // Use the handler's own write method to ensure format consistency (or craft JSON string manually)
         await fileHandler.writeToFile(filePath, nodesToSave);
@@ -239,10 +239,9 @@ void main() {
         // Assert
         expect(importedNodes, isNotNull, reason: 'Should return a list of nodes, not null');
         expect(importedNodes!.length, 2, reason: 'Should import two nodes');
-        expect(importedNodes.first.properties.get<String>('name'), 'First Node');
-        expect(importedNodes.first.properties.get<String>('id'), 'node1');
-        expect(importedNodes.last.properties.get<String>('name'), 'Second Node');
-        expect(importedNodes.last.properties.get<String>('custom'), 'value');
+        expect(importedNodes.first.name, 'First Node');
+        expect(importedNodes.last.name, 'Second Node');
+        expect(importedNodes.last.property('custom'), 'value');
       });
 
       test('should return an empty list if JSON file contains an empty list', () async {
@@ -307,8 +306,8 @@ void main() {
         // Arrange
         final filePath = '${testDir.path}/import_test_file.json';
         final nodesToSave = [
-          ConcreteTreeNode(id: 'nodeImport1', name: 'Imported Node 1', initialProperties: {}),
-          ConcreteTreeNode(id: 'nodeImport2', name: 'Imported Node 2', initialProperties: {}),
+          ConcreteTreeNode(name: 'Imported Node 1', initialProperties: {}),
+          ConcreteTreeNode(name: 'Imported Node 2', initialProperties: {}),
         ];
         // Use the handler's own write method to create the file (or craft JSON manually)
         // Note: For BasicFileHandler, writeToFile is separate and doesn't use context.
@@ -325,8 +324,8 @@ void main() {
         // Assert
         expect(importedNodes, isNotNull, reason: 'Imported nodes should not be null for a valid file.');
         expect(importedNodes?.length, 2, reason: 'Should import the correct number of nodes.');
-        expect(importedNodes?.any((n) => n.properties.get<String>('id') == 'nodeImport1' && n.properties.get<String>('name') == 'Imported Node 1'), isTrue);
-        expect(importedNodes?.any((n) => n.properties.get<String>('id') == 'nodeImport2' && n.properties.get<String>('name') == 'Imported Node 2'), isTrue);
+        expect(importedNodes?.any((n) => n.name == 'Imported Node 1'), isTrue);
+        expect(importedNodes?.any((n) => n.name == 'Imported Node 2'), isTrue);
 
         // SnackBar Assertion (basic check that it tried to show, requires tester)
         // This checks if a SnackBar was added to the widget tree.
@@ -397,8 +396,8 @@ void main() {
         // Arrange
         final filePath = '${testDir.path}/export_test_output_no_snackbar.json';
         final nodesToExport = [
-          ConcreteTreeNode(id: 'nodeExport1', name: 'Exported Node 1', initialProperties: {'data': TypedValue<String>('value1')}),
-          ConcreteTreeNode(id: 'nodeExport2', name: 'Exported Node 2', initialProperties: {'data': TypedValue<String>('value2')}),
+          ConcreteTreeNode(name: 'Exported Node 1', initialProperties: {'data': TypedValue<String>('value1')}),
+          ConcreteTreeNode(name: 'Exported Node 2', initialProperties: {'data': TypedValue<String>('value2')}),
         ];
 
         // Create a BuildContext (needed for the method signature, but UI interaction ignored)
@@ -471,7 +470,7 @@ void main() {
         final badFilePath = '/this/path/should/definitely/not/be/writable/export_fail_no_snackbar.json';
         final nodesToExport = [
           ConcreteTreeNode(
-              id: 'nodeFail', name: 'Fail Node', initialProperties: {})
+              name: 'Fail Node', initialProperties: {})
         ];
 
         late BuildContext capturedContext;

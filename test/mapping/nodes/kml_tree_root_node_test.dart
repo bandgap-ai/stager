@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 
 // Project files
+import 'package:stager_platform/system/point.dart';
 import 'package:stager_platform/mapping/kml_hole.dart';
 import 'package:stager_platform/mapping/nodes/kml_path_node.dart';
 import 'package:stager_platform/mapping/nodes/kml_placemark_node.dart';
@@ -33,14 +34,12 @@ void main() {
     test('Constructor correctly initializes with default styleUrl', () {
       // Arrange & Act
       final root = KMLTreeRootNode(
-        id: 'root1',
         name: 'KML Document',
         styleManager: manager,
       );
 
       // Assert
-      expect(root.properties.get<String>('id'), 'root1');
-      expect(root.properties.get<String>('name'), 'KML Document');
+      expect(root.name, 'KML Document');
       expect(root.styleUrl, 'default');
       expect(root.kmlStyle.id, 'default');
     });
@@ -54,7 +53,6 @@ void main() {
 
       // Act
       final root = KMLTreeRootNode(
-        id: 'root2',
         name: 'Styled Root',
         styleManager: manager,
         styleUrl: 'rootStyle',
@@ -69,7 +67,6 @@ void main() {
     test('Inherits traversal capabilities from ConcreteTreeNode', () {
       // Arrange & Act
       final root = KMLTreeRootNode(
-        id: 'root3',
         name: 'Traversable Root',
         styleManager: manager,
       );
@@ -84,7 +81,6 @@ void main() {
     test('Throws ArgumentError for missing non-default style', () {
       // Arrange
       final root = KMLTreeRootNode(
-        id: 'root4',
         name: 'Invalid Style Root',
         styleManager: manager,
         styleUrl: 'bad-style',
@@ -98,7 +94,6 @@ void main() {
       test('throws StateError if tree contains no geographic data', () {
         // Arrange
         final root = KMLTreeRootNode(
-          id: 'root_empty',
           name: 'Empty Root',
           styleManager: manager,
         );
@@ -110,58 +105,52 @@ void main() {
       test('correctly summarizes a complex KML tree', () {
         // Arrange
         final root = KMLTreeRootNode(
-          id: 'root_complex',
           name: 'Complex Root',
           styleManager: manager,
         );
 
         // Level 2: Placemark with Point
         final pm1 = KMLPlacemarkNode(
-          id: 'pm1',
           name: 'Point Placemark',
           styleManager: manager,
         );
-        pm1.addChild(KMLPointNode(
-          id: 'pt1',
+        final child = KMLPointNode(
           name: 'Point',
           styleManager: manager,
-          location: const LatLng(10, 10),
-        ));
+        );
+        child.position = Point(coords: [10, 10]);
+        pm1.addChild(child);
         root.addChild(pm1);
 
         // Level 2: Placemark with Path
         final pm2 = KMLPlacemarkNode(
-          id: 'pm2',
           name: 'Path Placemark',
           styleManager: manager,
         );
         pm2.addChild(KMLPathNode(
-          id: 'path1',
           name: 'Path',
           styleManager: manager,
-          outline: [const LatLng(20, 20), const LatLng(25, 25)],
+          outline: [const Point(coords: [20, 20]), const Point(coords: [25, 25])],
         ));
         root.addChild(pm2);
 
         // Level 2: Placemark with Polygon + Hole
         final pm3 = KMLPlacemarkNode(
-          id: 'pm3',
           name: 'Polygon Placemark',
           styleManager: manager,
         );
         pm3.addChild(KMLPolygonNode(
-          id: 'poly1',
           name: 'Polygon',
           styleManager: manager,
           outline: [
-            const LatLng(0, 0),
-            const LatLng(5, 0),
-            const LatLng(5, 5),
-            const LatLng(0, 5),
-            const LatLng(0, 0),
+            const Point(coords: [0, 0]),
+            const Point(coords: [5, 0]),
+            const Point(coords: [5, 5]),
+            const Point(coords: [0, 5]),
+            const Point(coords: [0, 0]),
           ],
           holes: [
-            KMLHole(points: [const LatLng(1, 1), const LatLng(2, 1), const LatLng(1, 1)]),
+            KMLHole(points: [const Point(coords: [1, 1]), const Point(coords: [2, 1]), const Point(coords: [1, 1])]),
           ],
         ));
         root.addChild(pm3);
@@ -183,8 +172,8 @@ void main() {
         // Lats: 10 + 20 + 25 + 0 + 5 + 5 + 0 + 0 + 1 + 2 + 1 = 69
         // Lngs: 10 + 20 + 25 + 0 + 0 + 5 + 5 + 0 + 1 + 1 + 1 = 68
         // Count: 11
-        expect(summary.centerPoint?.latitude, closeTo(69 / 11, 0.0001));
-        expect(summary.centerPoint?.longitude, closeTo(68 / 11, 0.0001));
+        expect(summary.centerPoint?.y, closeTo(69 / 11, 0.0001));
+        expect(summary.centerPoint?.x, closeTo(68 / 11, 0.0001));
 
         // Assert: Convex hull
         expect(summary.boundingPolygon.length, greaterThanOrEqualTo(3));

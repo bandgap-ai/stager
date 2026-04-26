@@ -9,6 +9,26 @@ import 'mock_node_observer.dart';
 
 /// Unit tests for the [ConcreteNodeProperties] class.
 void main() {
+
+  group('Basic NodeProperties', () {
+    test('ConcreteNodeProperties can set and get properties', () {
+      final properties = ConcreteNodeProperties();
+      properties.set<String>('name', 'Test Name');
+      properties.set<int>('value', 123);
+      properties.set<bool>('is_active', true);
+
+      expect(properties.get<String>('name'), 'Test Name');
+      expect(properties.get<int>('value'), 123);
+      expect(properties.get<bool>('is_active'), true);
+      expect(properties.contains('non_existent'), false);
+      // Check that being a moron and asking for something that isn't there
+      // throws a NodePropertyException.
+      expect(() => properties.get<String>('non_existent'),
+          throwsA(isA<NodePropertyException>()));
+    });
+
+  });
+
   group('ConcreteNodeProperties Tests', () {
     test('containsProperty should correctly identify existing and missing keys', () {
       // Create a properties container with a pre-defined String property to 

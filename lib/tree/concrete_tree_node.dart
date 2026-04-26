@@ -5,10 +5,10 @@
 /// node searching.
 library;
 import 'dart:math' as math;
-import 'package:latlong2/latlong.dart';
-import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/tree/iterators.dart';
-import 'package:stager_platform/tree/node_summary.dart';
+import 'tree.dart';
+import 'iterators.dart';
+import 'node_summary.dart';
+import '../system/point.dart';
 
 class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
   /// Creates a [ConcreteTreeNode] instance.
@@ -49,7 +49,7 @@ class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
   @override
   NodeSummary summarize() {
     final nodeCountsByLevel = <int, int>{};
-    final validCoordinates = <LatLng>[];
+    final validCoordinates = <Point>[];
     final allNodes = <LeafNode>[];
     double totalOutlineArea = 0.0;
     bool hasOutlineAreas = false;
@@ -67,10 +67,7 @@ class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
       nodeCountsByLevel[level] = (nodeCountsByLevel[level] ?? 0) + 1;
 
       // Extract coordinates if available
-      final coordinates = _extractCoordinates(node);
-      if (coordinates != null) {
-        validCoordinates.add(coordinates);
-      }
+      validCoordinates.add(node.position);
 
       // Calculate outline area for Level 1 nodes (direct children of root)
       if (level == 2) { // Level 1 nodes are at level 2 (root is level 1)
@@ -115,28 +112,12 @@ class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
     return level + 1;
   }
 
-  /// Extracts valid coordinates from a node's properties.
-  LatLng? _extractCoordinates(LeafNode node) {
-    LatLng? pos;
-    try {
-      if (containsProperty('latitude') && containsProperty('longitude')) {
-        // Leaving this AS-IS for now because I need to fix positions differently.
-        final lat = typedProperty('latitude').value as double;
-        final lng = typedProperty('longitude').value as double;
-        pos = LatLng(lat,lng);
-      }
-    } catch (e) {
-      pos = null;
-    }
-    return pos;
-  }
-
   /// Calculates the area of an outline polygon for a node.
   double? _calculateOutlineArea(LeafNode node) {
     double? retArea;
     try {
       if (containsProperty('outline')) {
-        final points = property('outline') as List<LatLng>;
+        final points = property('outline') as List<Point>;
 
         if (points.length < 3) return null;
 
@@ -144,8 +125,8 @@ class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
         double area = 0.0;
         for (int i = 0; i < points.length; i++) {
           final j = (i + 1) % points.length;
-          area += points[i].longitude * points[j].latitude;
-          area -= points[j].longitude * points[i].latitude;
+          area += points[i].x * points[j].y;
+          area -= points[j].x * points[i].y;
         }
         area = (area / 2.0).abs();
 
@@ -165,29 +146,29 @@ class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
   }
 
   /// Computes the convex hull of a set of points using Graham scan algorithm.
-  List<LatLng> _computeConvexHull(List<LatLng> points) {
+  List<Point> _computeConvexHull(List<Point> points) {
     if (points.length < 3) return points;
 
     // Find the bottom-most point (or left most in case of tie)
-    LatLng start = points[0];
+    Point start = points[0];
     for (final point in points) {
-      if (point.latitude < start.latitude || 
-          (point.latitude == start.latitude && point.longitude < start.longitude)) {
+      if (point.y < start.y || 
+          (point.y == start.y && point.x < start.x)) {
         start = point;
       }
     }
 
     // Sort points by polar angle with respect to start point
-    final sorted = List<LatLng>.from(points);
+    final sorted = List<Point>.from(points);
     sorted.remove(start);
     sorted.sort((a, b) {
-      final angleA = math.atan2(a.latitude - start.latitude, a.longitude - start.longitude);
-      final angleB = math.atan2(b.latitude - start.latitude, b.longitude - start.longitude);
+      final angleA = math.atan2(a.y - start.y, a.x - start.x);
+      final angleB = math.atan2(b.y - start.y, b.x - start.x);
       return angleA.compareTo(angleB);
     });
 
     // Graham scan
-    final hull = <LatLng>[start];
+    final hull = <Point>[start];
     for (final point in sorted) {
       while (hull.length > 1 && 
              _crossProduct(hull[hull.length - 2], hull[hull.length - 1], point) <= 0) {
@@ -200,23 +181,23 @@ class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
   }
 
   /// Calculates the cross product for three points (used in convex hull).
-  double _crossProduct(LatLng p1, LatLng p2, LatLng p3) {
-    return (p2.longitude - p1.longitude) * (p3.latitude - p1.latitude) - 
-           (p2.latitude - p1.latitude) * (p3.longitude - p1.longitude);
+  double _crossProduct(Point p1, Point p2, Point p3) {
+    return (p2.x - p1.x) * (p3.y - p1.y) - 
+           (p2.y - p1.y) * (p3.x - p1.x);
   }
 
   /// Computes the geographic center point (centroid) of a set of coordinates.
-  LatLng? _computeCenterPoint(List<LatLng> points) {
+  Point? _computeCenterPoint(List<Point> points) {
     if (points.isEmpty) return null;
 
     double sumLat = 0.0;
     double sumLng = 0.0;
 
     for (final point in points) {
-      sumLat += point.latitude;
-      sumLng += point.longitude;
+      sumLat += point.y;
+      sumLng += point.x;
     }
 
-    return LatLng(sumLat / points.length, sumLng / points.length);
+    return Point(coords: [sumLng / points.length, sumLat / points.length]);
   }
 }

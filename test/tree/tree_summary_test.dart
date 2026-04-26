@@ -4,7 +4,7 @@ library;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/system/typed_value.dart';
-import 'package:stager_platform/tree/point.dart';
+import 'package:stager_platform/system/point.dart';
 import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/node_summary.dart';
 
@@ -26,11 +26,11 @@ void main() {
         totalNodes: 5,
         nodeCountsByLevel: {1: 2, 2: 3},
         boundingPolygon: [
-          const LatLng(40.0, -74.0),
-          const LatLng(40.1, -74.0),
-          const LatLng(40.1, -74.1),
+          Point(coords: [-74.0,40.0]),
+          Point(coords: [-74.0,40.1]),
+          Point(coords: [-74.1,40.1]),
         ],
-        centerPoint: const LatLng(40.05, -74.05),
+        centerPoint: Point(coords: [-74.05,40.05]),
         totalOutlineArea: 1500.0,
         additionalStats: {'averageSpacing': 25.5},
       );
@@ -120,8 +120,8 @@ void main() {
       
       expect(summary.totalNodes, 4);
       expect(summary.centerPoint, isNotNull);
-      expect(summary.centerPoint!.latitude, closeTo(40.1, 0.01));
-      expect(summary.centerPoint!.longitude, closeTo(-74.1, 0.01));
+      expect(summary.centerPoint!.y, closeTo(40.1, 0.01));
+      expect(summary.centerPoint!.x, closeTo(-74.1, 0.01));
       expect(summary.boundingPolygon, isNotEmpty);
     });
 
@@ -130,7 +130,7 @@ void main() {
       
       // Node with coordinates
       final nodeWithCoords = ConcreteLeafNode(name: 'With Coords');
-      nodeWithCoords.position = Point(coords: [-74.0, 40.0]);
+      nodeWithCoords.position = Point(coords: [-74.0,40.0]);
       
       // Node without coordinates
       final nodeWithoutCoords = ConcreteLeafNode(name: 'No Coords');
@@ -142,8 +142,8 @@ void main() {
       
       expect(summary.totalNodes, 3);
       expect(summary.centerPoint, isNotNull); // Should still compute from valid coordinates
-      expect(summary.centerPoint!.latitude, 40.0);
-      expect(summary.centerPoint!.longitude, -74.0);
+      expect(summary.centerPoint!.y, 40.0);
+      expect(summary.centerPoint!.x, -74.0);
     });
 
     test('should compute convex hull for multiple points', () {
@@ -160,7 +160,7 @@ void main() {
       
       for (int i = 0; i < coordinates.length; i++) {
         final node = ConcreteLeafNode(name: 'Node $i');
-        node.position = Point(coords: [coordinates[i][1], coordinates[i][0]]);
+        node.position = Point(coords: [coordinates[i][1],coordinates[i][0]]);
         tree.addChild(node);
       }
       
@@ -178,11 +178,11 @@ void main() {
       // Add outline area to Level 1 node (rectangular area)
 
       // Gemini, can you unfuck this?
-      level1Node.setProperty('outline', TypedValue<List<LatLng>>([
-        LatLng(40.0, -74.0),
-        LatLng(40.1, -74.0),
-        LatLng(40.1, -74.1),
-        LatLng(40.0, -74.1),
+      level1Node.setProperty('outline', TypedValue<List<Point>>([
+        Point(coords: [-74.0,40.0]),
+        Point(coords: [-74.0,40.1]),
+        Point(coords: [-74.1,40.1]),
+        Point(coords: [-74.1,40.0]),
       ]));
       
       tree.addChild(level1Node);
@@ -240,11 +240,11 @@ void main() {
         totalNodes: 15,
         nodeCountsByLevel: {1: 1, 2: 5, 3: 9},
         boundingPolygon: [
-          const LatLng(40.0, -74.0),
-          const LatLng(40.1, -74.0),
-          const LatLng(40.1, -74.1),
+          Point(coords: [-74.0,40.0]),
+          Point(coords: [-74.0,40.1]),
+          Point(coords: [-74.1,40.1]),
         ],
-        centerPoint: const LatLng(40.05, -74.05),
+        centerPoint: Point(coords: [-74.05,40.05]),
         totalOutlineArea: 1234.56,
         additionalStats: {'averageHeight': 25.5, 'speciesCount': 3},
       );
@@ -256,18 +256,18 @@ void main() {
       expect(summaryString, startsWith('NodeSummary('));
       expect(summaryString, endsWith(')'));
       expect(summaryString, contains('totalNodes: 15'));
-      expect(summaryString, contains('center: LatLng(latitude:40.05, longitude:-74.05)'));
+      expect(summaryString, contains('center: Point(coords: [longitude:-74.05,latitude:40.05])'));
     });
 
     // Helper to create a fully populated NodeSummary instance for tests
     NodeSummary createPopulatedSummary({
       int totalNodes = 10,
       Map<int, int> nodeCountsByLevel = const {1: 1, 2: 3, 3: 6},
-      List<LatLng> boundingPolygon = const [
-        LatLng(10.0, 20.0),
-        LatLng(10.1, 20.1)
+      List<Point> boundingPolygon = const [
+        Point(coords: [20.0,10.0]),
+        Point(coords: [20.0,10.1])
       ],
-      LatLng? centerPoint = const LatLng(10.05, 20.05),
+      Point? centerPoint = const Point(coords: [20.05,10.05]),
       double? totalOutlineArea = 100.5,
       Map<String, dynamic> additionalStats = const {'avg_height': 15.5},
     }) {
@@ -309,15 +309,15 @@ void main() {
       });
 
       test('instances with different boundingPolygon should not be equal', () {
-        final summary1 = createPopulatedSummary(boundingPolygon: [const LatLng(0,0)]);
-        final summary2 = createPopulatedSummary(boundingPolygon: [const LatLng(1,1)]);
+        final summary1 = createPopulatedSummary(boundingPolygon: [Point(coords: [0,0])]);
+        final summary2 = createPopulatedSummary(boundingPolygon: [Point(coords: [1,1])]);
 
         expect(summary1, isNot(equals(summary2)));
       });
 
       test('instances with different centerPoint should not be equal', () {
-        final summary1 = createPopulatedSummary(centerPoint: const LatLng(0,0));
-        final summary2 = createPopulatedSummary(centerPoint: const LatLng(1,1));
+        final summary1 = createPopulatedSummary(centerPoint: Point(coords: [0,0]));
+        final summary2 = createPopulatedSummary(centerPoint: Point(coords: [1,1]));
         final summary3 = createPopulatedSummary(centerPoint: null);
 
 

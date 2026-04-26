@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/mapping/nodes/map_selection_visitor_handler.dart';
 import 'package:stager_platform/system/selection.dart';
+import 'package:stager_platform/system/point.dart';
 import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/tree/concrete_composite_node.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';
@@ -22,7 +23,6 @@ void main() {
     test('should update location when visiting a ConcreteLeafNode with coordinates', () {
       // Arrange
       final node = ConcreteLeafNode(
-        id: 'leaf-1',
         name: 'Test Leaf',
         initialProperties: {
           'latitude': TypedValue<double>(38.0),
@@ -41,7 +41,6 @@ void main() {
     test('should update location when visiting a ConcreteCompositeNode with coordinates', () {
       // Arrange
       final node = ConcreteCompositeNode(
-        id: 'comp-1',
         name: 'Test Composite',
         initialProperties: {
           'latitude': TypedValue<double>(40.0),
@@ -60,7 +59,6 @@ void main() {
     test('should update location when visiting a ConcreteTreeNode with coordinates', () {
       // Arrange
       final node = ConcreteTreeNode(
-        id: 'tree-1',
         name: 'Test Tree',
         initialProperties: {
           'latitude': TypedValue<double>(39.0),
@@ -79,10 +77,9 @@ void main() {
     test('should reset location to (0.0, 0.0) when coordinates are missing in properties', () {
       // Arrange
       // First set it to something else to verify it actually changes back to 0,0
-      handler.location = const LatLng(10.0, 10.0);
+      handler.location = Point(coords: [10.0, 10.0]);
       
       final node = ConcreteLeafNode(
-        id: 'leaf-no-loc',
         name: 'No Location Leaf',
         initialProperties: {
           'name': TypedValue<String>('Just a name'),
@@ -108,7 +105,6 @@ void main() {
     test('should handle partially missing coordinates (only latitude)', () {
        // Arrange
       final node = ConcreteLeafNode(
-        id: 'leaf-partial',
         name: 'Partial Location',
         initialProperties: {
           'latitude': TypedValue<double>(38.0),

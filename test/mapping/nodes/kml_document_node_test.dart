@@ -18,27 +18,23 @@ void main() {
     test('should correctly instantiate and inherit from KMLFeatureNode', () {
       // Arrange & Act
       final node = KMLDocumentNode(
-        id: 'doc1',
         name: 'My Document',
         styleManager: manager,
       );
 
       // Assert
       expect(node, isA<KMLFeatureNode>());
-      expect(node.properties.get<String>('id'), 'doc1');
-      expect(node.properties.get<String>('name'), 'My Document');
+      expect(node.name, 'My Document');
       expect(node.isComposite, isTrue);
     });
 
     test('should support children as a composite node', () {
       // Arrange
       final parent = KMLDocumentNode(
-        id: 'doc2',
         name: 'Parent Document',
         styleManager: manager,
       );
       final child = KMLDocumentNode(
-        id: 'doc3',
         name: 'Child Document',
         styleManager: manager,
       );
