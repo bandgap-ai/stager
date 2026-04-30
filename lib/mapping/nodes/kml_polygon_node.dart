@@ -1,8 +1,22 @@
-import '../../builders/stager_context.dart';
+import '../../system/stager_context.dart';
 import '../../system/point.dart';
-import '../../system/typed_value.dart';
 import '../kml_hole.dart';
+import '../style/kml_style_manager.dart';
 import 'kml_geometry_node.dart';
+import '../../builders/basic_builder.dart';
+
+/// This is a builder for KML Polygon nodes.
+///
+/// [context]: The context for building the node.
+/// Returns a [KMLPolygonNode] instance.
+@BasicBuilder(name: 'KMLPolygonNode')
+KMLPolygonNode buildKMLPolygonNode(StagerContext context) {
+  final manager = KMLStyleManager();
+  KMLPolygonNode node = KMLPolygonNode(name: 'Polygon',
+      styleManager: manager, outline: []);
+  node.fromMap(context.toMap());
+  return node;
+}
 
 /// A concrete [KMLGeometryNode] representing a KML Polygon.
 ///
@@ -77,7 +91,7 @@ class KMLPolygonNode extends KMLGeometryNode {
 
   @override
   void fromMap(Map<String, Object> inputMap) {
-    final map = Map<String, TypedValue<Object>>.from(inputMap);
+    final map = Map<String, Object>.from(inputMap);
 
     // Rehydrate outline member.
     if (map.containsKey('outline')) {
@@ -89,8 +103,8 @@ class KMLPolygonNode extends KMLGeometryNode {
     }
 
     // Rehydrate holes member.
-    if (map.containsKey('kml_holes')) {
-      final List<Object> rawList = map['kml_holes']! as List<Object>;
+    if (map.containsKey('holes')) {
+      final List<Object> rawList = map['holes']! as List<Object>;
       _holes = rawList.map((e) => KMLHole.fromMap(
           e as Map<String, Object>)).toList();
       map.remove('holes');

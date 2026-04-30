@@ -4,6 +4,7 @@ import 'package:stager_platform/mapping/nodes/kml_geometry_node.dart';
 import 'package:stager_platform/mapping/kml_hole.dart';
 import 'package:stager_platform/mapping/style/kml_style_manager.dart';
 import 'package:stager_platform/system/point.dart';
+import 'package:stager_platform/system/stager_context.dart';
 import 'package:stager_platform/system/typed_value.dart';
 
 void main() {
@@ -49,6 +50,11 @@ void main() {
 
       expect(node.outline, equals(outline));
       expect(node.holes, equals(holes));
+
+      // Try the builder
+      final node2 = buildKMLPolygonNode(StagerContext(node.toMap()));
+      expect(node2.outline, equals(outline));
+      expect(node2.holes, equals(holes));
     });
 
     test('should update geometry via intrinsic setters', () {

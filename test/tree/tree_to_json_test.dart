@@ -4,6 +4,21 @@ import 'package:stager_platform/data/basic_sample_data.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/tree/iterators.dart';
 
+
+class TestLeafNode extends ConcreteLeafNode {
+  TestLeafNode({required super.name});
+  @override
+  void fromMap(Map<String, Object> inputMap) {
+    super.fromMap(inputMap);
+  }
+  factory TestLeafNode.fromJson(Map<String, Object> map) {
+    final node = TestLeafNode(name: 'test');
+    node.fromMap(map);
+    print('TestLeafNode.fromJson(): ${node.toMap()}');
+    return node;
+  }
+}
+
 /// A utility test to visualize the hierarchical state of the sample data.
 ///
 /// This test traverses the [sampleSites] tree and prints the reified state
@@ -19,10 +34,10 @@ void main() {
 
     if (value is Map) {
       // Reify dynamic maps into strictly typed Map<String, Object>.
-      result = value.cast<String, Object>();
+      result = Map<String, Object>.from(value);
     } else if (value is List) {
       // Reify dynamic lists into strictly typed List<Object>.
-      result = value.cast<Object>();
+      result = List<Object>.from(value);
     }
 
     return result;
@@ -71,5 +86,18 @@ void main() {
 
     // Verify that the reified decoded map is equal to the original map.
     expect(decodedMap, equals(originalMap));
+  });
+
+  test('JSON LeafNode Check', () {
+    final leaf = TestLeafNode(name: 'Test Leaf');
+    final String leafJson = jsonEncode(leaf);
+    print(leafJson);
+    final revivedLeafCastMap = jsonDecode(leafJson, reviver: _jsonReviver);
+    print(revivedLeafCastMap);
+    print(revivedLeafCastMap.runtimeType);
+    final map = Map<String,Object>.from(revivedLeafCastMap);
+    print(map);
+    print(map.runtimeType);
+    final revivedLeaf = TestLeafNode.fromJson(map);
   });
 }

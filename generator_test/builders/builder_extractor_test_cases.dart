@@ -1,6 +1,6 @@
 import 'package:source_gen_test/annotations.dart';
 import 'package:stager_platform/builders/basic_builder.dart';
-import 'package:stager_platform/builders/stager_context.dart';
+import 'package:stager_platform/system/stager_context.dart';
 
 // Dummy class to act as our resolved 'T' type
 class AwesomeNode {}

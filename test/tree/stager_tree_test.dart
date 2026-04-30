@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stager_platform/system/stager_context.dart';
 import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/system/point.dart';
@@ -146,6 +147,51 @@ void main() {
       leaf.accept(visitor);
       expect(visitor.hasVisited, true);
     });
+
+    test('ConcreteLeafNode and LeafNode builders work', () {
+      Map<String, Object> map = {
+        'name': 'Leaf'
+      };
+      // Add a couple properties to the map. They should appear as node
+      // properties.
+      map['name'] = "Tree";
+      map['health'] = TypedValue<String>("Good").toTuple();
+      map['age'] = TypedValue<int>(10).toTuple();
+      final tree = buildConcreteLeafNode(StagerContext(map));
+      expect(tree.name, 'Tree');
+      expect(tree.runtimeType, ConcreteLeafNode);
+      expect(tree.property('health'), 'Good');
+      expect(tree.typedProperty('age').value as int, 10);
+    });
+
+    test('ConcreteLeafNode will complain for incorrect typed values', () {
+      Map<String, Object> map = {
+        'name': 'Leaf'
+      };
+      // Check a basic leaf node. This should be a concrete leaf node.
+      final leaf = buildConcreteLeafNode(StagerContext(map));
+      expect(leaf.name, 'Leaf');
+      expect(leaf.runtimeType, ConcreteLeafNode);
+      // Add a couple properties to the map. They should appear as node
+      // properties.
+      map['name'] = "Tree";
+      // The following value is not allowed because the maps accepted by
+      // ConcreteLeafNode are expected to be serialized to its tuple form.
+      map['health'] = TypedValue<String>("Good");
+      expect(
+            () => buildConcreteLeafNode(StagerContext(map)),
+        throwsA(
+          isA<NodePropertyException>().having(
+                (e) => e.toString(),
+            'toString()',
+            'NodePropertyException: Property "health" with type '
+                'TypedValue<String> is not a TypedValue tuple (List<Object>) but '
+                'must be since it is a generic property. If this property was'
+                'created programmatically, ensure that TypedValue.toTuple() was'
+                'called.',
+          ),
+        ),);
+    });
   });
 
   group('CompositeNode', () {
@@ -155,6 +201,16 @@ void main() {
       expect(composite.name, 'Composite 1');
       expect(composite.isComposite, isTrue);
       expect(composite.children, isEmpty);
+    });
+
+    test('ConcreteCompositeNode builder works', () {
+      Map<String, Object> map = {
+        'name': 'Branch'
+      };
+      // Check a composite node. This should be a concrete composite node.
+      final node = buildConcreteCompositeNode(StagerContext(map));
+      expect(node.name, 'Branch');
+      expect(node.runtimeType, ConcreteCompositeNode);
     });
 
     test('ConcreteCompositeNode adds and removes children correctly', () {
@@ -270,6 +326,16 @@ void main() {
 
       comp3.addChild(comp4);
       comp4.addChild(leaf5);
+    });
+
+    test('ConcreteTreeNode builder works', () {
+      Map<String, Object> map = {
+        'name': 'Tree'
+      };
+      // Check a composite node. This should be a concrete composite node.
+      final node = buildConcreteTreeNode(StagerContext(map));
+      expect(node.name, 'Tree');
+      expect(node.runtimeType, ConcreteTreeNode);
     });
 
     test('createIterator defaults to depth-first', () {

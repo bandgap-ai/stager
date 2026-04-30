@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/builders/basic_builder.dart';
-import 'package:stager_platform/builders/stager_context.dart';
+import 'package:stager_platform/system/stager_context.dart';
 
 /// Unit tests for [BasicBuilder] and [BasicBuilderHandler].
 void main() {

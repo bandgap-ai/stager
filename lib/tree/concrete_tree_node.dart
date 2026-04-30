@@ -4,11 +4,25 @@
 /// implementations for tree traversal (depth-first and breadth-first) and
 /// node searching.
 library;
+
 import 'dart:math' as math;
 import 'tree.dart';
 import 'iterators.dart';
 import 'node_summary.dart';
 import '../system/point.dart';
+import '../system/stager_context.dart';
+import '../builders/basic_builder.dart';
+
+/// This is a builder for concrete tree nodes.
+///
+/// [context]: The context for building the leaf node.
+/// Returns a [ConcreteTreeNode] instance.
+@BasicBuilder(name: 'ConcreteLeafNode')
+ConcreteTreeNode buildConcreteTreeNode(StagerContext context) {
+  ConcreteTreeNode node = ConcreteTreeNode(name: 'Tree');
+  node.fromMap(context.toMap());
+  return node;
+}
 
 class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
   /// Creates a [ConcreteTreeNode] instance.

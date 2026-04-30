@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
-import '../builders/stager_context.dart';
+import '../system/registry.dart';
+import '../system/stager_context.dart';
 import '../system/point.dart';
 import '../system/typed_value.dart';
 
@@ -31,18 +32,22 @@ class KMLHole {
   /// Exports the hole state to a map structure for persistence.
   Map<String, Object> toMap() {
     return {
-      'points': TypedValue<List<Object>>(points.map((p) => p.toMap()).toList())
-          .toTuple(),
+      'points': points.map((p) => p.toMap()).toList(),
     };
   }
 
   /// Rehydrates a [KMLHole] from a map representation.
   static KMLHole fromMap(Map<String, Object> inputMap) {
-    final context = StagerContext(inputMap);
-    final rawList = context.get<TypedValue<List<Object>>>('points').value;
-    final points = rawList
-        .map((e) => buildPoint(StagerContext({'value': e as List<Object>})))
-        .toList();
-    return KMLHole(points: points);
+    // Get the map, which should have "points" in it
+    List<Point> pointsList = [];
+    if (inputMap.containsKey('points')) {
+      final rawPointsList = inputMap['points']! as List<Object>;
+      // This should be a list of points.
+      for (final pointEntry in rawPointsList) {
+        Point point = buildObject('Point', pointEntry as Map<String, Object>) as Point;
+        pointsList.add(point);
+      }
+    }
+    return KMLHole(points: pointsList);
   }
 }

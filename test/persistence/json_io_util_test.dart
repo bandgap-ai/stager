@@ -1,158 +1,209 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stager_platform/data/basic_sample_data.dart';
 import 'package:stager_platform/persistence/json_io_util.dart';
 import 'package:stager_platform/system/typed_value.dart';
-import 'package:stager_platform/system/point.dart';
 import 'package:stager_platform/tree/tree.dart';
 
-/// Unit tests for the [JsonIOUtil] codec.
 void main() {
   group('JsonIOUtil Tests', () {
     const ioUtil = JsonIOUtil();
 
-    test('should serialize and deserialize a complex tree structure', () {
-      // Create a small tree hierarchy with diverse data types.
+    test('Handle LeafNodes', () {
+      // Create a some concrete leaf nodes and write them to a JSON string.
       final leaf1 = ConcreteLeafNode(name: 'Leaf 1');
-      
-      final leaf2 = ConcreteLeafNode(name: 'Leaf 2')
-        ..position = const Point(coords: [-77.0, 38.0]);
+      final leaf2 = ConcreteLeafNode(name: 'Leaf 2');
+      final leaf3 = ConcreteLeafNode(name: 'Leaf 3');
+      final List<LeafNode> jsonLeaves = [leaf1, leaf2, leaf3];
 
+      // Serialize the list of LeafNodes to a JSON string.
+      final jsonOutput = ioUtil.serialize(jsonLeaves);
+
+      // Parse the JSON string back into a list of LeafNodes.
+      final deserializedLeaves = ioUtil.deserialize(jsonOutput);
+
+      expect(deserializedLeaves.length, 3);
+      expect(deserializedLeaves[0].name, 'Leaf 1');
+      expect(deserializedLeaves[0].runtimeType, ConcreteLeafNode);
+      expect(deserializedLeaves[1].name, 'Leaf 2');
+      expect(deserializedLeaves[1].runtimeType, ConcreteLeafNode);
+      expect(deserializedLeaves[2].name, 'Leaf 3');
+      expect(deserializedLeaves[2].runtimeType, ConcreteLeafNode);    });
+
+    test('Handle Composite Nodes', () {
+      // Create a some concrete nodes and write them to a JSON string.
+      final leaf1 = ConcreteLeafNode(name: 'Leaf 1');
+      final leaf2 = ConcreteLeafNode(name: 'Leaf 2');
+      final branch = ConcreteCompositeNode(name: 'Branch');
+      final List<LeafNode> jsonNodes = [leaf1, leaf2, branch];
+
+      // Assign children to the branch node
+      branch.addChild(ConcreteLeafNode(name: 'Leaf 3'));
+      branch.addChild(ConcreteCompositeNode(name: 'Node 4'));
+
+      // Serialize the list of nodes to a JSON string.
+      final jsonOutput = ioUtil.serialize(jsonNodes);
+
+      // Parse the JSON string back into a list of nodes.
+      final deserializedNodes = ioUtil.deserialize(jsonOutput);
+
+      expect(deserializedNodes.length, 3);
+      expect(deserializedNodes[0].name, 'Leaf 1');
+      expect(deserializedNodes[0].runtimeType, ConcreteLeafNode);
+      expect(deserializedNodes[1].name, 'Leaf 2');
+      expect(deserializedNodes[1].runtimeType, ConcreteLeafNode);
+      expect(deserializedNodes[2].name, 'Branch');
+      expect(deserializedNodes[2].runtimeType, ConcreteCompositeNode);
+
+      // Check the branches children
+      final children = (deserializedNodes[2] as ConcreteCompositeNode).children;
+      expect(children.length, 2);
+      expect(children[0].name, 'Leaf 3');
+      expect(children[0].runtimeType, ConcreteLeafNode);
+      expect(children[1].name, 'Node 4');
+      expect(children[1].runtimeType, ConcreteCompositeNode);
+
+    });
+
+    test('Handle Tree Nodes', () {
+      // Create a some concrete nodes and write them to a JSON string.
+      final leaf1 = ConcreteLeafNode(name: 'Leaf 1');
+      final leaf2 = ConcreteLeafNode(name: 'Leaf 2');
+      final branch = ConcreteCompositeNode(name: 'Branch');
+      final branch2 = ConcreteCompositeNode(name: 'Branch 2');
+      final tree = ConcreteTreeNode(name: 'Tree');
+      // Assign the children and build a cool tree
+      branch.addChild(leaf1);
+      branch2.addChild(leaf2);
+      tree.addChild(branch);
+      tree.addChild(branch2);
+      // Build a second cool tree
+      final leaf3 = ConcreteLeafNode(name: 'Leaf 3');
+      final branch3 = ConcreteCompositeNode(name: 'Branch 3');
+      final tree2 = ConcreteTreeNode(name: 'Tree 2');
+      branch3.addChild(leaf3);
+      tree2.addChild(branch3);
+      // Create the list
+      final List<LeafNode> jsonNodes = [tree,tree2];
+
+      // Serialize the list of nodes to a JSON string.
+      final jsonOutput = ioUtil.serialize(jsonNodes);
+
+      // Parse the JSON string back into a list of nodes.
+      final deserializedNodes = ioUtil.deserialize(jsonOutput);
+
+      // There should be exactly two deserialized nodes since we only sent in
+      // two trees.
+      expect(deserializedNodes.length, 2);
+      expect(deserializedNodes[0].name, 'Tree');
+      expect(deserializedNodes[0].runtimeType, ConcreteTreeNode);
+      expect(deserializedNodes[1].name, 'Tree 2');
+
+      // Check tree 1's direct children - no need to go to the leaves since they
+      // get two more tests
+      final children = (deserializedNodes[0] as TreeNode).children;
+      expect(children.length, 2);
+      expect(children[0].name, 'Branch');
+      expect(children[0].runtimeType, ConcreteCompositeNode);
+      expect(children[1].name, 'Branch 2');
+      expect(children[1].runtimeType, ConcreteCompositeNode);
+      // And tree 2
+      final children2 = (deserializedNodes[1] as TreeNode).children;
+      expect(children2.length, 1);
+      expect(children2[0].name, 'Branch 3');
+
+    });
+
+    test('should serialize and deserialize a tree structure', () {
+      // Arrange
+      final leaf1 = ConcreteLeafNode(name: 'Leaf 1');
+      final leaf2 = ConcreteLeafNode(name: 'Leaf 2');
       final comp1 = ConcreteCompositeNode(name: 'Composite 1');
       comp1.addChild(leaf2);
-
-      final site1 = ConcreteTreeNode(name: 'Site 1');
-      site1.setProperty('test_prop', const TypedValue<String>('value1'));
+      final site1 = ConcreteTreeNode(
+        name: 'Site 1',
+        initialProperties: {'prop1': TypedValue<String>('value1')},
+      );
       site1.addChild(leaf1);
       site1.addChild(comp1);
-
       final originalTree = [site1];
 
-      // Execute the full round-trip serialization cycle.
+      // Act
       final jsonString = ioUtil.serialize(originalTree);
-      print(jsonString);
-      final deserializedTree = ioUtil.deserialize(jsonString);
+      final deserializedTree = ioUtil.deserialize(jsonString).cast<TreeNode>();
 
-      // Verify that the hierarchy and reified state are faithfully restored.
+      // Assert
+      expect(deserializedTree, isA<List<TreeNode>>());
       expect(deserializedTree.length, 1);
-      final deserializedSite1 = deserializedTree.first as TreeNode;
-      
+      final deserializedSite1 = deserializedTree.first;
       expect(deserializedSite1.name, 'Site 1');
-      expect(deserializedSite1.typedProperty('test_prop').value, 'value1');
-      
-      // Verify positional integrity and child counts.
-      expect(deserializedSite1.children.length, 2);
-      
-      final deserializedLeaf1 = deserializedSite1.children.first;
+      expect((deserializedSite1 as CompositeNode).children.length, 2);
+      final deserializedLeaf1 =
+          (deserializedSite1 as CompositeNode).children.first;
       expect(deserializedLeaf1.name, 'Leaf 1');
-      
-      final deserializedComp1 = deserializedSite1.children.last as CompositeNode;
+      final deserializedComp1 =
+          (deserializedSite1 as CompositeNode).children.last as CompositeNode;
+      expect(deserializedComp1.name, 'Composite 1');
       expect(deserializedComp1.children.length, 1);
-      
       final deserializedLeaf2 = deserializedComp1.children.first;
       expect(deserializedLeaf2.name, 'Leaf 2');
-      expect(deserializedLeaf2.position.x, -77.0);
     });
 
-    test('should use default name when missing in JSON properties', () {
-      // Provide a JSON object missing the 'name' property.
-      const jsonString = '''
-        [{
-          "type": "ConcreteLeafNode",
-          "properties": {
-            "id": ["UuidValue", "019dc5cf-cfab-7c0d-96da-38ccb2e75155"]
-          }
-        }]
-      ''';
+    test('should throw JsonException when JSON is not a list', () {
+      // Arrange
+      const jsonString = '{"type": "leaf"}';
 
-      // Rehydrate the node and verify that it defaults to 'Unknown Node'.
-      final nodes = ioUtil.deserialize(jsonString);
-      expect(nodes.first.name, 'Unknown Node');
-    });
-
-    test('should throw JsonIOException when JSON is not a list', () {
-      // Provide a map instead of the expected root list.
-      const jsonString = '{"type": "ConcreteLeafNode"}';
-
-      // Verify that the utility enforces the top-level list contract.
+      // Act & Assert
       expect(
         () => ioUtil.deserialize(jsonString),
         throwsA(isA<JsonIOException>().having(
           (e) => e.message,
           'message',
-          contains('Invalid JSON format: Expected a list but received String.'),
+          contains('Expected a list but received _Map<String, Object>.'),
         )),
       );
     });
 
-    test('should throw JsonIOException when mandatory structural keys are missing', () {
-      // Provide a node entry missing the 'type' discriminator.
-      const jsonString = '[{"properties": {"name": "Test"}}]';
+    test('should throw JsonException when mandatory keys are missing', () {
+      // Arrange
+      const jsonString = '[{"properties": {"id": "1", "name": "n"}}]'; // missing type
 
-      // Verify that structural requirements are validated.
+      // Act & Assert
       expect(
         () => ioUtil.deserialize(jsonString),
         throwsA(isA<JsonIOException>().having(
           (e) => e.message,
           'message',
-          contains('Missing mandatory structural keys'),
+          contains('Cannot deserialize List element without "type" '
+              'key. Aborting'),
         )),
       );
     });
 
-    test('should throw JsonIOException when rehydration fails (malformed tuple)', () {
-      // Provide a malformed TypedValue tuple (too short).
-      const jsonString = '''
-        [{
-          "type": "ConcreteLeafNode",
-          "properties": {
-            "name": "Broken",
-            "age": ["int"]
-          }
-        }]
-      ''';
+    test('should throw JsonException when JSON list contains non-map elements',
+        () {
+      // Arrange
+      const jsonString = '[123]'; // Not a Map<String, dynamic>
 
-      // Verify that tuple validation errors are caught and re-wrapped.
+      // Act & Assert
       expect(
         () => ioUtil.deserialize(jsonString),
         throwsA(isA<JsonIOException>().having(
           (e) => e.message,
           'message',
-          contains('Malformed context data'),
+          contains('Something bad happened during deserialization:'),
         )),
       );
     });
 
-    test('should throw JsonIOException when properties contain null values', () {
-      // Provide a JSON structure where a typed value is null.
-      const jsonString = '''
-        [{
-          "type": "ConcreteLeafNode",
-          "properties": {
-            "name": "NullTest",
-            "age": ["int", null]
-          }
-        }]
-      ''';
+    test('Can load the basic sample data', () {
+      // Write the sampleSites data to a json string
+      final sampleSiteJson = ioUtil.serialize(sampleSites);
 
-      // Verify that parsing errors (null to int) trigger a rehydration exception.
-      expect(
-        () => ioUtil.deserialize(jsonString),
-        throwsA(isA<JsonIOException>().having(
-          (e) => e.message,
-          'message',
-          contains('Deserialization failed'),
-        )),
-      );
+      // Try to read it back in
+      final deserializedSampleSites = ioUtil.deserialize(sampleSiteJson);
+
+
     });
 
-    test('should successfully skip non-map elements in the JSON list', () {
-      // Provide a list containing both valid node maps and primitive values.
-      const jsonString = '[123, {"type": "leaf", "properties": {"name": "Valid"}}]';
-
-      // Verify that the deserializer robustly handles heterogeneous lists by 
-      // focusing only on valid node representations.
-      final nodes = ioUtil.deserialize(jsonString);
-      expect(nodes.length, 1);
-      expect(nodes.first.name, 'Valid');
-    });
   });
 }

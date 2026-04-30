@@ -5,12 +5,24 @@ library;
 
 import 'package:uuid/uuid.dart';
 
-import '../builders/stager_context.dart';
+import '../system/stager_context.dart';
 import 'node_visitor.dart';
 import 'tree.dart';
 import 'node_observer.dart';
 import '../system/point.dart';
 import '../system/typed_value.dart';
+import '../builders/basic_builder.dart';
+
+/// This is a builder for concrete leaf nodes.
+///
+/// [context]: The context for building the leaf node.
+/// Returns a [ConcreteLeafNode] instance.
+@BasicBuilder(name: 'ConcreteLeafNode')
+ConcreteLeafNode buildConcreteLeafNode(StagerContext context) {
+  ConcreteLeafNode node = ConcreteLeafNode(name: 'Leaf');
+  node.fromMap(context.toMap());
+  return node;
+}
 
 /// A concrete implementation of a [LeafNode] that provides basic functionality.
 ///
@@ -80,6 +92,8 @@ class ConcreteLeafNode extends LeafNode {
       'name' : name,
       'id' : id.toString(),
       'position' : position.toMap(),
+      // Add a type marker so clients know the type of the node
+      'type' : runtimeType.toString(),
       ..._properties.map
     };
 
@@ -107,12 +121,26 @@ class ConcreteLeafNode extends LeafNode {
       map.remove('position');
     }
 
+    // Remove the type marker
+    if (map.containsKey('type')) {
+      map.remove('type');
+    }
+
     // Load all the generic properties from what remains in the map.
     // We map every entry to a rehydrated TypedValue by passing the raw map 
     // data to the centralized buildTypedValue factory.
-    final Map<String, TypedValue<Object>> rehydratedMap = map.map((key, value) =>
-        MapEntry(key, buildTypedValue(
-            StagerContext({'value': value as List<Object>}))));
+    final Map<String, TypedValue<Object>> rehydratedMap = map.map((key, value) {
+      if (value is List<Object>) {
+        return MapEntry(key, buildTypedValue(
+            StagerContext({'value': value})));
+      } else {
+        throw NodePropertyException('Property "$key" with type '
+            '${value.runtimeType} is not a TypedValue tuple (List<Object>) but '
+            'must be since it is a generic property. If this property was'
+            'created programmatically, ensure that TypedValue.toTuple() was'
+            'called.');
+      }
+    });
 
     final tempProps = ConcreteNodeProperties(rehydratedMap);
     

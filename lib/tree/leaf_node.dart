@@ -204,6 +204,11 @@ abstract class LeafNode implements ObservableSubject {
   /// Returns the full set of intrinsic and generic properties as a map.
   Map<String, Object> toMap();
 
+  /// Converts the node to an encodable object for JSON serialization.
+  ///
+  /// Returns the node as a map downcast to an Object.
+  Object toJson() => toMap();
+
   /// Loads the full set of intrinsic and generic properties from a map. The map
   /// should contain key-value pairs representing the properties already set by
   /// the node.

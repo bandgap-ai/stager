@@ -1,5 +1,5 @@
 import '../builders/basic_builder.dart';
-import '../builders/stager_context.dart';
+import 'stager_context.dart';
 
 /// Specialized exception for failures during [TypedValue] rehydration.
 class TypedValueRehydrationException implements Exception {
@@ -12,6 +12,48 @@ class TypedValueRehydrationException implements Exception {
   @override
   String toString() => 'TypedValueRehydrationException: $message';
 }
+
+/// A specialized builder for [TypedValue].
+///
+/// [context]: The context for building the [TypedValue]. It expects the
+/// context to include a "value" key that provides a tuple for a value where
+/// the first element is the reified type name and the second element is the
+/// value. For example:
+/// `context.get<List<Object>("value") = ["String","Perfect"];`
+///
+/// Returns a [TypedValue] instance.
+@BasicBuilder(name: 'TypedValue')
+TypedValue<Object> buildTypedValue(StagerContext context) {
+  late final TypedValue<Object> result;
+  late String typeName;
+  late Object rawValue;
+
+  try {
+    final List<Object> tuple = context.getOrDefault<List<Object>>('value',
+        []);
+
+    if (tuple.length >= 2) {
+      typeName = tuple[0].toString();
+      rawValue = tuple[1];
+    } else {
+      throw StagerContextException('Malformed value tuple: $tuple');
+    }
+
+    if (typedValueTypeMap.containsKey(typeName)) {
+      result = typedValueTypeMap[typeName]!(rawValue);
+    } else {
+      throw TypedValueRehydrationException(
+          'No rehydration function registered for type: $typeName');
+    }
+  } on StagerContextException catch (e) {
+    throw TypedValueRehydrationException('Malformed context data: ${e.err}');
+  } on Exception catch (e) {
+    throw TypedValueRehydrationException('Unexpected rehydration failure: $e');
+  }
+
+  return result;
+}
+
 
 /// A generic utility for rehydrating primitive types into native types for
 /// [TypedValue<T>] containers.
@@ -44,17 +86,17 @@ T _rehydrate<T>(Object input, T Function(String) parser) {
 }
 
 /// Rehydrates a [String] value into a [TypedValue].
-TypedValue<String> _convertToString(Object input) {
+TypedValue<String> convertToString(Object input) {
   // Strings are the base case for rehydration and always succeed.
   return TypedValue<String>(input.toString());
 }
 
 /// Rehydrates an [int] value into a [TypedValue].
-TypedValue<int> _convertToInt(Object input) =>
+TypedValue<int> convertToInt(Object input) =>
     TypedValue<int>(_rehydrate<int>(input, int.parse));
 
 /// Rehydrates a [double] value into a [TypedValue].
-TypedValue<double> _convertToDouble(Object input) {
+TypedValue<double> convertToDouble(Object input) {
   late final TypedValue<double> result;
 
   // Optimized branch order: check if input is already numeric.
@@ -71,17 +113,17 @@ TypedValue<double> _convertToDouble(Object input) {
 }
 
 /// Rehydrates a [bool] value into a [TypedValue].
-TypedValue<bool> _convertToBool(Object input) =>
+TypedValue<bool> convertToBool(Object input) =>
     TypedValue<bool>(_rehydrate<bool>(input, bool.parse));
 
 /// Rehydrates an [Object] value into a [TypedValue].
-TypedValue<Object> _convertToObject(Object input) {
+TypedValue<Object> convertToObject(Object input) {
   // Everything is an object, so we just wrap it.
   return TypedValue<Object>(input);
 }
 
 /// Rehydrates a [List<T>] of primitives by delegating to the generic helper.
-TypedValue<List<T>> _convertToList<T>(Object input, T Function(String) parser) {
+TypedValue<List<T>> convertToList<T>(Object input, T Function(String) parser) {
   late final TypedValue<List<T>> result;
 
   if (input is List<T>) {
@@ -102,7 +144,7 @@ TypedValue<List<T>> _convertToList<T>(Object input, T Function(String) parser) {
 }
 
 /// Rehydrates a [List<Object>] value into a [TypedValue].
-TypedValue<List<Object>> _convertToListObject(Object input) {
+TypedValue<List<Object>> convertToListObject(Object input) {
   late final TypedValue<List<Object>> result;
 
   if (input is List<Object>) {
@@ -117,7 +159,7 @@ TypedValue<List<Object>> _convertToListObject(Object input) {
 }
 
 /// Rehydrates a [Map<K, V>] of primitives.
-TypedValue<Map<K, V>> _convertToMap<K, V>(
+TypedValue<Map<K, V>> convertToMap<K, V>(
   Object input,
   K Function(String) keyParser,
   V Function(String) valParser,
@@ -146,7 +188,7 @@ TypedValue<Map<K, V>> _convertToMap<K, V>(
 }
 
 /// Rehydrates a [Map<String, Object>] value into a [TypedValue].
-TypedValue<Map<String, Object>> _convertToMapStringObject(Object input) {
+TypedValue<Map<String, Object>> convertToMapStringObject(Object input) {
   late final TypedValue<Map<String, Object>> result;
 
   if (input is Map<String, Object>) {
@@ -161,79 +203,38 @@ TypedValue<Map<String, Object>> _convertToMapStringObject(Object input) {
 }
 
 // Internal registry of rehydrator delegates.
-final Map<String, TypedValue<Object> Function(Object)> _typeMap = {
-  "String": _convertToString,
-  "int": _convertToInt,
-  "double": _convertToDouble,
-  "bool": _convertToBool,
-  "Object": _convertToObject,
+final Map<String, TypedValue<Object> Function(Object)> typedValueTypeMap = {
+  "String": convertToString,
+  "int": convertToInt,
+  "double": convertToDouble,
+  "bool": convertToBool,
+  "Object": convertToObject,
 
   // List Rehydrators
-  "List<String>": (input) => _convertToList<String>(input, (s) => s),
-  "List<int>": (input) => _convertToList<int>(input, int.parse),
-  "List<double>": (input) => _convertToList<double>(input, double.parse),
-  "List<bool>": (input) => _convertToList<bool>(input, bool.parse),
-  "List<Object>": _convertToListObject,
+  "List<String>": (input) => convertToList<String>(input, (s) => s),
+  "List<int>": (input) => convertToList<int>(input, int.parse),
+  "List<double>": (input) => convertToList<double>(input, double.parse),
+  "List<bool>": (input) => convertToList<bool>(input, bool.parse),
+  "List<Object>": convertToListObject,
 
   // Map<String, T> Rehydrators
-  "Map<String, String>": (input) => _convertToMap<String, String>(input, (s) => s, (s) => s),
-  "Map<String, int>": (input) => _convertToMap<String, int>(input, (s) => s, int.parse),
-  "Map<String, double>": (input) => _convertToMap<String, double>(input, (s) => s, double.parse),
-  "Map<String, bool>": (input) => _convertToMap<String, bool>(input, (s) => s, bool.parse),
-  "Map<String, Object>": _convertToMapStringObject,
+  "Map<String, String>": (input) => convertToMap<String, String>(input, (s) => s, (s) => s),
+  "Map<String, int>": (input) => convertToMap<String, int>(input, (s) => s, int.parse),
+  "Map<String, double>": (input) => convertToMap<String, double>(input, (s) => s, double.parse),
+  "Map<String, bool>": (input) => convertToMap<String, bool>(input, (s) => s, bool.parse),
+  "Map<String, Object>": convertToMapStringObject,
 
   // Map<int, T> Rehydrators
-  "Map<int, String>": (input) => _convertToMap<int, String>(input, int.parse, (s) => s),
-  "Map<int, int>": (input) => _convertToMap<int, int>(input, int.parse, int.parse),
-  "Map<int, double>": (input) => _convertToMap<int, double>(input, int.parse, double.parse),
-  "Map<int, bool>": (input) => _convertToMap<int, bool>(input, int.parse, bool.parse),
+  "Map<int, String>": (input) => convertToMap<int, String>(input, int.parse, (s) => s),
+  "Map<int, int>": (input) => convertToMap<int, int>(input, int.parse, int.parse),
+  "Map<int, double>": (input) => convertToMap<int, double>(input, int.parse, double.parse),
+  "Map<int, bool>": (input) => convertToMap<int, bool>(input, int.parse, bool.parse),
 
   // Map<bool, T> Rehydrators
-  "Map<bool, String>": (input) => _convertToMap<bool, String>(input, bool.parse, (s) => s),
-  "Map<bool, int>": (input) => _convertToMap<bool, int>(input, bool.parse, int.parse),
-  "Map<bool, double>": (input) => _convertToMap<bool, double>(input, bool.parse, double.parse),
+  "Map<bool, String>": (input) => convertToMap<bool, String>(input, bool.parse, (s) => s),
+  "Map<bool, int>": (input) => convertToMap<bool, int>(input, bool.parse, int.parse),
+  "Map<bool, double>": (input) => convertToMap<bool, double>(input, bool.parse, double.parse),
 };
-
-/// A specialized builder for [TypedValue].
-///
-/// [context]: The context for building the [TypedValue]. It expects the
-/// context to include a "value" key that provides a tuple for a value where
-/// the first element is the reified type name and the second element is the
-/// value. For example:
-/// `context.get<List<Object>("value") = ["String","Perfect"];`
-///
-/// Returns a [TypedValue] instance.
-@BasicBuilder(name: 'TypedValue')
-TypedValue<Object> buildTypedValue(StagerContext context) {
-  late final TypedValue<Object> result;
-  late String typeName;
-  late Object rawValue;
-
-  try {
-    final List<Object> tuple = context.getOrDefault<List<Object>>('value',
-        []);
-
-    if (tuple.length >= 2) {
-      typeName = tuple[0].toString();
-      rawValue = tuple[1];
-    } else {
-      throw StagerContextException('Malformed value tuple: $tuple');
-    }
-
-    if (_typeMap.containsKey(typeName)) {
-      result = _typeMap[typeName]!(rawValue);
-    } else {
-      throw TypedValueRehydrationException(
-          'No rehydration function registered for type: $typeName');
-    }
-  } on StagerContextException catch (e) {
-    throw TypedValueRehydrationException('Malformed context data: ${e.err}');
-  } on Exception catch (e) {
-    throw TypedValueRehydrationException('Unexpected rehydration failure: $e');
-  }
-
-  return result;
-}
 
 /// A lightweight container that bundles a value with its reified type.
 ///

@@ -41,8 +41,7 @@ void main() {
 
       // Verify that the points are exported as a reified list of maps.
       expect(map.containsKey('points'), isTrue);
-      final reifiedPoints = map['points'] as Map<String, Object>;
-      expect(reifiedPoints['type'], 'List<Object>');
+      final reifiedPoints = map['points'] as List<Object>;
 
       // Perform rehydration from the map.
       final newHole = KMLHole.fromMap(map);

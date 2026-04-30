@@ -108,7 +108,7 @@ generation process. Actual construction is delegated to
 `@BasicBuilder`. Note that only functions can be annotated, not classes, and multiple functions can
 be annotated per file.
 
-[`StagerContext`](../../lib/builders/stager_context.dart) is a formal context class that holds build
+[`StagerContext`](../../lib/system/stager_context.dart) is a formal context class that holds build
 properties and provides handy utilities for dynamically instantiating classes,
 etc. It is created during the build process for each new builder. 
 

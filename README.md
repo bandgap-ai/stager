@@ -4,15 +4,69 @@
 [![coverage report](https://gitlab.com/bandgap/stager-platform/stager/badges/main/coverage.svg)](https://gitlab.com/bandgap/stager-platform/stager/-/commits/main)
 [![SonarQube Cloud](https://sonarcloud.io/summary/new_code?id=bandgap_stager)](https://sonarcloud.io/summary/new_code?id=bandgap_stager)
 
-Stager is a sophisticated Flutter and Dart framework designed to manage and
-"stage" complex UI components and data structures. It provides a robust
+Stager is a Flutter and Dart framework designed to manage and "stage" complex 
+UI components and hierarchical data structures. It provides a robust
 architecture for hierarchical data management, specifically optimized for GIS
 workflows and tree-based state manipulation. By distinguishing clearly between
 display-only widgets and data-modifying editors, Stager ensures a clean
 separation of concerns while offering high-level tools for dynamic component
 registration and geographic data ingestion.
 
-## Project Architecture
+## Developer Workflow
+
+Development on the Stager Platform is primarily driven through the included
+`Makefile`, which abstracts the underlying Flutter and Dart CLI commands into a
+consistent, cross-platform interface. This ensures that essential tasks like
+dependency resolution, code generation, and testing are executed with the
+correct flags regardless of the host operating system. Developers can build the
+entire project and run all tests by executing
+
+```bash
+make all 
+```
+
+Developers can see the available make targets by simply executing `make`
+without any arguments.
+
+### Specific Build Targets
+
+The `make all` target executes the `generate`, `build`, and `test` sub-targets.
+The `generate` target runs the Dart `build_runner` to process source
+annotations, generate the master `stager_registry.g.dart` file and produce other
+required artifacts. The `build` target only executes the normal Flutter build.
+The `analyze` target will run the Flutter analyzer.
+
+### Executing Tests
+
+All tests in the project can be executed by running
+
+```bash
+make test
+```
+
+Full verification of the codebase is split between standard Flutter tests and
+specialized generator tests that must be run by `dart` to test the code
+generators. The `flutter_test` target will run the normal unit tests and the
+`dart_test` target will run the tests for the code generators.
+
+### Cleaning Up
+
+There is a standard `clean` target and running `make clean` will mostly reset
+the project to its initial state. However, there are situations where a deeper
+clean is required, and there are notes in [AGENT_NOTES.md](AGENT_NOTES.md) from
+20260405 describing that process.
+
+## Running the Demonstration
+
+A fully functional demonstration of the platform's capabilities is provided in
+the `example/` directory. To compile and launch this application on the native
+desktop platform of the host OS, execute the `run` target:
+
+```bash
+make run
+```
+
+## Project Layout
 
 The core implementation resides within the `lib/` directory, which is organized
 into specialized modules to handle different aspects of the platform's
@@ -36,7 +90,7 @@ platforms.
 
 Stager allows clients to dynamically register builder functions (see 
 [`BasicBuilder`](lib/builders/basic_builder.dart) and its tests) using 
-annotations akin to `@Provider` in Java. In Stager might look like
+annotations akin to `@Provider` in Java. In Stager this might look like
 
 ```
 @BasicBuilder(name: 'DataBuilder')
@@ -49,12 +103,26 @@ class DataBuilder {
 }
 ```
 
-We use this mechanism for "dynamically" (although there is little dynamic about
-it...) building classes for several reasons. First, it works well with large
-class hierarchies and generics. Second, it doesn't have the type restrictions
-of factory constructors. Finally, it allows us to construct classes via a
-lookup table created by the Dart code generator instead of hard-wiring the
-necessary logic everywhere.
+We use this mechanism for "dynamically" building classes (although there is 
+little dynamic behavior about it...) for several reasons. First, it works well 
+with large class hierarchies and generics. Second, it doesn't have the type 
+restrictions of factory constructors. Finally, it allows us to construct 
+classes via a lookup table created by the Dart code generator instead of 
+hard-wiring the necessary logic everywhere.
+
+Builders do not replace other other methods for a class `X` such as factory 
+constructors or instance methods, including `X.fromJson()` and `X.fromMap().`
+The builder methods may call these methods, if it makes sense and the class is
+not generic (since factory methods don't allow generic types). The convention
+on when to use a builder versus when to use a traditional factory or other
+constructor is simply this: In cases where the concrete type is known and
+interactions happen with that object as that type, use a regular factory
+constructor or class-specific build method, and in other cases, such as generic
+I/O where only a representation of the concrete type is known, use a Stager
+builder.
+
+Specific examples of where Builders are used include Stager's JSON utilities
+and to implement [`TypedValue`](lib/system/typed_value.dart).
 
 ### toMap() and fromMap()
 
@@ -73,60 +141,6 @@ routines to write it and read it from the map directly.
 4. If a class has an ambiguous type, is a collection of multiple type ("bag of
 types"), or is generally ornery when serialized, wrap it in a 
 [`TypedValue`](lib/system/typed_value.dart).
-
-## Developer Workflow
-
-Development on the Stager Platform is primarily driven through the included
-`Makefile`, which abstracts the underlying Flutter and Dart CLI commands into a
-consistent, cross-platform interface. This ensures that essential tasks like
-dependency resolution, code generation, and testing are executed with the
-correct flags regardless of the host operating system. Developers can build the
-entire project and run all tests by executing
-
-```bash
-make all 
-```
-
-Developers can see the available make targets by simply executing `make` 
-without any arguments.
-
-### Specific Build Targets
-
-The `make all` target executes the `generate`, `build`, and `test` sub-targets.
-The `generate` target runs the Dart `build_runner` to process source
-annotations, generate the master `stager_registry.g.dart` file and produce other
-required artifacts. The `build` target only executes the normal Flutter build. 
-The `analyze` target will run the Flutter analyzer.
-
-### Executing Tests
-
-All tests in the project can be executed by running
-
-```bash
-make test
-```
-
-Full verification of the codebase is split between standard Flutter tests and
-specialized generator tests that must be run by `dart` to test the code 
-generators. The `flutter_test` target will run the normal unit tests and the
-`dart_test` target will run the tests for the code generators.
-
-### Cleaning Up
-
-There is a standard `clean` target and running `make clean` will mostly reset
-the project to its initial state. However, there are situations where a deeper
-clean is required, and there are notes in [AGENT_NOTES.md](AGENT_NOTES.md) from
-20260405 describing that process.
-
-## Running the Demonstration
-
-A fully functional demonstration of the platform's capabilities is provided in
-the `example/` directory. To compile and launch this application on the native
-desktop platform of the host OS, execute the `run` target:
-
-```bash
-make run
-```
 
 ## Technical Standards
 

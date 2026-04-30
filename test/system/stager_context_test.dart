@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager_platform/builders/stager_context.dart';
+import 'package:stager_platform/system/stager_context.dart';
 
 void main() {
 
@@ -33,6 +33,17 @@ void main() {
 
     });
 
+    test('Check more complicated get()', () {
+      // This tests the somewhat complicated case where a List<double> is
+      // present in the context as a List<Object>, so nothing knows for sure
+      // what the real type is and, thus, it needs to be rebuilt.
+      final List<Object> testValueList = [1.0,2.0,3.0] as List<Object>;
+      testProps.addAll({'value':testValueList});
+      StagerContext testContext = StagerContext(testProps);
+      final List<double> testValue = testContext.get<List<double>>('value');
+      expect(testValue, [1.0,2.0,3.0]);
+    });
+
     test('Check getOrDefault()', () {
       StagerContext testContext = StagerContext(testProps);
       expect(testContext.getOrDefault<String>('foo', 'default'), 'bar');
@@ -40,5 +51,20 @@ void main() {
       expect(testContext.getOrDefault<int>('meow', 0), 1);
       expect(testContext.getOrDefault<int>('nope', 9), 9);
     });
+
+    test('Check contains() and contains<T>()', () {
+      StagerContext testContext = StagerContext(testProps);
+      expect(testContext.contains('foo'), true);
+      expect(testContext.contains('nope'), false);
+      expect(testContext.containsTyped<String>('foo'), true);
+      expect(testContext.containsTyped<String>('nope'), false);
+      expect(testContext.containsTyped<int>('meow'), true);
+    });
+
+    test('Check toMap()', () {
+      StagerContext testContext = StagerContext(testProps);
+      expect(testContext.toMap(), testProps);
+    });
+
   });
 }

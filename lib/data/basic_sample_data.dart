@@ -26,19 +26,21 @@ List<TreeNode> _buildSampleSites() {
 
   final planting2025 = ConcreteCompositeNode(
     name: '2025 Planting',
-    initialProperties: {
-      // Location of the 2025 planting area
-      'outline': TypedValue<List<Map<String, TypedValue<double>>>>([
-        // Define a rectangular outline around the planting area
-        {'latitude': TypedValue<double>(36.73445), 'longitude': TypedValue<double>(-81.86050)}, // Top-left
-        {'latitude': TypedValue<double>(36.73445), 'longitude': TypedValue<double>(-81.86060)}, // Top-right
-        {'latitude': TypedValue<double>(36.73438), 'longitude': TypedValue<double>(-81.86060)}, // Bottom-right
-        {'latitude': TypedValue<double>(36.73438), 'longitude': TypedValue<double>(-81.86050)}, // Bottom-left
-      ]),
-    },
   );
   // Location of the 2025 planting area
   planting2025.position = Point(coords: [-81.86052, 36.73442]);
+
+  final planting2025Outline = KMLPolygonNode(
+    name: '2025 Planting Outline',
+    outline: [
+      Point(coords: [-81.86050, 36.73445]),
+      Point(coords: [-81.86060, 36.73445]),
+      Point(coords: [-81.86060, 36.73438]),
+      Point(coords: [-81.86050, 36.73438]),
+    ],
+    styleManager: KMLStyleManager(),
+  );
+  planting2025.addChild(planting2025Outline);
 
   final row1 = ConcreteCompositeNode(
     name: 'Row 1',
@@ -128,16 +130,19 @@ List<TreeNode> _buildSampleSites() {
 
   final sectionA = ConcreteCompositeNode(
     name: 'Section A',
-    initialProperties: {
-      'outline': TypedValue<List<Map<String, TypedValue<double>>>>([
-        // Define a triangular outline for Section A
-        {'latitude': TypedValue<double>(39.9512), 'longitude': TypedValue<double>(-75.1608)}, // Top
-        {'latitude': TypedValue<double>(39.9508), 'longitude': TypedValue<double>(-75.1615)}, // Bottom-right
-        {'latitude': TypedValue<double>(39.9508), 'longitude': TypedValue<double>(-75.1605)}, // Bottom-left
-      ]),
-    },
   );
   sectionA.position = Point(coords: [-75.161, 39.951]);
+
+  final sectionAOutline = KMLPolygonNode(
+    name: 'Section A Outline',
+    outline: [
+      Point(coords: [-75.1608, 39.9512]),
+      Point(coords: [-75.1615, 39.9508]),
+      Point(coords: [-75.1605, 39.9508]),
+    ],
+    styleManager: KMLStyleManager(),
+  );
+  sectionA.addChild(sectionAOutline);
 
   sectionA.addChild(ConcreteLeafNode(
       name: 'Urban Tree 1',

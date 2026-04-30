@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:stager_platform/system/registry.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/tree/iterators.dart';
 
@@ -31,78 +32,13 @@ class JsonIOUtil {
   /// members and reified generic properties.
   ///
   /// [nodes]: The list of root nodes to serialize.
-  String serialize(List<LeafNode> nodes) {
-    final Map<LeafNode, Map<String, Object>> nodeMap = {};
-    final List<LeafNode> allNodes = [];
-
-    // Flatten the trees to capture all nodes and their local state.
-    // We utilize DepthFirstIterator to unify processing for all node types.
-    for (final rootNode in nodes) {
-      _flattenSubtree(rootNode, allNodes, nodeMap);
-    }
-
-    // Connect the parent-child relationships in the JSON representation.
-    _linkHierarchy(allNodes, nodeMap);
-
-    // Filter the final list to include only the root-level JSON objects.
-    final rootJson = nodes.map((node) {
-      final json = nodeMap[node];
-      if (json == null) {
-        throw JsonIOException(
-            'Failed to capture state for root node: ${node.name}');
-      }
-      return json;
-    }).toList();
-
-    return jsonEncode(rootJson);
+  String serialize(List<LeafNode> nodeList) {
+    // No magic here - I moved it elsewhere!
+    return jsonEncode(nodeList);
   }
 
-  /// Traverses a subtree starting at [node] and populates the tracking maps.
-  void _flattenSubtree(LeafNode node, List<LeafNode> allNodes,
-      Map<LeafNode, Map<String, Object>> nodeMap) {
-    final iterator = DepthFirstIterator(node);
-    while (iterator.moveNext()) {
-      final current = iterator.current;
-      allNodes.add(current);
-      nodeMap[current] = _nodeToJson(current);
-    }
-  }
-
-  /// Transforms a single [LeafNode] into its JSON map representation.
-  ///
-  /// This performs a 'Full Harvest' by calling node.toMap(), which captures
-  /// the reified state of identity, position, and property bag members.
-  Map<String, Object> _nodeToJson(LeafNode node) {
-    late final Map<String, Object> result;
-
-    result = {
-      'type': node.runtimeType.toString(),
-      'properties': node.toMap(),
-      if (node.isComposite) 'children': <Map<String, Object>>[],
-    };
-
-    return result;
-  }
-
-  /// Establishes parent-child links within the serializable maps.
-  void _linkHierarchy(
-      List<LeafNode> allNodes, Map<LeafNode, Map<String, Object>> nodeMap) {
-    for (final node in allNodes) {
-      // Follows Rule 11: Use safe branching instead of null checks.
-      if (node.hasParent()) {
-        final parent = node.parent;
-        final parentJson = nodeMap[parent];
-        final childJson = nodeMap[node];
-
-        if (parentJson != null && childJson != null) {
-          final List<Object>? children =
-              parentJson['children'] as List<Object>?;
-          children?.add(childJson);
-        }
-      }
-    }
-  }
-
+  /// This is a custom reviver to remove null values from the JSON decoding
+  /// output and partially regenerate maps and lists. It's handy.
   Object _jsonReviver(Object? key, Object? value) {
     Object result = ':';
     // Only revive the value if it is... revivable?
@@ -111,7 +47,7 @@ class JsonIOUtil {
       if (value is Map) {
         result = Map<String,Object>.from(value);
       } else if (value is List) {
-        result = List.from(value);
+        result = List<Object>.from(value);
       }
     }
     return result;
@@ -125,89 +61,43 @@ class JsonIOUtil {
   /// [jsonString]: The JSON data representing the tree.
   /// Returns a list of reconstructed root nodes.
   List<LeafNode> deserialize(String jsonString) {
-    final List<LeafNode> rootNodes = [];
-    final List<Map<String, Object?>> stack = [];
+    final List<LeafNode> nodeList = [];
 
-    final Object decoded = jsonDecode(jsonString,reviver:_jsonReviver);
-    if (decoded is! List) {
-      throw JsonIOException(
-          'Invalid JSON format: Expected a list but received ${decoded.runtimeType}.');
-    }
+    // jsonDecode automatically creates a List<dynamic> from the JSON string.
+    // However, we avoid dynamic where possible in Stager, so we use a custom
+    // "reviver" function that converts dynamic list elements - which could be
+    // null values - to full Objects. The reviver also recovers List and Map
+    // types. Assuming there's nothing funny with the data, each List element is
+    // a node.
+    final Object decodedJson = jsonDecode(jsonString,reviver:_jsonReviver);
 
-    try {
-      final List<Object?> topLevelData = decoded;
-
-      // Initialize the stack with top-level roots in reverse order for correct
-      // depth-first processing.
-      for (final data in topLevelData.reversed) {
-        if (data is Map<String, Object?>) {
-          stack.add({'data': data, 'parent': null});
-        }
-      }
-
-      while (stack.isNotEmpty) {
-        final current = stack.removeLast();
-        final data = current['data'] as Map<String, Object?>;
-        final parent = current['parent'] as CompositeNode?;
-
-        // Rehydrate the node and its local state.
-        final LeafNode node = _createNodeFromJson(data.cast<String, Object>());
-
-        // Establish the hierarchical link.
-        if (parent != null) {
-          parent.addChild(node);
-        } else {
-          rootNodes.add(node);
-        }
-
-        // Push children for subsequent processing.
-        if (data.containsKey('children')) {
-          final List<Object?> childrenData = data['children'] as List<Object?>;
-          for (final childData in childrenData.reversed) {
-            if (childData is Map<String, Object?>) {
-              stack.add({'data': childData, 'parent': node});
-            }
+    if (decodedJson is List) {
+      // The base implementation of LeafNode provides a type parameter in
+      // the map that identifies which concrete type the data represents. Thus,
+      // here, we need recreate the Map, pull the type entry, use the type with
+      // the Stager Registry to recreate the LeafNode, and add the
+      // rebuilt node to the list to return.
+      for (final entry in decodedJson as List) {
+        try {
+          if (entry.containsKey('type')) {
+            final nodeMap = Map<String, Object>.from(entry);
+            final nodeType = nodeMap['type']! as String;
+            final node = buildObject(nodeType, nodeMap) as LeafNode;
+            nodeList.add(node);
+          } else {
+            throw JsonIOException(
+                'Cannot deserialize List element without "type" '
+                    'key. Aborting');
           }
+        } catch (e) {
+          throw JsonIOException(
+              'Something bad happened during deserialization: $e');
         }
       }
-    } on Exception catch (e) {
-      throw JsonIOException('Deserialization failed: $e');
+    } else {
+      throw JsonIOException('Expected a list but received '
+          '${decodedJson.runtimeType}.');
     }
-
-    return rootNodes;
-  }
-
-  // FIXME - This lookup table should be replaced by the platform's
-  // global builder registry (stagerRegistry).
-  static final Map<String, LeafNode Function(String)> _nodeFactory = {
-    'ConcreteTreeNode': (name) => ConcreteTreeNode(name: name),
-    'ConcreteCompositeNode': (name) => ConcreteCompositeNode(name: name),
-    'ConcreteLeafNode': (name) => ConcreteLeafNode(name: name),
-    // Support for legacy type discriminators.
-    'tree': (name) => ConcreteTreeNode(name: name),
-    'composite': (name) => ConcreteCompositeNode(name: name),
-    'leaf': (name) => ConcreteLeafNode(name: name),
-  };
-
-  /// Instantiates a node and rehydrates its reified state from a JSON map.
-  LeafNode _createNodeFromJson(Map<String, Object> data) {
-    if (!data.containsKey('type') || !data.containsKey('properties')) {
-      throw JsonIOException('Missing mandatory structural keys in node JSON.');
-    }
-
-    final type = data['type'] as String;
-    final Map<String, Object> properties =
-        (data['properties'] as Map<String, dynamic>).cast<String, Object>();
-
-    // Extract identity for construction.
-    final String name = (properties['name'] ?? 'Unknown Node').toString();
-
-    // Instantiate via factory and delegate state restoration to fromMap().
-    final factory = _nodeFactory[type] ?? _nodeFactory['leaf']!;
-    final node = factory(name);
-
-    node.fromMap(properties);
-
-    return node;
+    return nodeList;
   }
 }

@@ -123,7 +123,7 @@ class BuilderCompiler implements Builder {
   /// This map allows the platform to look up builders by their reified type.
   Field _buildStagerRegistryField() {
     return Field((f) => f
-      ..name = 'stagerRegistry'
+      ..name = 'stagerRegistryMap'
       ..modifier = FieldModifier.final$
       ..type = TypeReference((b) => b
         ..symbol = 'Map'

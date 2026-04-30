@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:latlong2/latlong.dart';
 import '../builders/basic_builder.dart';
-import '../builders/stager_context.dart';
+import 'stager_context.dart';
 import 'typed_value.dart';
 
 /// Supported coordinate reference systems within the Stager Platform.
@@ -32,11 +32,9 @@ class PointConversionException implements Exception {
 /// platform's dynamic factory system.
 @BasicBuilder(name: 'Point')
 Point buildPoint(StagerContext context) {
-  // Extract the raw value map from the context.
   final coords = context.get<List<double>>('coords');
   final system = CoordinateSystem.values.byName(
       context.getOrDefault<String>('system','wgs84'));
-
   return Point(coords: coords, system: system);
 }
 

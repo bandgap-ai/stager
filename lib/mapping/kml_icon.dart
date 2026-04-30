@@ -1,7 +1,6 @@
 import '../builders/basic_builder.dart';
-import '../builders/stager_context.dart';
+import '../system/stager_context.dart';
 import '../data/stager_icon.dart';
-import '../system/typed_value.dart';
 
 /// A specialized builder for rehydrating [KMLIcon] instances.
 @BasicBuilder(name: 'KMLIcon')
