@@ -130,8 +130,8 @@ class ConcreteTreeNode extends ConcreteCompositeNode implements TreeNode {
   double? _calculateOutlineArea(LeafNode node) {
     double? retArea;
     try {
-      if (containsProperty('outline')) {
-        final points = property('outline') as List<Point>;
+      if (hasProperty('outline')) {
+        final points = properties.get<List<Point>>('outline');
 
         if (points.length < 3) return null;
 

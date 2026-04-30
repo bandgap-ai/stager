@@ -15,7 +15,7 @@ void main() {
 
   group('LeafNodeEditor Tests', () {
     testWidgets('LeafNodeEditor displays title and content', (WidgetTester tester) async {
-      node.setProperty('description', TypedValue<String>('Some description'));
+      node.properties.set<String>('description', 'Some description');
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
           body: LeafNodeEditor(state:node),
@@ -44,7 +44,7 @@ void main() {
 
     testWidgets('LeafNodeEditor returns updated properties on Save', (WidgetTester tester) async {
       node.name = 'Old Name';
-      node.setProperty('description', TypedValue<String>('Old Description'));
+      node.properties.set<String>('description', 'Old Description');
       node.position = Point(coords: [2.0, 1.0]);
 
       Map<String, dynamic>? result;

@@ -176,14 +176,12 @@ void main() {
       final level1Node = ConcreteCompositeNode(name: 'Level 1 with Outline');
       
       // Add outline area to Level 1 node (rectangular area)
-
-      // Gemini, can you unfuck this?
-      level1Node.setProperty('outline', TypedValue<List<Point>>([
+      level1Node.properties.set<List<Point>>('outline', [
         Point(coords: [-74.0,40.0]),
         Point(coords: [-74.0,40.1]),
         Point(coords: [-74.1,40.1]),
         Point(coords: [-74.1,40.0]),
-      ]));
+      ]);
       
       tree.addChild(level1Node);
       

@@ -18,7 +18,7 @@ void main() {
     /// nodes.
     testWidgets('CompositeNodeEditor delegates to LeafNodeEditor', (WidgetTester tester) async {
       node.name = 'Test Node';
-      node.setProperty('description', TypedValue<String>('Some description'));
+      node.properties.set<String>('description', 'Some description');
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
           body: CompositeNodeEditor(state:node),

@@ -441,11 +441,12 @@ void main() {
       final ConcreteLeafNode leaf = ConcreteLeafNode(name: 'testLeaf');
 
       // Add diverse properties to verify broad rehydration support.
-      leaf.setProperty('scale', TypedValue<double>(0.5));
-      leaf.setProperty('count', TypedValue<int>(10));
-      leaf.setProperty('active', TypedValue<bool>(true));
-      leaf.setProperty('coords', TypedValue<List<double>>([1.0, 2.0]));
-      leaf.setProperty('meta', TypedValue<Map<String, String>>({'key': 'val'}));
+      final properties = leaf.properties;
+      properties.set<double>('scale', 0.5);
+      properties.set<int>('count', 10);
+      properties.set<bool>('active', true);
+      properties.set<List<double>>('coords', [1.0, 2.0]);
+      properties.set<Map<String, String>>('meta', {'key': 'val'});
 
       // Wrap the leaf in a TypedValue and create its map representation.
       final TypedValue<ConcreteLeafNode> typedLeaf =

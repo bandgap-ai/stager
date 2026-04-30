@@ -30,13 +30,11 @@ void main() {
       const icon = KMLIcon(href: 'path/to/icon.png');
       final map = icon.toMap();
 
-      // Verify reification.
-      expect(map['href'], const TypedValue<String>('path/to/icon.png'));
+      // Verify it is in the dumped map.
+      expect(map['href'], 'path/to/icon.png');
 
       // Rehydrate.
-      final newIcon = KMLIcon.fromMap({
-        'href': TypedValue<String>('path/to/icon.png'),
-      });
+      final newIcon = KMLIcon.fromMap(map);
       expect(newIcon, equals(icon));
     });
   });

@@ -45,10 +45,7 @@ class KMLPathNode extends KMLGeometryNode {
   Map<String, Object> toMap() {
     // Add the outline to the map.
     final map = super.toMap();
-    map.addAll({
-      'outline' : TypedValue<List<Object>>(
-          _outline.map((p) => p.toMap()).toList()),
-    });
+    map.addAll({'outline' : _outline.map((e) => e.toMap()).toList()});
     return map;
   }
 

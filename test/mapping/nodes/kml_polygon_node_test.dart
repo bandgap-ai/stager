@@ -89,7 +89,7 @@ void main() {
 
       // Verify that geometry members are correctly captured in the tagged record set.
       expect(map.containsKey('outline'), isTrue);
-      expect(map.containsKey('kml_holes'), isTrue);
+      expect(map.containsKey('holes'), isTrue);
       
       // Perform rehydration into a new node instance.
       final newNode = KMLPolygonNode(

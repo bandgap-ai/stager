@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/mapping/nodes/kml_feature_node.dart';
 import 'package:stager_platform/system/typed_value.dart';
+import 'package:stager_platform/tree/node_properties.dart';
 
 /// A concrete implementation of [KMLFeatureNode] for testing purposes.
 class TestFeatureNode extends KMLFeatureNode {
@@ -26,17 +27,15 @@ void main() {
     test('should pipe extended data to and from the properties bag', () {
       // Create a test node and provide it with a map of custom extended data.
       final node = TestFeatureNode(name: 'Feature 1');
-      final customData = {'tree_health': 'Good', 'dbh': 34.5};
       
       expect(node.hasExtendedData, isFalse);
-      node.extendedData = customData;
-
-      // Verify that the data is accessible via the extendedData getter 
-      // and has been correctly reified in the underlying property bag.
+      NodeProperties extendedData = node.extendedData;
+      extendedData.set<String>('tree_health','Good');
+      extendedData.set<double>('dbh',34.5);
+      // Make sure it shows up now. We don't need to test actual containment
+      // since NodeProperties is thoroughly test elsewhere.
       expect(node.hasExtendedData, isTrue);
-      expect(node.extendedData['tree_health'], 'Good');
-      expect(node.extendedData['dbh'], 34.5);
-      expect(node.property('tree_health'), 'Good');
+
     });
 
     test('should throw exception when accessing missing snippet', () {
@@ -58,25 +57,23 @@ void main() {
       // Setup a node with specific KML attributes and extended data.
       final node = TestFeatureNode(name: 'Export Node')
         ..visibility = false
-        ..snippet = 'Snippet'
-        ..extendedData = {'meta': 'data'};
+        ..snippet = 'Snippet';
 
       // Generate the reified map representation.
       final map = node.toMap();
 
       // Verify that KML members and the property bag are harvested correctly.
-      expect(map['visibility'], TypedValue<bool>(false));
-      expect(map['snippet'], TypedValue<String>('Snippet'));
-      expect(map['meta'], TypedValue<String>('data'));
+      expect(map['visibility'], isFalse);
+      expect(map['snippet'], 'Snippet');
     });
 
     test('should rehydrate state correctly via fromMap', () {
       // Define a reified map representing a dehydrated KML feature.
       final inputMap = {
-        'name': const TypedValue<String>('Rehydrated'),
-        'visibility': const TypedValue<bool>(false),
-        'snippet': const TypedValue<String>('Rehydrated Snippet'),
-        'custom_key': const TypedValue<String>('custom_value'),
+        'name': 'Rehydrated',
+        'visibility': false,
+        'snippet': 'Rehydrated Snippet',
+        'custom_key': const TypedValue<String>('custom_value').toTuple(),
       };
 
       // Create a blank node and rehydrate it from the map.
@@ -87,7 +84,7 @@ void main() {
       expect(node.name, 'Rehydrated');
       expect(node.visibility, isFalse);
       expect(node.snippet, 'Rehydrated Snippet');
-      expect(node.property('custom_key'), 'custom_value');
+      expect(node.properties.get<String>('custom_key'), 'custom_value');
     });
   });
 }

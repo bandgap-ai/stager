@@ -1,5 +1,6 @@
 import '../../system/typed_value.dart';
 import '../../tree/concrete_composite_node.dart';
+import '../../tree/node_properties.dart';
 
 /// This is a custom exception for KMLFeatureNodes.
 class KMLFeatureNodeException implements Exception {
@@ -15,6 +16,15 @@ class KMLFeatureNodeException implements Exception {
 ///
 /// This class represents common KML feature attributes such as visibility, 
 /// snippets, and extended data. It extends [ConcreteCompositeNode].
+///
+/// The KML feature visibility and snippet are treated as intrinsic properties
+/// of this node. KML feature extended data is identical to Stager's generic
+/// node properties, and the normal node property methods from the LeafNode
+/// API provide that functionality here. Two additional helper methods,
+/// hasExtendedData() and extendedData(), are provided on KMLFeatureNode as
+/// markers of the required extended data functionality. KML-focused development
+/// can call these methods to determine if extended data should be supported for
+/// any given feature node.
 abstract class KMLFeatureNode extends ConcreteCompositeNode {
 
   /// Whether the feature is drawn in the geographic view.
@@ -22,9 +32,6 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
 
   /// The short description of the feature.
   String _snippet = '';
-
-  /// The map of custom data associated with the feature.
-  Map<String, Object> _extendedData = {};
 
   /// Creates a [KMLFeatureNode] instance.
   ///
@@ -82,27 +89,20 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
   }
 
   /// Returns `true` if this feature has custom extended data.
-  bool get hasExtendedData {
-    return _extendedData.isNotEmpty;
-  }
-
-  /// Returns the map of custom data associated with the feature.
   ///
-  /// Maps to the `<ExtendedData>` element in the KML specification.
-  /// 
-  /// Throws a [StateError] if [hasExtendedData] is false.
-  Map<String, Object> get extendedData {
-    if (hasExtendedData) {
-      return _extendedData;
-    } else {
-      throw KMLFeatureNodeException('KML Feature does not have extended data.');
-    }
+  /// This is a semantic convenience function to preserve the notion of KML
+  /// extended data for KML features and it is equivalent to the base LeafNode's
+  /// hasProperties property.
+  bool get hasExtendedData {
+    return hasProperties;
   }
 
-  set extendedData(Map<String, Object> value) {
-    _extendedData = value;
-    notify();
-  }
+  /// Returns the extended data for this feature.
+  ///
+  /// This is a semantic convenience function to preserve the notion of KML
+  /// extended data for KML features and it is equivalent to the base LeafNode's
+  /// properties property.
+  NodeProperties get extendedData => properties;
 
   @override
   Map<String, Object> toMap() {
@@ -111,7 +111,6 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
     map.addAll({
       'visibility' : visibility,
       'snippet' : _snippet,
-      'extendedData' : TypedValue<Map<String, Object>>(_extendedData),
     });
     return map;
   }
@@ -129,11 +128,6 @@ abstract class KMLFeatureNode extends ConcreteCompositeNode {
     if (map.containsKey('snippet')) {
       _snippet = map['snippet'] as String;
       map.remove('snippet');
-    }
-    if (map.containsKey('extendedData')) {
-      _extendedData = (map['extendedData']!
-        as TypedValue<Map<String, Object>>).value;
-      map.remove('extendedData');
     }
     // Let the base class handle the rest
     super.fromMap(map);

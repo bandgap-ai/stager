@@ -17,6 +17,7 @@ void main() {
       properties.set<int>('value', 123);
       properties.set<bool>('is_active', true);
 
+      print(properties.get<String>('name'));
       expect(properties.get<String>('name'), 'Test Name');
       expect(properties.get<int>('value'), 123);
       expect(properties.get<bool>('is_active'), true);

@@ -241,7 +241,7 @@ void main() {
         expect(importedNodes!.length, 2, reason: 'Should import two nodes');
         expect(importedNodes.first.name, 'First Node');
         expect(importedNodes.last.name, 'Second Node');
-        expect(importedNodes.last.property('custom'), 'value');
+        expect(importedNodes.last.properties.get<String>('custom'), 'value');
       });
 
       test('should return an empty list if JSON file contains an empty list', () async {

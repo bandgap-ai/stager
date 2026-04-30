@@ -68,17 +68,17 @@ class KMLGroundOverlayNode extends KMLGeometryNode {
   @override
   void fromMap(Map<String, Object> inputMap) {
     // Create a mutable copy to pluck overlay attributes.
-    final map = Map<String, TypedValue<Object>>.from(inputMap);
+    final map = Map<String, Object>.from(inputMap);
 
     // Rehydrate icon member.
     if (map.containsKey('kml_icon')) {
-      _icon = KMLIcon.fromMap(map['kml_icon']!.value as Map<String, Object>);
+      _icon = KMLIcon.fromMap(map['kml_icon']! as Map<String, Object>);
       map.remove('kml_icon');
     }
 
     // Rehydrate latLonBox member.
     if (map.containsKey('kml_latlonbox')) {
-      final boxData = map['kml_latlonbox']!.value as Map<String, Object>;
+      final boxData = map['kml_latlonbox']! as Map<String, Object>;
       _latLonBox = LatLonBox.fromMap(boxData.cast<String, TypedValue<Object>>());
       map.remove('kml_latlonbox');
     }

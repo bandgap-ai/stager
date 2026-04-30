@@ -1,6 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:uuid/uuid.dart';
-
 import 'package:stager_platform/tree/basic_node_builder.dart';
 import 'package:stager_platform/tree/composite_node.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
@@ -13,10 +11,8 @@ void main() {
 
     test('Build a leaf node', () {
       // Create a leaf node
-      UuidValue id = Uuid().v7obj();
       String name = "One";
       LeafNode node = builder.buildLeafNode(name);
-      expect(node.id, id);
       expect(node.name, name);
       expect(node.isComposite,isFalse);
     });
@@ -24,10 +20,8 @@ void main() {
     test('Build a composite node', () {
 
       // Create a composite node
-      UuidValue id = Uuid().v7obj();
       String name = "Two";
       CompositeNode node = builder.buildCompositeNode(name);
-      expect(node.id, id);
       expect(node.name, name);
       expect(node.isComposite,isTrue);
 

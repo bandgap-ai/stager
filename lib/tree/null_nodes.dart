@@ -56,12 +56,6 @@ final class NullComposite implements CompositeNode {
   List<LeafNode> get children => throw UnimplementedError();
 
   @override
-  bool containsProperty(String key) {
-    // TODO: implement containsProperty
-    throw UnimplementedError();
-  }
-
-  @override
   void detach(NodeObserver<dynamic> observer) {
     // TODO: implement detach
   }
@@ -111,10 +105,18 @@ final class NullComposite implements CompositeNode {
   LeafNode get previous => throw UnimplementedError();
 
   @override
-  String property(String key) {
-    // TODO: implement property
+  // TODO: implement hasProperties
+  bool get hasProperties => false;
+
+  @override
+  bool hasProperty(String name) {
+    // TODO: implement hasProperty
     throw UnimplementedError();
   }
+
+  @override
+  // TODO: implement properties
+  NodeProperties get properties => throw UnimplementedError();
 
   @override
   void removeChild(LeafNode child) {
@@ -142,11 +144,6 @@ final class NullComposite implements CompositeNode {
   }
 
   @override
-  void setProperty(String key, TypedValue<Object> value) {
-    // TODO: implement setProperty
-  }
-
-  @override
   Object toJson() {
     // TODO: implement toJson
     throw UnimplementedError();
@@ -158,9 +155,4 @@ final class NullComposite implements CompositeNode {
     throw UnimplementedError();
   }
 
-  @override
-  TypedValue<Object> typedProperty(String key) {
-    // TODO: implement typedProperty
-    throw UnimplementedError();
-  }
 }

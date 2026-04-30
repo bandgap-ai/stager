@@ -52,6 +52,8 @@ void main() {
           38.98951052421746]).toMap()
       };
 
+      // Make sure no properties are set in the node to start.
+      expect(leaf.hasProperties,isFalse);
       // Set them.
       leaf.fromMap(mapInput);
 
@@ -60,15 +62,16 @@ void main() {
       expect(leaf.name, 'Updated Name');
       expect(leaf.position, Point(coords: [-77.9687646357412,
         38.98951052421746]));
-      expect(leaf.property('value'), "456");
-      expect(leaf.typedProperty('value').value as int, 456);
-      expect(leaf.property('is_active'), "false");
-      expect(leaf.typedProperty('is_active').value as bool, false);
-      // There should now be 4 properties
-      expect(leaf.toMap().length, 5);
+      NodeProperties properties = leaf.properties;
+      expect(properties.get<int>('value'), 456);
+      expect(properties.get<bool>('is_active'), false);
+      // There should now be 6 properties - type is added for reference
+      expect(leaf.toMap().length, 6);
       // Ensure that observers were notified the state changed.
       expect(observer.lastUpdatedNode, isNotNull);
-
+      // Make sure hasProperties behaves as expected.
+      expect(leaf.hasProperties,isTrue);
+      expect(leaf.hasProperty('value'),isTrue);
     });
 
     test('ConcreteLeafNode initializes correctly', () {
@@ -160,8 +163,8 @@ void main() {
       final tree = buildConcreteLeafNode(StagerContext(map));
       expect(tree.name, 'Tree');
       expect(tree.runtimeType, ConcreteLeafNode);
-      expect(tree.property('health'), 'Good');
-      expect(tree.typedProperty('age').value as int, 10);
+      expect(tree.properties.get<String>('health'), 'Good');
+      expect(tree.properties.get<int>('age'), 10);
     });
 
     test('ConcreteLeafNode will complain for incorrect typed values', () {

@@ -11,14 +11,14 @@ class MockNodeBuilder extends BasicNodeBuilder {
   @override
   CompositeNode buildCompositeNode(String name, [CompositeNode parent = const NullComposite()]) {
     CompositeNode node = super.buildCompositeNode(name, parent);
-    node.setProperty("isMock", TypedValue<bool>(true));
+    node.properties.set<bool>("isMock", true);
     return node;
   }
 
   @override
   LeafNode buildLeafNode(String name, [CompositeNode parent = const NullComposite()]) {
     LeafNode node = super.buildLeafNode(name, parent);
-    node.setProperty("isMock", TypedValue<bool>(false));
+    node.properties.set<bool>("isMock", false);
     return node;
   }
 

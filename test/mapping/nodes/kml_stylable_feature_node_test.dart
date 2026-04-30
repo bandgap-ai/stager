@@ -23,12 +23,12 @@ void main() {
       // Try the setters
       node.visibility = false;
       node.snippet = 'A brief snippet';
-      node.extendedData = {'key': 'value'};
+      node.extendedData.set<String>('key', 'value');
 
       // Verify the getters
       expect(node.visibility, isFalse);
       expect(node.snippet, 'A brief snippet');
-      expect(node.extendedData['key'], 'value');
+      expect(node.extendedData.get<String>('key'), 'value');
     });
 
     test('should support style resolution via KMLStylable', () {

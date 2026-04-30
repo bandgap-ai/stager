@@ -104,13 +104,13 @@ void main() {
       String name = 'Test Mock Leaf Node';
       Map<String, Object> results = {'name': name, 'isGroup': false};
       customController.process(results);
-      expect(customParent.children[0].property('isMock'),"false");
+      expect(customParent.children[0].properties.get<bool>('isMock'),isFalse);
 
       // Check adding a composite node.
       name = 'Test Mock Composite Node';
       results = {'name': name, 'isGroup': true};
       customController.process(results);
-      expect(customParent.children[1].property('isMock'),"false");
+      expect(customParent.children[1].properties.get<bool>('isMock'),isFalse);
 
       return;
     });

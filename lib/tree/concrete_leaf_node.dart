@@ -67,7 +67,7 @@ class ConcreteLeafNode implements LeafNode {
     Map<String, TypedValue<Object>> initialProperties = const {},
   }) : _name = name,
         _id = Uuid().v7obj(),
-        _point = Point(coords: const [-77.96876463574121, 38.98951052421746]),
+        _point = LeafNode.defaultPosition,
         _properties = ConcreteNodeProperties(initialProperties);
 
   @override
@@ -110,26 +110,13 @@ class ConcreteLeafNode implements LeafNode {
   bool get isComposite => false;
 
   @override
-  bool containsProperty(String key) {
-    return _properties.contains(key);
-  }
+  bool get hasProperties => !_properties.isEmpty();
 
   @override
-  String property(String key) {
-    return _properties.get<Object>(key).toString();
-  }
+  bool hasProperty(String name) => _properties.contains(name);
 
   @override
-  void setProperty(String key, TypedValue<Object> value) {
-    _properties.set<Object>(key, value);
-    // Notify observers about the change in properties
-    notify();
-  }
-
-  @override
-  TypedValue<Object> typedProperty(String key) {
-    return _properties.map[key]!;
-  }
+  NodeProperties get properties => _properties;
 
   @override
   Map<String, Object> toMap() {
@@ -187,7 +174,7 @@ class ConcreteLeafNode implements LeafNode {
         throw NodePropertyException('Property "$key" with type '
             '${value.runtimeType} is not a TypedValue tuple (List<Object>) but '
             'must be since it is a generic property. If this property was'
-            'created programmatically, ensure that TypedValue.toTuple() was'
+            'created programmatically, ensure that TypedValue.toTuple() was '
             'called.');
       }
     });

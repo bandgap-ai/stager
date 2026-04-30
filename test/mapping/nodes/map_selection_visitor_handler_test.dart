@@ -7,6 +7,7 @@ import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/tree/concrete_composite_node.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';
 import 'package:stager_platform/tree/concrete_tree_node.dart';
+import 'package:stager_platform/tree/leaf_node.dart';
 
 void main() {
   group('MapSelectionVisitorHandler Tests', () {
@@ -17,93 +18,67 @@ void main() {
     });
 
     test('should initialize with default location (0.0, 0.0)', () {
-      expect(handler.location, const LatLng(0.0, 0.0));
+      expect(handler.location, const Point());
     });
 
     test('should update location when visiting a ConcreteLeafNode with coordinates', () {
-      // Arrange
-      final node = ConcreteLeafNode(
-        name: 'Test Leaf',
-        initialProperties: {
-          'latitude': TypedValue<double>(38.0),
-          'longitude': TypedValue<double>(-77.0),
-        },
-      );
+      
+      final node = ConcreteLeafNode(name: 'Test Leaf');
+      node.position = Point(coords: [-77.0, 38.0]);
       final selection = Selection<ConcreteLeafNode>(node);
 
-      // Act
+      
       handler.visit(selection);
 
-      // Assert
-      expect(handler.location, const LatLng(38.0, -77.0));
+      
+      expect(handler.location, Point(coords: [-77.0, 38.0]));
     });
 
     test('should update location when visiting a ConcreteCompositeNode with coordinates', () {
-      // Arrange
-      final node = ConcreteCompositeNode(
-        name: 'Test Composite',
-        initialProperties: {
-          'latitude': TypedValue<double>(40.0),
-          'longitude': TypedValue<double>(-74.0),
-        },
-      );
+      
+      final node = ConcreteCompositeNode(name: 'Test Composite');
+      node.position = Point(coords: [-74.0, 40.0]);
       final selection = Selection<ConcreteCompositeNode>(node);
 
-      // Act
+      
       handler.visit(selection);
 
-      // Assert
-      expect(handler.location, const LatLng(40.0, -74.0));
+      
+      expect(handler.location, Point(coords: [-74.0, 40.0]));
     });
 
     test('should update location when visiting a ConcreteTreeNode with coordinates', () {
-      // Arrange
-      final node = ConcreteTreeNode(
-        name: 'Test Tree',
-        initialProperties: {
-          'latitude': TypedValue<double>(39.0),
-          'longitude': TypedValue<double>(-76.0),
-        },
-      );
+      final node = ConcreteTreeNode(name: 'Test Tree');
+      node.position = Point(coords: [-76.0, 39.0]);
       final selection = Selection<ConcreteTreeNode>(node);
-
-      // Act
+      
       handler.visit(selection);
-
-      // Assert
-      expect(handler.location, const LatLng(39.0, -76.0));
+      
+      expect(handler.location, Point(coords: [-76.0, 39.0]));
     });
 
-    test('should reset location to (0.0, 0.0) when coordinates are missing in properties', () {
-      // Arrange
+    test('should reset location to default node position when coordinates are missing in properties', () {
       // First set it to something else to verify it actually changes back to 0,0
       handler.location = Point(coords: [10.0, 10.0]);
       
-      final node = ConcreteLeafNode(
-        name: 'No Location Leaf',
-        initialProperties: {
-          'name': TypedValue<String>('Just a name'),
-        },
-      );
+      final node = ConcreteLeafNode(name: 'No Location Leaf');
       final selection = Selection<ConcreteLeafNode>(node);
 
-      // Act
+      
       handler.visit(selection);
 
-      // Assert
-      expect(handler.location, const LatLng(0.0, 0.0));
+      expect(handler.location, LeafNode.defaultPosition);
     });
 
     test('should throw exception when visiting an unregistered type', () {
-      // Arrange
+      
       final selection = Selection<String>('I am not a node');
 
-      // Act & Assert
       expect(() => handler.visit(selection), throwsException);
     });
 
     test('should handle partially missing coordinates (only latitude)', () {
-       // Arrange
+       
       final node = ConcreteLeafNode(
         name: 'Partial Location',
         initialProperties: {
@@ -113,11 +88,11 @@ void main() {
       );
       final selection = Selection<ConcreteLeafNode>(node);
 
-      // Act
+      
       handler.visit(selection);
 
-      // Assert
-      expect(handler.location, const LatLng(0.0, 0.0));
+      
+      expect(handler.location, LeafNode.defaultPosition);
     });
   });
 }

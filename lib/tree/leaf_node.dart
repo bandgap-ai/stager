@@ -1,5 +1,6 @@
 
 import 'package:uuid/uuid.dart';
+import 'node_properties.dart';
 import 'observable_subject.dart';
 import 'node_visitor.dart';
 import '../system/point.dart';
@@ -68,6 +69,10 @@ class NodeStructureException implements Exception {
 ///
 /// All nodes accept visitors (per the visitor pattern) with accept().
 abstract class LeafNode implements ObservableSubject {
+
+  /// A default position for nodes.
+  static const Point defaultPosition = Point(
+      coords: const [-77.96876463574121, 38.98951052421746]);
 
   const LeafNode();
 
@@ -150,32 +155,18 @@ abstract class LeafNode implements ObservableSubject {
   /// orphaned state.
   void resetRelatives();
 
-  /// Sets the property value associated with [key].
-  ///
-  /// [key]: The key of the property to set.
-  /// [value]: The value to set for the property.
-  /// Returns the key that was set.
-  void setProperty(String key, TypedValue<Object> value);
-
-  /// Returns the property value associated with [key] as a String.
-  ///
-  /// [key]: The key of the property to retrieve.
-  /// Returns the property value as a String or throws an exception if the key
-  /// is not found.
-  String property(String key);
-
-  /// Returns the property value associated with [key] as a [TypedValue].
-  ///
-  /// [key]: The key of the property to retrieve.
-  /// Returns the property value as a [TypedValue] or throws an exception if the
-  /// key is not found.
-  TypedValue<Object> typedProperty(String key);
+  /// Returns true if generic properties beyond name and id are available for
+  /// this node, and returns false otherwise.
+  bool get hasProperties;
 
   /// True if the node has a property for [key].
   ///
   /// [key]: The key of the property to check.
   /// Returns `true` if the node has a property for [key], `false` otherwise.
-  bool containsProperty(String key);
+  bool hasProperty(String name);
+
+  /// Returns the properties for this node.
+  NodeProperties get properties;
 
   /// Returns the full set of intrinsic and generic properties as a map.
   Map<String, Object> toMap();
