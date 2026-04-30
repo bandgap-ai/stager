@@ -19,12 +19,7 @@ class TestLeafNode extends ConcreteLeafNode {
   }
 }
 
-/// A utility test to visualize the hierarchical state of the sample data.
-///
-/// This test traverses the [sampleSites] tree and prints the reified state
-/// of each node using its [toMap] method. This bypasses the potentially
-/// unstable [JsonIOUtil] while providing a clear view of the "fruits of our 
-/// labor" regarding the Stager 0.0.5 overhaul.
+/// A bunch of diagnostic tests for json manipulation.
 void main() {
   /// A reviver function for [jsonDecode] that ensures the resulting object 
   /// graph is strictly typed and adheres to the platform's No-Null Policy.
@@ -48,10 +43,6 @@ void main() {
     // all nodes in a predictable, iterative manner.
     for (final site in sampleSites) {
       final iterator = DepthFirstIterator(site);
-
-      // We use a stack (path) to track the current hierarchy level so we 
-      // can manage indentation and the closing of JSON structure correctly.
-      final List<LeafNode> path = [];
 
       while (iterator.moveNext()) {
         final node = iterator.current;
@@ -99,5 +90,6 @@ void main() {
     print(map);
     print(map.runtimeType);
     final revivedLeaf = TestLeafNode.fromJson(map);
+    print(revivedLeaf);
   });
 }

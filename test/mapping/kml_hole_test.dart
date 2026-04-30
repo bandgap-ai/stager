@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/mapping/kml_hole.dart';
 import 'package:stager_platform/system/point.dart';
-import 'package:stager_platform/system/typed_value.dart';
 
 void main() {
   group('KMLHole Tests', () {
@@ -41,7 +40,6 @@ void main() {
 
       // Verify that the points are exported as a reified list of maps.
       expect(map.containsKey('points'), isTrue);
-      final reifiedPoints = map['points'] as List<Object>;
 
       // Perform rehydration from the map.
       final newHole = KMLHole.fromMap(map);

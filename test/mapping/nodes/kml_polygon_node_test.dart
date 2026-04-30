@@ -5,7 +5,6 @@ import 'package:stager_platform/mapping/kml_hole.dart';
 import 'package:stager_platform/mapping/style/kml_style_manager.dart';
 import 'package:stager_platform/system/point.dart';
 import 'package:stager_platform/system/stager_context.dart';
-import 'package:stager_platform/system/typed_value.dart';
 
 void main() {
   group('KMLPolygonNode Tests', () {

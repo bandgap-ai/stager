@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/system/stager_context.dart';
-import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/system/point.dart';
 
 void main() {

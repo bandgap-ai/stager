@@ -202,7 +202,7 @@ void main() {
       // Try to read it back in
       final deserializedSampleSites = ioUtil.deserialize(sampleSiteJson);
 
-
+      expect(deserializedSampleSites.length, sampleSites.length);
     });
 
   });

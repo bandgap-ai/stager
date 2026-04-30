@@ -1,7 +1,5 @@
-import 'package:stager_platform/tree/node_observer.dart';
-import 'package:uuid/uuid.dart';
 
-import 'node_properties.dart';
+import 'package:uuid/uuid.dart';
 import 'observable_subject.dart';
 import 'node_visitor.dart';
 import '../system/point.dart';

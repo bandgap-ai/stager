@@ -7,7 +7,6 @@ library;
 
 import '../system/registry.dart';
 import '../system/stager_context.dart';
-import '../system/typed_value.dart';
 import 'tree.dart';
 import 'node_observer.dart';
 import '../builders/basic_builder.dart';

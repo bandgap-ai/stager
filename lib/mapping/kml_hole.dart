@@ -1,8 +1,6 @@
 import 'package:collection/collection.dart';
 import '../system/registry.dart';
-import '../system/stager_context.dart';
 import '../system/point.dart';
-import '../system/typed_value.dart';
 
 /// Represents an inner boundary (a hole) of a KML Polygon.
 ///

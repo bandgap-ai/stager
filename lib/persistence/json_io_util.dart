@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:stager_platform/system/registry.dart';
 import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/tree/iterators.dart';
 
 /// Exception thrown when an error occurs during JSON serialization or
 /// deserialization of the Stager tree structure.
@@ -77,7 +76,7 @@ class JsonIOUtil {
       // here, we need recreate the Map, pull the type entry, use the type with
       // the Stager Registry to recreate the LeafNode, and add the
       // rebuilt node to the list to return.
-      for (final entry in decodedJson as List) {
+      for (final entry in decodedJson) {
         try {
           if (entry.containsKey('type')) {
             final nodeMap = Map<String, Object>.from(entry);

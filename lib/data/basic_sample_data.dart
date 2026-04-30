@@ -2,10 +2,8 @@
 /// This data is used for development and testing purposes.
 library;
 
-import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/system/point.dart';
-
 import '../mapping/nodes/kml_polygon_node.dart';
 import '../mapping/style/kml_style_manager.dart';
 import '../system/typed_value.dart';
