@@ -36,10 +36,6 @@ class AddNodeController extends Controller<CompositeNode> {
   void process(Object input) {
     // Prepare the input
     Map<String, dynamic> mapInput = input as Map<String, dynamic>;
-    String name = mapInput['name'] as String;
-    // Create the ID
-    var uuid = Uuid();
-    String id = uuid.v7();
     // Create the node. The build will handle linking it to the parent (state)
     // and notifying the observers.
     if (mapInput['isGroup'] as bool) {

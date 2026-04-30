@@ -1,6 +1,5 @@
 import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/tree/composite_node.dart';
-import 'package:uuid/uuid_value.dart';
 
 /// This is a builder interface for creating nodes. See [BasicNodeBuilder] for
 /// an example.

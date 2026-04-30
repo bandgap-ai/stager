@@ -3,7 +3,6 @@ import 'leaf_node.dart';
 import 'node_builder.dart';
 import 'concrete_composite_node.dart';
 import 'concrete_leaf_node.dart';
-import 'package:uuid/uuid_value.dart';
 import 'null_nodes.dart';
 
 /// This is an implementation of [NodeBuilder] that provides a default

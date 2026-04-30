@@ -36,7 +36,6 @@ void main() {
       node.attach(observer);
 
       // Now build a leaf node and add it as a child
-      UuidValue id2 = Uuid().v7obj();
       String name2 = "Three";
       LeafNode child = builder.buildLeafNode(name2, node);
       // Check to see that the composite is linked as the child's parent
