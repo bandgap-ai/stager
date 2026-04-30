@@ -69,53 +69,31 @@ class NodeStructureException implements Exception {
 /// All nodes accept visitors (per the visitor pattern) with accept().
 abstract class LeafNode implements ObservableSubject {
 
-  /// The common name of the node
-  String _name;
-
-  /// The unique identifier for the node.
-  UuidValue _id;
-
-  /// The position of the node
-  Point _point;
-
-  LeafNode({required String name}) : _name = name,
-        _id = Uuid().v7obj(),
-        _point = Point(coords: const [-77.96876463574121, 38.98951052421746]);
+  const LeafNode();
 
   /// Returns the name of the node
-  String get name => _name;
+  String get name;
 
   /// Sets the name of the node if the name is not empty and does nothing
   /// otherwise. Visitors are notified when the name changes.
   ///
   /// [newName]: The new name for the node.
-  set name(String newName) {
-    if (newName.isNotEmpty) {
-      _name = newName;
-      notify();
-    }
-  }
+  set name(String newName);
 
   /// Returns the unique identifier for the node.
-  UuidValue get id => _id;
+  UuidValue get id;
 
   /// Sets the unique identifier for the node. Visitors are notified when the
   /// name changes.
-  set id(UuidValue newId) {
-    _id = newId;
-    notify();
-  }
+  set id(UuidValue newId);
 
   /// Retrieves the position of the node.
-  Point get position => _point;
+  Point get position;
 
   /// Sets the position of the node. Setting the position notifies listeners.
   ///
   /// [newPoint]: The new position for the node.
-  set position(Point newPoint) {
-    _point = newPoint;
-    notify();
-  }
+  set position(Point newPoint);
 
   /// Indicates whether this node has a parent.
   ///
@@ -205,7 +183,7 @@ abstract class LeafNode implements ObservableSubject {
   /// Converts the node to an encodable object for JSON serialization.
   ///
   /// Returns the node as a map downcast to an Object.
-  Object toJson() => toMap();
+  Object toJson();
 
   /// Loads the full set of intrinsic and generic properties from a map. The map
   /// should contain key-value pairs representing the properties already set by

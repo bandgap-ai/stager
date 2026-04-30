@@ -33,7 +33,7 @@ class ImportExportMenu extends StatelessWidget {
         if (value == 'export') {
           final nodesToExport = selectedNode != null ? [selectedNode] : siteState.treeData;
           final fileName = selectedNode != null
-              ? '${selectedNode.properties.get('name')}.json'
+              ? '${selectedNode.name}.json'
               : 'tracee_export.json';
           await fileHandler.export(
             nodes: nodesToExport,

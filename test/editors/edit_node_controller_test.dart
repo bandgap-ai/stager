@@ -82,10 +82,10 @@ void main() {
 
       // Get and check the properties.
       expect(parent.name, 'Updated Name');
-      expect(parent.properties.get<int>('value'), 456);
-      expect(parent.properties.get<bool>('is_active'), false);
+      expect(parent.typedProperty('value').value, 456);
+      expect(parent.typedProperty('is_active').value, false);
       // There should now be 4 properties
-      expect(parent.properties.map.length, 4);
+      expect(parent.toMap().length, 4);
       // Ensure that observers were notified the state changed.
       expect(observer.updated, isTrue);
       observer.reset();

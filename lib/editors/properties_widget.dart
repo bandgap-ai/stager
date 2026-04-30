@@ -85,14 +85,15 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
       // Get the current image paths if they exist, and otherwise start with an
       // empty list.
       List<String> currentImagePaths = [];
-      if (node.properties.contains('imagePaths')) {
-        currentImagePaths = node.properties.get<List<String>>('imagePaths');
-      }
+      throw UnimplementedError();
+      // if (node.properties.contains('imagePaths')) {
+      //   currentImagePaths = node.properties.get<List<String>>('imagePaths');
+      // }
       // Merge the new image path with the existing list
-      node.properties.set<List<String>>('imagePaths', [
-        ...currentImagePaths,
-        pickedFile.path,
-      ]);
+      // node.properties.set<List<String>>('imagePaths', [
+      //   ...currentImagePaths,
+      //   pickedFile.path,
+      // ]);
     }
   }
 
@@ -156,8 +157,10 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
 
   /// Builds the images view
   Widget _buildImagesView(LeafNode node) {
-    final imagePaths = node.properties.contains('imagePaths') ?
-        (node.properties.get<List<String>>('imagePaths')) : [];
+    final imagePaths = [];
+    // FIXME!
+    //  node.properties.contains('imagePaths') ?
+        //(node.properties.get<List<String>>('imagePaths')) : [];
 
     return Column(
       children: [

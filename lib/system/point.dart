@@ -67,6 +67,12 @@ LatLng _basicWGS84ToLatLng(List<double> coords, CoordinateSystem system) {
 /// [toString] prints the coordinates and reference frame to a comma-separated
 /// string.
 class Point {
+
+  /// Default position in WGS84.
+  static const defaultPosition = [0.0,0.0,0.0];
+  /// Default coordinate system.
+  static const defaultSystem = CoordinateSystem.wgs84;
+
   /// The raw coordinate values.
   final List<double> coords;
 
@@ -82,8 +88,8 @@ class Point {
   /// [system]: The CRS used. Defaults to [CoordinateSystem.wgs84].
   /// [converter]: Function to resolve [LatLng]. Defaults to [defaultConverter].
   const Point({
-    this.coords = const [0.0, 0.0, 0.0],
-    this.system = CoordinateSystem.wgs84,
+    this.coords = Point.defaultPosition,
+    this.system = Point.defaultSystem,
     this.converter = _basicWGS84ToLatLng,
   });
 

@@ -11,7 +11,7 @@ import 'package:stager_platform/tree/leaf_node.dart';
 /// and siblings (i.e., it is orphaned).
 abstract class CompositeNode extends LeafNode {
 
-  CompositeNode({required super.name});
+  const CompositeNode();
 
   /// Retrieves the list of child [LeafNode]s directly associated with this composite node.
   ///

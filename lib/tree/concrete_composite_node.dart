@@ -22,6 +22,11 @@ ConcreteCompositeNode buildConcreteCompositeNode(StagerContext context) {
   return node;
 }
 
+/// This class is concrete implementation of a [CompositeNode] that provides all
+/// the required capabilities to manage a set of child [LeafNode]s.
+///
+/// Note that most of the methods on this class propagate to its children, such
+/// as toMap() and fromMap().
 class ConcreteCompositeNode extends ConcreteLeafNode implements CompositeNode {
   /// The list of child nodes.
   @override

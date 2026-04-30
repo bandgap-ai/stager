@@ -8,7 +8,7 @@ import 'package:stager_platform/tree/node_summary.dart';
 /// structure and to find specific nodes based on a given predicate.
 abstract class TreeNode extends CompositeNode {
 
-  TreeNode({required super.name});
+  const TreeNode();
 
   /// Creates and returns an [Iterator] for traversing the tree.
   ///

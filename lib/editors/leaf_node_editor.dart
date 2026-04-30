@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:stager_platform/editors/stager_editor.dart';
-import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/editors/standard_widgets.dart';
-import 'package:stager_platform/editors/basic_widget_factory.dart';
+import 'stager_editor.dart';
+import '../tree/tree.dart';
+import 'standard_widgets.dart';
+import 'basic_widget_factory.dart';
+import '../system/point.dart';
 
 import '../system/typed_value.dart';
 
@@ -29,7 +30,7 @@ class LeafNodeEditor extends StagerEditor<LeafNode> {
 class _NodeEditorState extends State<LeafNodeEditor> {
 
   /// The properties of the node to be edited.
-  late NodeProperties properties;
+  late Map<String,Object> properties;
 
   /// A map to store [TextEditingController]s for string-based properties.
   final Map<String, TextEditingController> _textControllers = {};
@@ -40,16 +41,21 @@ class _NodeEditorState extends State<LeafNodeEditor> {
   @override
   void initState() {
     super.initState();
-    properties = widget.state.properties;
+    properties = widget.state.toMap();
     // Initialize controllers for each property based on their type.
-    properties.map.forEach((key, typedValue) {
+    properties.forEach((key, value) {
       // For all properties, create a TextEditingController.
-      _textControllers[key] = TextEditingController(text: typedValue.value.toString() ?? '');
+      if (value is TypedValue) {
+        _textControllers[key] =
+            TextEditingController(text: value.value.toString());
+      } else {
+        _textControllers[key] = TextEditingController(text: value.toString());
+      }
     });
 
     // Initialize _pickFromMap based on whether latitude/longitude exist
-    _pickFromMap = !(properties.map.containsKey('latitude') ||
-        properties.map.containsKey('longitude'));
+    final position = widget.state.position;
+    _pickFromMap = !(position.coords != Point.defaultPosition);
   }
 
   // Call back for point picking on the map
@@ -83,7 +89,7 @@ class _NodeEditorState extends State<LeafNodeEditor> {
             // Dynamically build text field editors for all properties
             // except 'id' (because it is private), and lat/long because
             // they are edited with a different widget.
-            ...properties.map.entries.where((entry) => entry.key != 'id' && entry.key != 'latitude' && entry.key != 'longitude').map((entry) {
+            ...properties.entries.where((entry) => entry.key != 'id' && entry.key != 'latitude' && entry.key != 'longitude').map((entry) {
               return buildTextFieldEditor(
                 context,
                 _textControllers[entry.key]!, // Use the pre-initialized controller
@@ -91,16 +97,14 @@ class _NodeEditorState extends State<LeafNodeEditor> {
                 'Enter ${entry.key}', // Hint text
               );
             }),
-            // If latitude or longitude properties exist, build a geographic coordinate editor.
-            if (properties.map.containsKey('latitude') || properties.map.containsKey('longitude'))
-              buildPositionMethodWidget(context, _pickFromMap, (value) {
+            // Build a geographic coordinate editor.
+            buildPositionMethodWidget(context, _pickFromMap, (value) {
                 setState(() {
                   _pickFromMap = value;
                 });
               }),
             SizedBox(height: 8),
-            if (properties.map.containsKey('latitude') || properties.map.containsKey('longitude'))
-              SizedBox(
+            SizedBox(
                 width: _pickFromMap ? MediaQuery.of(context).size.width * 0.8 : null,
                 height: _pickFromMap ? MediaQuery.of(context).size.height * 0.5 : null,
                 child: _pickFromMap
@@ -131,8 +135,8 @@ class _NodeEditorState extends State<LeafNodeEditor> {
         TextButton(
           onPressed: () {
             // Create a mutable copy of the properties map.
-            // FIXME - This should be done
-            final updatedProperties = Map<String, TypedValue<Object>>.from(properties.map);
+            // FIXME - WILL NEED TO ADJUST THIS!
+            final updatedProperties = Map<String, TypedValue<Object>>.from(properties);
             _textControllers.forEach((key, controller) {
               if (key == 'latitude' || key == 'longitude') {
                 updatedProperties[key] = TypedValue<double>(double.tryParse(controller.text)!);

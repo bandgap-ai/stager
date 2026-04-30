@@ -15,7 +15,7 @@ void main() {
       // Create a leaf node
       UuidValue id = Uuid().v7obj();
       String name = "One";
-      LeafNode node = builder.buildLeafNode(id, name);
+      LeafNode node = builder.buildLeafNode(name);
       expect(node.id, id);
       expect(node.name, name);
       expect(node.isComposite,isFalse);
@@ -26,7 +26,7 @@ void main() {
       // Create a composite node
       UuidValue id = Uuid().v7obj();
       String name = "Two";
-      CompositeNode node = builder.buildCompositeNode(id, name);
+      CompositeNode node = builder.buildCompositeNode(name);
       expect(node.id, id);
       expect(node.name, name);
       expect(node.isComposite,isTrue);
@@ -38,7 +38,7 @@ void main() {
       // Now build a leaf node and add it as a child
       UuidValue id2 = Uuid().v7obj();
       String name2 = "Three";
-      LeafNode child = builder.buildLeafNode(id2, name2, node);
+      LeafNode child = builder.buildLeafNode(name2, node);
       // Check to see that the composite is linked as the child's parent
       expect(child.parent == node, isTrue);
       // Check to see that the observer was notified

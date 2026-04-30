@@ -32,7 +32,15 @@ ConcreteLeafNode buildConcreteLeafNode(StagerContext context) {
 /// Subclasses can override this behavior as needed, or allow ConcreteLeafNode
 /// to load the properties and overwrite them after the initial values are
 /// loaded.
-class ConcreteLeafNode extends LeafNode {
+class ConcreteLeafNode implements LeafNode {
+  /// The common name of the node
+  String _name;
+
+  /// The unique identifier for the node.
+  UuidValue _id;
+
+  /// The position of the node
+  Point _point;
 
   /// The [NodeProperties] associated with this leaf node.
   ///
@@ -55,9 +63,48 @@ class ConcreteLeafNode extends LeafNode {
   /// [name]: The display name of the node. Stored in properties.
   /// [initialProperties]: Optional initial properties for the node.
   ConcreteLeafNode({
-    required super.name,
+    required name,
     Map<String, TypedValue<Object>> initialProperties = const {},
-  }) : _properties = ConcreteNodeProperties(initialProperties);
+  }) : _name = name,
+        _id = Uuid().v7obj(),
+        _point = Point(coords: const [-77.96876463574121, 38.98951052421746]),
+        _properties = ConcreteNodeProperties(initialProperties);
+
+  @override
+  String get name => _name;
+
+  @override
+  set name(String newName) {
+    if (newName.isNotEmpty) {
+      _name = newName;
+      notify();
+    }
+  }
+
+  /// Returns the unique identifier for the node.
+  @override
+  UuidValue get id => _id;
+
+  /// Sets the unique identifier for the node. Visitors are notified when the
+  /// name changes.
+  @override
+  set id(UuidValue newId) {
+    _id = newId;
+    notify();
+  }
+
+  /// Retrieves the position of the node.
+  @override
+  Point get position => _point;
+
+  /// Sets the position of the node. Setting the position notifies listeners.
+  ///
+  /// [newPoint]: The new position for the node.
+  @override
+  set position(Point newPoint) {
+    _point = newPoint;
+    notify();
+  }
 
   @override
   bool get isComposite => false;
@@ -98,6 +145,9 @@ class ConcreteLeafNode extends LeafNode {
     };
 
   }
+
+  @override
+  Object toJson() => toMap();
 
   @override
   void fromMap(Map<String, Object> inputMap) {
@@ -188,7 +238,6 @@ class ConcreteLeafNode extends LeafNode {
       throw NodeStructureException('previous');
     }
   }
-
 
   @override
   void setParent(LeafNode parent) {

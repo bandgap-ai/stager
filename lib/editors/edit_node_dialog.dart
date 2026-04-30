@@ -23,8 +23,8 @@ class EditNodeDialog extends LeafNodeEditor {
 /// The state for the [EditNodeDialog] widget.
 class _EditNodeDialogState extends State<EditNodeDialog> {
 
-  /// The [NodeProperties] to be edited.
-  late NodeProperties properties;
+  /// The node properties to be edited.
+  late Map<String,Object> properties;
 
   /// Controller for the text field, pre-filled with the node's current name.
   late TextEditingController _nameController;
@@ -32,8 +32,8 @@ class _EditNodeDialogState extends State<EditNodeDialog> {
   @override
   void initState() {
     super.initState();
-    properties = widget.state.properties;
-    _nameController = TextEditingController(text: name);
+    properties = widget.state.toMap();
+    _nameController = TextEditingController(text: widget.state.name);
   }
 
   void _cancelEdit() {
