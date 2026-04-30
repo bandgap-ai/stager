@@ -189,8 +189,8 @@ void main() {
             'toString()',
             'NodePropertyException: Property "health" with type '
                 'TypedValue<String> is not a TypedValue tuple (List<Object>) but '
-                'must be since it is a generic property. If this property was'
-                'created programmatically, ensure that TypedValue.toTuple() was'
+                'must be since it is a generic property. If this property was '
+                'created programmatically, ensure that TypedValue.toTuple() was '
                 'called.',
           ),
         ),);

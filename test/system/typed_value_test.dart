@@ -472,6 +472,9 @@ void main() {
 
       // Retrieve the property map from the node.
       final leafPropMap = leaf.toMap();
+      // Remove the "type" value from the entry map because we don't test that
+      // here - it isn't a TypedValue.
+      leafPropMap.remove("type");
 
       print('Original Property Map: $leafPropMap');
       print("Typed Leaf Map: $testTypedMap");

@@ -46,13 +46,13 @@ class _AddNodeDialogState extends State<AddNodeDialog> {
   List<Widget> _createActionButtons(BuildContext context) {
     // Cancels the action
     Widget cancelButton = TextButton(
-      onPressed: () => Navigator.of(context).pop(),
+      onPressed: () => Navigator.of(context).pop({"pressed":true}),
       child: const Text('Cancel'),
     );
     // Returns the input all the way back up the stack to the editor.
     Widget addButton = TextButton(
       onPressed: () {
-        Navigator.of(context).pop<Map<String, dynamic>?>({
+        Navigator.of(context).pop<Map<String, Object>>({
           'name': _nameController.text,
           'isGroup': _isGroupNotifier.value,
         });

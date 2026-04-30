@@ -22,30 +22,30 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
     implements NodePropertiesObserver {
 
   /// The properties of the node
-  late Map<String, Object> properties;
+  late NodeProperties properties;
 
   @override
   void initState() {
     super.initState();
-    properties = widget.state.toMap();
-    widget.state.attach(this);
+    properties = widget.state.properties;
+    properties.attach(this);
   }
 
   @override
   void didUpdateWidget(NodePropertiesView oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    properties = widget.state.toMap();
-    Map<String,Object> oldProps = oldWidget.state.toMap();
+    properties = widget.state.properties;
+    NodeProperties oldProps = oldWidget.state.properties;
     if (properties != oldProps) {
-      oldWidget.state.detach(this);
-      widget.state.attach(this);
+      oldProps.detach(this);
+      properties.attach(this);
     }
   }
 
   @override
   void dispose() {
-    widget.state.detach(this);
+    properties.detach(this);
     super.dispose();
   }
 
@@ -106,9 +106,9 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
   ///
   /// [context]: The context in which the widget is being built.
   /// [properties]: The [NodeProperties] object containing the properties to display.
-  Widget _createTableWidget(BuildContext context, Map<String, Object> inProps) {
+  Widget _createTableWidget(BuildContext context, NodeProperties properties) {
 
-    final Iterable<MapEntry<String, Object>> props = inProps.entries.where((entry) =>
+    final Iterable<MapEntry<String, TypedValue<Object>>> props = properties.map.entries.where((entry) =>
     entry.key != 'id' &&
         entry.key != 'name' &&
         entry.key != 'imagePaths').toList();
@@ -140,7 +140,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 // Yes, it really is .value.value for now.
-                (entry.value is TypedValue) ? (entry.value as TypedValue).value.toString() : entry.value.toString(), // Handle potential null values
+                entry.value.value.toString() ?? 'N/A', // Handle potential null values
               ),
             ),
           ],
@@ -171,8 +171,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
             if (updatedProperties != null) {
               // Update the properties of the current node
               updatedProperties.forEach((key, value) {
-                throw UnimplementedError();
-                //properties.set<String>(key, value);
+                properties.set<String>(key, value);
               });
             }
           },
@@ -190,8 +189,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
             if (newProperty != null && newProperty.keys.isNotEmpty) {
               final key = newProperty.keys.first;
               final value = newProperty[key];
-              throw UnimplementedError();
-              //properties.set<String>(key, value);
+              properties.set<String>(key, value);
             }
           },
         ),
@@ -206,12 +204,12 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          properties['name'].toString(),
+          widget.state.name,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         // Show the table only if there are properties to display
-        if (properties.isNotEmpty)
+        if (properties.map.isNotEmpty)
           _createTableWidget(context, properties)
         // Show an error message otherwise.
         else const Text("No properties to display."),

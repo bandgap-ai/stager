@@ -32,14 +32,9 @@ class EditNodeController extends Controller<LeafNode> {
   }
 
   @override
-  void process(Object input) {
-
-    // FIXME: Why take an input of Object? Why not take what we actually want?
-
-    // Prepare the input
-    Map<String, Object> mapInput = input as Map<String, Object>;
+  void process(Map<String, Object> input) {
     // Process the results
-    state.fromMap(mapInput);
+    state.fromMap(input);
     return;
   }
 }

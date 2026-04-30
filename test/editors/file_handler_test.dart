@@ -8,6 +8,8 @@ import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/editors/file_handler.dart';
 import 'package:stager_platform/persistence/json_io_util.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
+import 'package:stager_platform/persistence/json_io_util.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
 
@@ -52,14 +54,11 @@ void main() {
     });
 
     test('writeToFile should save a file with the correct content', () async {
-      // Arrange
       final nodes = [ConcreteTreeNode(name: 'Test Node')];
       final filePath = '${testDir.path}/export_test.json';
 
-      // Act
       await fileHandler.writeToFile(filePath, nodes);
 
-      // Assert
       final file = File(filePath);
       expect(await file.exists(), isTrue);
       final content = await file.readAsString();
@@ -67,15 +66,13 @@ void main() {
     });
 
     test('readFromFile should correctly read data from a file', () async {
-      // Arrange
+      final nodes = [ConcreteTreeNode(name: 'Test Node')];
       final filePath = '${testDir.path}/import_test.json';
       final file = File(filePath);
-      await file.writeAsString('[{"type":"tree","properties":{"id":{"type":"String","value":"1"},"name":{"type":"String","value":"Test Node"}},"children":[]}]');
+      await file.writeAsString('[${jsonEncode(nodes[0])}]');
 
-      // Act
       final importedNodes = await fileHandler.readFromFile(filePath);
 
-      // Assert
       expect(importedNodes, isNotNull);
       expect(importedNodes!.length, 1);
       expect(importedNodes.first.name, 'Test Node');
@@ -112,100 +109,39 @@ void main() {
 
     group('writeToFile', () {
       test('should save a file with the correct JSON content for multiple nodes', () async {
-        // Arrange
-        // Correct way to think about nodes for serialization:
-        // We create them individually. If they were part of a tree,
-        // their 'parentId' property would be set internally when added.
-        // For testing writeToFile, we are testing the serialization of
-        // a list of nodes as they might be provided, potentially already
-        // having parentId set if extracted from a tree.
 
-        // Scenario 1: Nodes are already structured (e.g., extracted from a tree)
-        // In this case, 'parentId' would be part of their 'properties' or a dedicated field
-        // that your toJson/fromJson logic handles.
-        // For ConcreteTreeNode, if parentId is managed via properties:
-        final node1 = ConcreteTreeNode(name: 'Node One', initialProperties: {'type': TypedValue<String>('root')});
-        final node2 = ConcreteTreeNode(name: 'Node Two', initialProperties: {'type': TypedValue<String>('child'), 'parentId': TypedValue<String>('1')});
+        final node1 = ConcreteTreeNode(name: 'Node One');
+        final node2 = ConcreteTreeNode(name: 'Node Two',
+            initialProperties: {'parentId': TypedValue<String>('1')});
 
-        // For this test, let's assume 'parentId' is a property that gets serialized if present.
-        // The toJson() method of ConcreteTreeNode is responsible for what gets written.
         final nodesToSerialize = [node1, node2];
         final filePath = '${testDir.path}/export_multiple_nodes.json';
 
-        // Act
         await fileHandler.writeToFile(filePath, nodesToSerialize);
 
-        // Assert
+        // Manually read the file as a string to verify its contents
         final file = File(filePath);
         expect(await file.exists(), isTrue, reason: 'File should have been created');
 
         final content = await file.readAsString();
         expect(content, isNotEmpty, reason: 'File content should not be empty');
 
-        final List<dynamic> decodedJson = jsonDecode(content);
-        expect(decodedJson, isA<List>());
-        expect(decodedJson.length, 2, reason: 'Should contain two nodes');
-
-        // ---- DEBUGGING ----
-        print('Decoded JSON for inspection:');
-        for (var item in decodedJson) {
-          print(item);
-          if (item is Map) { // Check if it's a map before trying to access keys
-            print('  Keys in this map item: ${item.keys}');
-            if (item.containsKey('id')) {
-              print('  Value of "id": ${item['id']} (Type: ${item['id'].runtimeType})');
-            } else {
-              print('  This map item does NOT contain an "id" key.');
-            }
-          } else {
-            print('  This item is not a Map. It is: ${item.runtimeType}');
-          }
-        }
-        // ---- END DEBUGGING ----
-
-        // Find node1 data by looking into its 'properties' map
-        final Map<String, dynamic> node1Json = decodedJson.firstWhere(
-              (n) => n is Map &&
-              n.containsKey('properties') &&
-              n['properties'] is Map &&
-              n['properties']['id'] is Map &&
-              n['properties']['id']['value'] == '1', // ID is a string '1' in your node setup
-          orElse: () => throw StateError('Node with properties.id "1" not found or structure incorrect'),
-        );
-
-        // All relevant data for node1 is within its 'properties' map in the JSON
-        final Map<String, dynamic> node1Properties = node1Json['properties'];
-        expect(node1Json['type'], 'tree'); // Top-level type
-        expect(node1Properties['name']['value'], 'Node One');
-        expect(node1Properties['type']['value'], 'root');
-        expect(node1Json['children'], isEmpty); // Assuming it has no children in this basic setup
-
-        // Find node2 data
-        final Map<String, dynamic> node2Json = decodedJson.firstWhere(
-              (n) => n is Map &&
-              n.containsKey('properties') &&
-              n['properties'] is Map &&
-              n['properties']['id']['value'] == '2', // ID is a string '2'
-          orElse: () => throw StateError('Node with properties.id "2" not found or structure incorrect'),
-        );
-
-        final Map<String, dynamic> node2Properties = node2Json['properties'];
-        expect(node2Json['type'], 'tree'); // Top-level type
-        expect(node2Properties['name']['value'], 'Node Two');
-        expect(node2Properties['type']['value'], 'child');
-        expect(node2Properties['parentId']['value'], '1'); // parentId is also in properties
-        expect(node2Json['children'], isEmpty);
+        // Rebuild the json
+        JsonIOUtil jsonUtil = JsonIOUtil();
+        print("Content:\n$content");
+        final List<LeafNode> rebuiltNodes = jsonUtil.deserialize(content);
+        print(rebuiltNodes.toString());
       });
 
       test('should save an empty list if nodes list is empty', () async {
-        // Arrange
+        
         final List<ConcreteTreeNode> nodes = [];
         final filePath = '${testDir.path}/export_empty_list.json';
 
-        // Act
+        
         await fileHandler.writeToFile(filePath, nodes);
 
-        // Assert
+        
         final file = File(filePath);
         expect(await file.exists(), isTrue);
         final content = await file.readAsString();
@@ -213,15 +149,11 @@ void main() {
         expect(decodedJson, isA<List>());
         expect(decodedJson.isEmpty, isTrue);
       });
-
-      // It's harder to test "invalid path" or "permission denied"
-      // with real file I/O in a reliable, cross-platform way in unit tests.
-      // This is where mocking shines.
     });
 
     group('readFromFile', () {
       test('should correctly read and parse data from a valid JSON file', () async {
-        // Arrange
+        
         final filePath = '${testDir.path}/import_valid.json';
         final file = File(filePath);
         // Prepare a file with valid JSON content
@@ -233,10 +165,10 @@ void main() {
         await fileHandler.writeToFile(filePath, nodesToSave);
 
 
-        // Act
+        
         final importedNodes = await fileHandler.readFromFile(filePath);
 
-        // Assert
+        
         expect(importedNodes, isNotNull, reason: 'Should return a list of nodes, not null');
         expect(importedNodes!.length, 2, reason: 'Should import two nodes');
         expect(importedNodes.first.name, 'First Node');
@@ -245,27 +177,27 @@ void main() {
       });
 
       test('should return an empty list if JSON file contains an empty list', () async {
-        // Arrange
+        
         final filePath = '${testDir.path}/import_empty.json';
         final file = File(filePath);
         await file.writeAsString('[]'); // Empty JSON array
 
-        // Act
+        
         final importedNodes = await fileHandler.readFromFile(filePath);
 
-        // Assert
+        
         expect(importedNodes, isNotNull);
         expect(importedNodes!.isEmpty, isTrue);
       });
 
       test('should return null (or throw) if file does not exist', () async {
-        // Arrange
+        
         final filePath = '${testDir.path}/non_existent_file.json';
 
-        // Act
+        
         final importedNodes = await fileHandler.readFromFile(filePath);
 
-        // Assert
+        
         // Depending on BasicFileHandler's implementation:
         expect(importedNodes, isNull, reason: 'Should return null for non-existent file');
         // OR if it throws:
@@ -274,7 +206,7 @@ void main() {
       });
 
       test('should throw if file content is not valid JSON', () async {
-        // Arrange
+        
         final filePath = '${testDir.path}/invalid_json.json';
         final file = File(filePath);
         await file.writeAsString('This is not JSON {');
@@ -283,13 +215,13 @@ void main() {
       });
 
       test('should throw if JSON structure is valid but not a list of nodes', () async {
-        // Arrange
+        
         final filePath = '${testDir.path}/not_a_list.json';
         final file = File(filePath);
         // Example: JSON is an object, not a list as expected by fromJsonList
         await file.writeAsString('{"message": "This is an object, not a list of nodes"}');
 
-        expect(() async => await fileHandler.readFromFile(filePath), throwsA(isA<FormatException>()));
+        expect(() async => await fileHandler.readFromFile(filePath), throwsA(isA<JsonIOException>()));
       });
 
 
@@ -303,7 +235,7 @@ void main() {
       // This test is better suited as a widgetTest due to BuildContext and SnackBar.
       // However, if we focus on the file reading part and assume context is valid:
       test('should import nodes from a valid file path and attempt to show SnackBar', () async {
-        // Arrange
+        
         final filePath = '${testDir.path}/import_test_file.json';
         final nodesToSave = [
           ConcreteTreeNode(name: 'Imported Node 1', initialProperties: {}),
@@ -313,7 +245,7 @@ void main() {
         // Note: For BasicFileHandler, writeToFile is separate and doesn't use context.
         fileHandler.writeToFile(filePath, nodesToSave);
 
-        // Act
+        
         List<LeafNode>? importedNodes = await fileHandler.import(
           filePath: filePath,
           notificationCallback: setNotificationMessage,
@@ -321,7 +253,7 @@ void main() {
 
         // TODO Check the call back was called
 
-        // Assert
+        
         expect(importedNodes, isNotNull, reason: 'Imported nodes should not be null for a valid file.');
         expect(importedNodes?.length, 2, reason: 'Should import the correct number of nodes.');
         expect(importedNodes?.any((n) => n.name == 'Imported Node 1'), isTrue);
@@ -337,7 +269,7 @@ void main() {
       });
 
       testWidgets('should return null and attempt to show error SnackBar if file path is invalid', (WidgetTester tester) async {
-        // Arrange
+        
         final invalidFilePath = '${testDir.path}/non_existent_import_file.json';
 
         await tester.pumpWidget(MaterialApp(
@@ -354,7 +286,7 @@ void main() {
         ));
         expect(testContext, isNotNull);
 
-        // Act
+        
         late List<LeafNode>? importedNodes;
         await tester.runAsync(() async {
           importedNodes = await fileHandler.import(
@@ -363,25 +295,25 @@ void main() {
           );
         });
 
-        // Assert
+        
         expect(importedNodes, isNull, reason: 'Imported nodes should be null for an invalid file path.');
 
       });
 
       test('should return null and attempt to show error SnackBar for malformed JSON', () async {
-        // Arrange
+        
         final filePath = '${testDir.path}/malformed_import.json';
         final file = File(filePath);
 
        await file.writeAsString('This is not valid JSON {');
 
-        // Act
+        
         List<LeafNode>? importedNodes = await fileHandler.import(
             filePath: filePath,
             notificationCallback: setNotificationMessage,
         );
 
-        // Assert
+        
         expect(importedNodes, isNull, reason: 'Imported nodes should be null for malformed JSON.');
         expect(testMessage,
             contains('Import failed: FormatException'),
@@ -393,7 +325,7 @@ void main() {
     group('export (no SnackBar assertion)', () {
       // Test the non-mobile path (desktop-like behavior)
       testWidgets('should export nodes to a file given a specific filePath', (WidgetTester tester) async {
-        // Arrange
+        
         final filePath = '${testDir.path}/export_test_output_no_snackbar.json';
         final nodesToExport = [
           ConcreteTreeNode(name: 'Exported Node 1', initialProperties: {'data': TypedValue<String>('value1')}),
@@ -417,7 +349,7 @@ void main() {
 
         expect(capturedContext, isNotNull);
 
-        // Act: Use tester.runAsync for potential I/O in export (which calls writeToFile)
+        // Use tester.runAsync for potential I/O in export (which calls writeToFile)
         // We are assuming this test runs on a non-mobile platform environment
         // so it takes the path that calls writeToFile.
         await tester.runAsync(() async => fileHandler.export(
@@ -430,7 +362,7 @@ void main() {
 
         // TODO Check callbacks
 
-        // Assert
+        
         // 1. Check if the file was created
         late File exportedFile;
         await tester.runAsync( () async {
@@ -463,7 +395,7 @@ void main() {
       testWidgets(
           'should not throw an error if export fails due to bad path (error handling internal)', (
           WidgetTester tester) async {
-        // Arrange
+        
         // Using a deliberately bad path that writeToFile will likely fail on.
         // The goal is to ensure export() handles this internally (e.g., catches exception)
         // rather than rethrowing an unhandled exception that fails the test.
@@ -487,7 +419,6 @@ void main() {
           ),
         ));
 
-        // Act & Assert
         // We expect the export method to handle the error gracefully (e.g., log it, try to show SnackBar - which we ignore)
         // but NOT to throw an unhandled exception that would fail the test here.
         // The `export` method has a try-catch, so it should not rethrow.

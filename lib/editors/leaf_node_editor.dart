@@ -30,7 +30,7 @@ class LeafNodeEditor extends StagerEditor<LeafNode> {
 class _NodeEditorState extends State<LeafNodeEditor> {
 
   /// The properties of the node to be edited.
-  late Map<String,Object> properties;
+  late NodeProperties properties;
 
   /// A map to store [TextEditingController]s for string-based properties.
   final Map<String, TextEditingController> _textControllers = {};
@@ -41,21 +41,29 @@ class _NodeEditorState extends State<LeafNodeEditor> {
   @override
   void initState() {
     super.initState();
-    properties = widget.state.toMap();
+    properties = widget.state.properties;
     // Initialize controllers for each property based on their type.
-    properties.forEach((key, value) {
+
+    // FIXME! This is where the name, id, latitude and longitude would normally
+    // be created if they were still part of the the properties map.
+
+    // Create text controllers for the name, id, and position
+    _textControllers['name'] = TextEditingController(text: widget.state.name);
+    _textControllers['id'] = TextEditingController(text: widget.state.id.toString());
+    final longitude = widget.state.position.coords[0];
+    final latitude = widget.state.position.coords[1];
+    _textControllers['latitude'] = TextEditingController(text: latitude.toString());
+    _textControllers['longitude'] = TextEditingController(text: longitude.toString());
+
+    // Create text controllers for each generic property in the node properties.
+    properties.map.forEach((key, typedValue) {
       // For all properties, create a TextEditingController.
-      if (value is TypedValue) {
-        _textControllers[key] =
-            TextEditingController(text: value.value.toString());
-      } else {
-        _textControllers[key] = TextEditingController(text: value.toString());
-      }
+      _textControllers[key] = TextEditingController(text: typedValue.value.toString() ?? '');
     });
 
     // Initialize _pickFromMap based on whether latitude/longitude exist
-    final position = widget.state.position;
-    _pickFromMap = !(position.coords != Point.defaultPosition);
+    _pickFromMap = !(widget.state.position != Point() ||
+    widget.state.position != LeafNode.defaultPosition);
   }
 
   // Call back for point picking on the map
@@ -87,9 +95,8 @@ class _NodeEditorState extends State<LeafNodeEditor> {
             // Display an informational label at the top of the dialog.
             buildInfoLabel(context,info),
             // Dynamically build text field editors for all properties
-            // except 'id' (because it is private), and lat/long because
-            // they are edited with a different widget.
-            ...properties.entries.where((entry) => entry.key != 'id' && entry.key != 'latitude' && entry.key != 'longitude').map((entry) {
+            // except 'id' (because it is private)
+            ...properties.map.entries.where((entry) => entry.key != 'id' ).map((entry) {
               return buildTextFieldEditor(
                 context,
                 _textControllers[entry.key]!, // Use the pre-initialized controller
@@ -97,12 +104,11 @@ class _NodeEditorState extends State<LeafNodeEditor> {
                 'Enter ${entry.key}', // Hint text
               );
             }),
-            // Build a geographic coordinate editor.
             buildPositionMethodWidget(context, _pickFromMap, (value) {
                 setState(() {
                   _pickFromMap = value;
                 });
-              }),
+            }),
             SizedBox(height: 8),
             SizedBox(
                 width: _pickFromMap ? MediaQuery.of(context).size.width * 0.8 : null,
@@ -110,10 +116,7 @@ class _NodeEditorState extends State<LeafNodeEditor> {
                 child: _pickFromMap
                     ? buildSinglePointMapEditor(
                         context,
-                        LatLng(
-                          double.tryParse(_textControllers['latitude']!.text) ?? 0.0,
-                          double.tryParse(_textControllers['longitude']!.text) ?? 0.0,
-                        ),
+                        widget.state.position.toLatLng(),
                         _onPointChanged,
                       )
                     : buildGeoCoordEditor(
@@ -135,8 +138,8 @@ class _NodeEditorState extends State<LeafNodeEditor> {
         TextButton(
           onPressed: () {
             // Create a mutable copy of the properties map.
-            // FIXME - WILL NEED TO ADJUST THIS!
-            final updatedProperties = Map<String, TypedValue<Object>>.from(properties);
+            // FIXME - This should be done
+            final updatedProperties = Map<String, TypedValue<Object>>.from(properties.map);
             _textControllers.forEach((key, controller) {
               if (key == 'latitude' || key == 'longitude') {
                 updatedProperties[key] = TypedValue<double>(double.tryParse(controller.text)!);

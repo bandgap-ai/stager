@@ -49,8 +49,8 @@ class SiteState implements ObservableSubject {
   /// If the deleted node was the currently selected one, the selection is cleared.
   /// After deletion, it notifies all observers.
   void deleteNode(LeafNode node) {
-    if (node.parent != null && node.parent!.isComposite) {
-      (node.parent! as CompositeNode).removeChild(node);
+    if (node.hasParent() && node.parent.isComposite) {
+      (node.parent as CompositeNode).removeChild(node);
     } else {
       // Handle deletion of a top-level site node.
       _treeData.remove(node);

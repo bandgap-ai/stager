@@ -25,7 +25,7 @@ abstract class Controller<T> {
   /// Processes changes to the state in response to an input.
   ///
   /// [input]: The input to be processed to change the state.
-  void process(Object input);
+  void process(Map<String,Object> input);
 
   /// Returns the icon data that should be used for the control button.
   IconData iconData();

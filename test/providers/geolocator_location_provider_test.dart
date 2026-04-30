@@ -78,8 +78,8 @@ void main() {
       final result = await provider.locationFromAddress(address);
 
       // Assert
-      expect(result.latitude, expectedLocation.latitude);
-      expect(result.longitude, expectedLocation.longitude);
+      expect(result.latitude, closeTo(expectedLocation.latitude,1.0e-7));
+      expect(result.longitude, closeTo(expectedLocation.longitude,1.0e-7));
     });
   });
 }

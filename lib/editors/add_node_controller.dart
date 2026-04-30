@@ -33,15 +33,14 @@ class AddNodeController extends Controller<CompositeNode> {
   }
 
   @override
-  void process(Object input) {
-    // Prepare the input
-    Map<String, dynamic> mapInput = input as Map<String, dynamic>;
+  void process(Map<String,Object> input) {
     // Create the node. The build will handle linking it to the parent (state)
     // and notifying the observers.
-    if (mapInput['isGroup'] as bool) {
-      nodeBuilder.buildCompositeNode(state.name, state);
+    String name = input['name'] as String;
+    if (input['isGroup'] as bool) {
+      nodeBuilder.buildCompositeNode(name, state);
     } else {
-      nodeBuilder.buildLeafNode(state.name, state);
+      nodeBuilder.buildLeafNode(name, state);
     }
   }
 }

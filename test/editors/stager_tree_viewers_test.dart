@@ -20,7 +20,7 @@ void main() {
 
     setUp(() {
       node = ConcreteLeafNode(name: 'Test Node');
-      node.position = Point(coords: [-81.86052, 36.73444]);
+      node.properties.set<int>('temperature', 10);
     });
 
     testWidgets('should display node properties correctly', (WidgetTester tester) async {
@@ -35,13 +35,10 @@ void main() {
       // Verify properties are displayed correctly
       // The name should be displayed as bold text
       expect(find.text('Test Node'), findsOneWidget);
-      // Other properties should be displayed as key-value pairs
-      expect(find.text('Latitude'), findsOneWidget);
-      expect(find.text('36.73444'), findsOneWidget);
-      expect(find.text('Longitude'), findsOneWidget);
-      expect(find.text('-81.86052'), findsOneWidget);
-      // id should NOT be displayed (it's filtered out)
-      expect(find.text('test_id'), findsNothing);
+      // Other properties should be displayed as key-value pairs. The text is
+      // "cleaned up," so look for that capital "T" on the screen.
+      expect(find.text('Temperature'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
     });
 
     testWidgets('should display edit icon and open NodeEditor on tap', (WidgetTester tester) async {
@@ -80,6 +77,8 @@ void main() {
 
       // Update property
       node.name = 'Updated Node';
+      // Manually notify since the name is not part of the properties.
+      node.properties.notify();
       await tester.pump();
 
       // Verify update

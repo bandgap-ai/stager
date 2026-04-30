@@ -4,6 +4,7 @@ import 'package:stager_platform/editors/edit_node_controller.dart';
 import 'package:stager_platform/editors/controller.dart';
 import 'package:stager_platform/editors/editor_factory.dart';
 import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/tree/composite_node.dart';
 import 'package:stager_platform/tree/concrete_composite_node.dart';
 import 'mock_composite_node_observer.dart';
@@ -72,20 +73,19 @@ void main() {
 
       // Make some new property values
       Map<String, Object> results = {
-        'name': 'Updated Name',
-        'value': 456,
-        'is_active': false,
+        'value': TypedValue<int>(456).toTuple(),
+        'is_active': TypedValue<bool>(false).toTuple(),
       };
 
       // Update them
       controller.process(results);
 
       // Get and check the properties.
-      expect(parent.name, 'Updated Name');
       expect(parent.properties.get<int>('value'), 456);
       expect(parent.properties.get<bool>('is_active'), isFalse);
-      // There should now be 4 properties
-      expect(parent.toMap().length, 4);
+      print(parent.toMap());
+      // There should now be 2 properties
+      expect(parent.properties.map.length, 2);
       // Ensure that observers were notified the state changed.
       expect(observer.updated, isTrue);
       observer.reset();

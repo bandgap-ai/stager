@@ -173,7 +173,7 @@ class ConcreteLeafNode implements LeafNode {
       } else {
         throw NodePropertyException('Property "$key" with type '
             '${value.runtimeType} is not a TypedValue tuple (List<Object>) but '
-            'must be since it is a generic property. If this property was'
+            'must be since it is a generic property. If this property was '
             'created programmatically, ensure that TypedValue.toTuple() was '
             'called.');
       }

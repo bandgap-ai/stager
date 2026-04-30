@@ -16,7 +16,7 @@ class DialogControlButton extends StatelessWidget {
   /// Handles the results from the editor and must be implemented by subclasses.
   ///
   /// [results] is the results from the editor.
-  void processResults(dynamic results) {
+  void processResults(Map<String,Object> results) {
     controller.process(results);
   }
 

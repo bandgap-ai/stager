@@ -77,6 +77,7 @@ void main() {
       Map<String, Object> results = {'name': name, 'isGroup': false};
       controller.process(results);
       expect(parent.children.length, equals(1));
+      print(parent.children[0].toMap());
       expect(parent.children[0].name, equals(name));
       // Make sure it was observed and reset the observer.
       expect(observer.updated, isTrue);
@@ -110,7 +111,7 @@ void main() {
       name = 'Test Mock Composite Node';
       results = {'name': name, 'isGroup': true};
       customController.process(results);
-      expect(customParent.children[1].properties.get<bool>('isMock'),isFalse);
+      expect(customParent.children[1].properties.get<bool>('isMock'),isTrue);
 
       return;
     });

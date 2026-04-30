@@ -41,7 +41,7 @@ class _MockStagerEditorState extends State<MockSiteEditor> {
       content: const Text("Now you see me!"),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
+          onPressed: () => Navigator.of(context).pop({"pressed" : false}),
           child: const Text('OK'),
         ),
       ],
