@@ -71,21 +71,36 @@ void main() {
       // Make sure the observer has not been updated without being reset.
       expect(observer.updated, isFalse);
 
+      // Add some properties to the parent
+      parent.properties.set<int>('value',456);
+      parent.properties.set<bool>('is_active',false);
+
       // Make some new property values
       Map<String, Object> results = {
-        'value': TypedValue<int>(456).toTuple(),
-        'is_active': TypedValue<bool>(false).toTuple(),
+        'name': "Pearl Jam",
+        'latitude': "4.0",
+        'longitude': "-5.0",
+        'value': "1112",
+        'is_active': "true",
+        'song_name': 'No Way'
       };
 
       // Update them
       controller.process(results);
 
-      // Get and check the properties.
-      expect(parent.properties.get<int>('value'), 456);
-      expect(parent.properties.get<bool>('is_active'), isFalse);
+      // Get and check the properties that were already there, but with
+      // udpated values.
+      expect(parent.name, "Pearl Jam");
+      expect(parent.position.y, 4.0);
+      expect(parent.position.x, -5.0);
+      expect(parent.properties.get<int>('value'), 1112);
+      expect(parent.properties.get<bool>('is_active'), isTrue);
+      // Check the new property, which should be a string since it was added by
+      // the UI.
+      expect(parent.properties.get<String>('song_name'), 'No Way');
       print(parent.toMap());
-      // There should now be 2 properties
-      expect(parent.properties.map.length, 2);
+      // There should now be 3 generic properties
+      expect(parent.properties.map.length, 3);
       // Ensure that observers were notified the state changed.
       expect(observer.updated, isTrue);
       observer.reset();

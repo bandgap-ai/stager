@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
+import '../mapping/location_editor.dart';
 import 'stager_editor.dart';
 import '../tree/tree.dart';
 import 'standard_widgets.dart';
@@ -104,49 +105,33 @@ class _NodeEditorState extends State<LeafNodeEditor> {
                 'Enter ${entry.key}', // Hint text
               );
             }),
-            buildPositionMethodWidget(context, _pickFromMap, (value) {
-                setState(() {
-                  _pickFromMap = value;
-                });
-            }),
             SizedBox(height: 8),
             SizedBox(
-                width: _pickFromMap ? MediaQuery.of(context).size.width * 0.8 : null,
-                height: _pickFromMap ? MediaQuery.of(context).size.height * 0.5 : null,
-                child: _pickFromMap
-                    ? buildSinglePointMapEditor(
-                        context,
-                        widget.state.position.toLatLng(),
-                        _onPointChanged,
-                      )
-                    : buildGeoCoordEditor(
-                        context,
-                        _textControllers['latitude']!,
-                        _textControllers['longitude']!,
-                      ),
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.height * 0.5,
+                child: LocationEditor(
+                    initialLocation: widget.state.position.toLatLng(),
+                    onLocationChanged: (LatLng location) {
+                      _onPointChanged(location);
+                    }),
               ),
           ],
         ),
       ),
       actions: [
-        // Cancel button: Pops the dialog and returns null.
+        // Cancel button: Pops the dialog and returns an empty map.
         TextButton(
-          onPressed: () => Navigator.of(context).pop(null),
+          onPressed: () => Navigator.of(context).pop<Map<String, Object>>({}),
           child: const Text('Cancel'),
         ),
         // Save button: Collects updated values and pops the dialog with the result.
         TextButton(
           onPressed: () {
-            // Create a mutable copy of the properties map.
-            // FIXME - This should be done
-            final updatedProperties = Map<String, TypedValue<Object>>.from(properties.map);
-            _textControllers.forEach((key, controller) {
-              if (key == 'latitude' || key == 'longitude') {
-                updatedProperties[key] = TypedValue<double>(double.tryParse(controller.text)!);
-              } else {
-                updatedProperties[key] = TypedValue<String>(controller.text);
-              }
-            });
+            // Map the text controller properties straight to Map<String,Object>
+            // and pop it like its hoooooooottt.
+            final updatedProperties = Map<String,Object>.from(_textControllers.map((key,value) {
+              return MapEntry(key,value.text);
+            }));
             Navigator.of(context).pop(updatedProperties);
           },
           child: const Text('Save'),

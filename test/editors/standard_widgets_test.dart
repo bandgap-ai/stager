@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/editors/node_properties_view.dart';
 import 'package:stager_platform/editors/properties_widget.dart';
+import 'package:stager_platform/mapping/location_editor.dart';
 import 'package:stager_platform/system/selection.dart';
 import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/editors/standard_widgets.dart';
@@ -103,7 +104,7 @@ void main() {
       ));
 
       // This is a basic test. A more thorough test would require a mock map implementation.
-      expect(find.byType(SinglePointMapEditor), findsOneWidget);
+      expect(find.byType(LocationEditor), findsOneWidget);
     });
 
     testWidgets('buildGeoCoordEditor builds a coordinate editor', (WidgetTester tester) async {

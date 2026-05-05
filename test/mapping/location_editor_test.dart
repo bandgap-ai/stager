@@ -216,5 +216,49 @@ void main() {
       expect(memoryOutput.buffer.first.level, Level.error);
       expect(memoryOutput.buffer.first.lines[4].contains('Failed to lookup address'), isTrue);
     });
+
+    testWidgets('Should update and notify when coordinates are manually edited', (WidgetTester tester) async {
+      // Arrange: Set up the initial state and the callback to capture changes.
+      LatLng? receivedLocation;
+      const initialLocation = LatLng(39.0, -77.0);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LocationEditor(
+              initialLocation: initialLocation,
+              onLocationChanged: (loc) => receivedLocation = loc,
+            ),
+          ),
+        ),
+      );
+
+      // Find the text fields for latitude and longitude.
+      final latitudeFinder = find.ancestor(
+        of: find.text('Latitude:'),
+        matching: find.byType(TextField),
+      );
+      final longitudeFinder = find.ancestor(
+        of: find.text('Longitude:'),
+        matching: find.byType(TextField),
+      );
+
+      // Verify that the initial values are correctly displayed.
+      expect(tester.widget<TextField>(latitudeFinder).controller!.text, '39.0');
+      expect(tester.widget<TextField>(longitudeFinder).controller!.text, '-77.0');
+
+      // Act: Manually enter new coordinates into the text fields.
+      await tester.enterText(latitudeFinder, '40.0');
+      await tester.enterText(longitudeFinder, '-78.0');
+      await tester.pump();
+
+      // Assert: Verify that the controllers reflect the new values and the
+      // callback was triggered with the updated LatLng.
+      expect(tester.widget<TextField>(latitudeFinder).controller!.text, '40.0');
+      expect(tester.widget<TextField>(longitudeFinder).controller!.text, '-78.0');
+      expect(receivedLocation, isNotNull);
+      expect(receivedLocation!.latitude, 40.0);
+      expect(receivedLocation!.longitude, -78.0);
+    });
   });
 }

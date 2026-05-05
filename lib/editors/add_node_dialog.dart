@@ -10,6 +10,9 @@ import 'package:stager_platform/tree/composite_node.dart';
 ///
 /// This dialog provides a [TextField] for the user to enter the name of the new node.
 /// When the 'Add' button is pressed, the entered name is returned.
+///
+/// If the user cancels the dialog, this dialog will emit a map with the key
+/// "canceled" and value true.
 class AddNodeDialog extends StagerEditor<CompositeNode> {
 
   /// Creates an [AddNodeDialog].
@@ -46,16 +49,22 @@ class _AddNodeDialogState extends State<AddNodeDialog> {
   List<Widget> _createActionButtons(BuildContext context) {
     // Cancels the action
     Widget cancelButton = TextButton(
-      onPressed: () => Navigator.of(context).pop({"pressed":true}),
+      // If we do nothing, the dialog will not close. If we pass null, we have
+      // to check for it everywhere. To get controlled instead, we pass a
+      // message indicating the dialog was cancelled.
+      onPressed: () => Navigator.of(context).pop<Map<String, Object>>({"canceled":true}),
       child: const Text('Cancel'),
     );
     // Returns the input all the way back up the stack to the editor.
     Widget addButton = TextButton(
       onPressed: () {
-        Navigator.of(context).pop<Map<String, Object>>({
-          'name': _nameController.text,
-          'isGroup': _isGroupNotifier.value,
-        });
+        // Force users to set the name
+        if (_nameController.text.isNotEmpty) {
+          Navigator.of(context).pop<Map<String, Object>>({
+            'name': _nameController.text,
+            'isGroup': _isGroupNotifier.value,
+          });
+        }
       },
       child: const Text('Add'),
     );

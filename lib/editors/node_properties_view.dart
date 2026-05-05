@@ -111,7 +111,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
     final Iterable<MapEntry<String, TypedValue<Object>>> props = properties.map.entries.where((entry) =>
     entry.key != 'id' &&
         entry.key != 'name' &&
-        entry.key != 'imagePaths').toList();
+        entry.key != 'dataNodes').toList();
 
     Widget tableWidget =  Table(
       border: TableBorder.all( // Adds borders to cells for clarity
@@ -161,7 +161,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
         IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () async {
-            final updatedProperties = await showDialog<Map<String, dynamic>>(
+            final updatedProperties = await showDialog<Map<String, Object>>(
               context: context,
               builder: (BuildContext context) {
                 return LeafNodeEditor(state: widget.state);
@@ -171,7 +171,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
             if (updatedProperties != null) {
               // Update the properties of the current node
               updatedProperties.forEach((key, value) {
-                properties.set<String>(key, value);
+                properties.set<String>(key, value.toString());
               });
             }
           },
@@ -179,7 +179,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
         IconButton(
           icon: const Icon(Icons.add),
           onPressed: () async {
-            final newProperty = await showDialog<Map<String, dynamic>>(
+            final newProperty = await showDialog<Map<String, Object>>(
               context: context,
               builder: (BuildContext context) {
                 return const AddPropertyDialog();
@@ -189,10 +189,11 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
             if (newProperty != null && newProperty.keys.isNotEmpty) {
               final key = newProperty.keys.first;
               final value = newProperty[key];
-              properties.set<String>(key, value);
+              properties.set<String>(key, value.toString());
             }
           },
         ),
+        // No delete for now
       ],
     );
   }

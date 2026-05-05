@@ -1,6 +1,7 @@
 import 'package:stager_platform/stager.dart';
 import 'package:stager_platform/system/point.dart';
 import 'package:stager_platform/system/typed_value.dart';
+import 'package:stager_platform/tree/data_properties.dart';
 import 'package:stager_platform/tree/node_observer.dart';
 import 'package:stager_platform/tree/node_visitor.dart';
 import 'package:uuid/uuid_value.dart';
@@ -154,5 +155,13 @@ final class NullComposite implements CompositeNode {
     // TODO: implement toMap
     throw UnimplementedError();
   }
+
+  @override
+  // TODO: implement dataNodes
+  DataProperties get dataNodes => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasData
+  bool get hasData => throw UnimplementedError();
 
 }

@@ -1,5 +1,6 @@
 
 import 'package:uuid/uuid.dart';
+import 'data_properties.dart';
 import 'node_properties.dart';
 import 'observable_subject.dart';
 import 'node_visitor.dart';
@@ -67,12 +68,18 @@ class NodeStructureException implements Exception {
 /// [NodeStructureException] when attempting to access the parent or sibling if
 /// they don't exist.
 ///
+/// References to data that should be stored with the node are managed by the
+/// DataProperties classes and stored in DataNodes. While LeafNodes stores
+/// DataNodes and provide DataProperties, it offers no additional management of
+/// data. Like generic node properties, clients can check if data nodes exist
+/// with hasData() and pull the set of data nodes with dataProperties().
+///
 /// All nodes accept visitors (per the visitor pattern) with accept().
 abstract class LeafNode implements ObservableSubject {
 
   /// A default position for nodes.
   static const Point defaultPosition = Point(
-      coords: const [-77.96876463574121, 38.98951052421746]);
+      coords: [-77.96876463574121, 38.98951052421746]);
 
   const LeafNode();
 
@@ -167,6 +174,12 @@ abstract class LeafNode implements ObservableSubject {
 
   /// Returns the properties for this node.
   NodeProperties get properties;
+
+  /// Returns true if the node has data, false otherwise.
+  bool get hasData;
+
+  /// Returns the data nodes, stored as data properties, for this node.
+  DataProperties get dataNodes;
 
   /// Returns the full set of intrinsic and generic properties as a map.
   Map<String, Object> toMap();

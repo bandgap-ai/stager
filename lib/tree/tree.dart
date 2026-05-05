@@ -10,6 +10,8 @@ export 'package:stager_platform/tree/node_properties.dart';
 export 'package:stager_platform/tree/leaf_node.dart';
 export 'package:stager_platform/tree/composite_node.dart';
 export 'package:stager_platform/tree/tree_node.dart';
+export 'package:stager_platform/tree/data_node.dart';
+export 'package:stager_platform/tree/data_properties.dart';
 
 // Concrete implementations
 export 'package:stager_platform/tree/concrete_node_properties.dart';

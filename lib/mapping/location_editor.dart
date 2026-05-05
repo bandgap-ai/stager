@@ -14,6 +14,13 @@ import 'package:logger/logger.dart';
 /// - Fetching the device's current location.
 /// - Manually entering an address.
 class LocationEditor extends StatefulWidget {
+
+  /// Default initial location shown by the editor
+  static const LatLng _defaultLocation = LatLng(40.8624, -73.8774);
+
+  /// Initial location shown by the editor
+  final LatLng initialLocation;
+
   /// The provider used to fetch location data.
   final LocationProvider locationProvider;
 
@@ -21,7 +28,7 @@ class LocationEditor extends StatefulWidget {
   final Logger? logger;
 
   /// Callback triggered whenever the coordinates are updated via location
-  /// services.
+  /// services or manual entry.
   final void Function(LatLng) onLocationChanged;
 
   /// Creates a [LocationEditor] widget.
@@ -36,6 +43,7 @@ class LocationEditor extends StatefulWidget {
     this.locationProvider = const GeolocatorLocationProvider(),
     this.logger,
     this.onLocationChanged = _defaultOnLocationChanged,
+    this.initialLocation = _defaultLocation,
   });
 
   /// Default callback that logs the location update.
@@ -50,49 +58,93 @@ class LocationEditor extends StatefulWidget {
 class _LocationEditorState extends State<LocationEditor> {
   late final Logger log;
 
-  @override
-  void initState() {
-    super.initState();
-    log = widget.logger ?? Logger();
-  }
-
   /// The currently selected method for picking a location.
   LocationPickerMethod _selectedMethod = LocationPickerMethod.auto;
 
   /// Controls the text field for latitude.
-  final TextEditingController latitudeController =
-      TextEditingController(text: '40.8624');
+  late TextEditingController latitudeController;
 
   /// Controls the text field for longitude.
-  final TextEditingController longitudeController =
-      TextEditingController(text: '-73.8774');
+  late TextEditingController longitudeController;
 
   /// Controls the text field for the address.
-  final TextEditingController addressController =
-      TextEditingController(text: 'New York Botanical Garden');
+  late TextEditingController addressController;
+
+  /// Tracks the last location sent to the parent to avoid redundant updates
+  /// caused by focus or selection changes in the text controllers.
+  late LatLng _lastNotifiedLocation;
+
+  @override
+  void initState() {
+    super.initState();
+    log = widget.logger ?? Logger();
+    _lastNotifiedLocation = widget.initialLocation;
+
+    /// Controls the text field for latitude.
+    latitudeController = TextEditingController(
+        text: widget.initialLocation.latitude.toString());
+    latitudeController.addListener(_onControllerChanged);
+
+    /// Controls the text field for longitude.
+    longitudeController = TextEditingController(
+        text: widget.initialLocation.longitude.toString());
+    longitudeController.addListener(_onControllerChanged);
+
+    /// Controls the text field for the address.
+    addressController = TextEditingController(
+        text: 'New York Botanical Garden');
+  }
+
+  @override
+  void dispose() {
+    // Remove listeners to avoid calling setState or widget callbacks
+    // after disposal.
+    latitudeController.removeListener(_onControllerChanged);
+    longitudeController.removeListener(_onControllerChanged);
+
+    latitudeController.dispose();
+    longitudeController.dispose();
+    addressController.dispose();
+    super.dispose();
+  }
+
+  /// Listens for changes in the coordinate controllers and notifies the parent.
+  void _onControllerChanged() {
+    final lat = double.tryParse(latitudeController.text);
+    final lng = double.tryParse(longitudeController.text);
+    if (lat != null && lng != null) {
+      final newLocation = LatLng(lat, lng);
+      // Only notify if the coordinates have actually changed. This prevents
+      // redundant notifications (e.g., on focus or selection changes).
+      if (newLocation != _lastNotifiedLocation) {
+        _lastNotifiedLocation = newLocation;
+        widget.onLocationChanged(newLocation);
+      }
+    }
+  }
 
   /// Fetches the current location and updates the UI.
   ///
-  /// On success, it triggers the [widget.onLocationChanged] callback.
+  /// On success, the UI is updated, which triggers the listeners and
+  /// subsequently the [widget.onLocationChanged] callback.
   /// On failure, it logs the error.
   Future<void> _handleGetLocation() async {
     try {
       final position = await _samplePosition();
+      
       setState(() {
         latitudeController.text = position.latitude.toString();
         longitudeController.text = position.longitude.toString();
       });
-      // Trigger the callback.
-      widget.onLocationChanged(LatLng(position.latitude, position.longitude));
     } catch (e) {
-      // Log the error for now, but might need to do more to help the user.
       log.log(Level.error, e.toString());
     }
   }
 
   /// Fetches coordinates for the entered address and updates the UI.
   ///
-  /// On success, it triggers the [widget.onLocationChanged] callback.
+  /// On success, the UI is updated, which triggers the listeners and
+  /// subsequently the [widget.onLocationChanged] callback.
   /// On failure, it logs the error.
   Future<void> _handleAddressLookup() async {
     final String address = addressController.text;
@@ -107,9 +159,6 @@ class _LocationEditorState extends State<LocationEditor> {
           latitudeController.text = location.latitude.toString();
           longitudeController.text = location.longitude.toString();
         });
-
-        // Trigger the callback.
-        widget.onLocationChanged(location);
       } catch (e) {
         log.e('Failed to lookup address "$address": $e');
       }
@@ -210,7 +259,7 @@ class _LocationEditorState extends State<LocationEditor> {
         result = _buildAddressPanel(context);
     }
 
-    return result;
+    return SingleChildScrollView(child: result);
   }
 
   @override

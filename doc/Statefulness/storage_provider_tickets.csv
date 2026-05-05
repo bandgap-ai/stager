@@ -1,0 +1,40 @@
+title,description,due_date,milestone
+"Implement DataNode and DataProperties","Implement the DataNode model and DataProperties container (specialized NodeProperties).
+1. Create `DataNode` in `lib/tree/` to hold storage identifiers and binary metadata.
+2. Implement `DataProperties` as a specialized `NodeProperties` to manage `DataNode` collections.
+3. Document equality and hashing logic to ensure compatibility with Stager collections.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~""Full AI"" ~Testing",,
+"Refactor LeafNode for DataProperties","Update LeafNode to include DataProperties, updating toMap/fromMap and unit tests.
+1. Update `LeafNode` to include a `dataProperties` member.
+2. Update `LeafNode.toMap()` and `LeafNode.fromMap()` to support nested data properties during serialization.
+3. Update `LeafNode` unit tests to verify sidecar management.
+
+/assign @jayjaybillings_bg
+/label ~Enhancement ~""Limited AI"" ~Testing",,
+"Migrate imagePaths to DataProperties","Refactor PropertiesWidget and existing editors to use the new DataProperties sidecar instead of imagePaths lists.
+1. Refactor `PropertiesWidget` to render attachments from `DataProperties`.
+2. Update the `ImagePicker` logic to create `DataNodes` instead of updating string lists.
+3. Remove deprecated `imagePaths` references across the codebase.
+
+/assign @jayjaybillings_bg
+/label ~Enhancement ~""Limited AI""",,
+"Define StagerStorageProvider Interface","Create the abstract StagerStorageProvider and integrate with StagerSystem.
+1. Define the `StagerStorageProvider` interface in `lib/persistence/`.
+2. Add a `storage` static member to `StagerSystem` to host the active implementation.
+
+/assign @jayjaybillings_bg
+/label ~Feature ~""Full AI""",,
+"Implement LocalFileStorageProvider","Implement the OS-aware LocalFileStorageProvider for mobile and desktop.
+1. Implement `LocalFileStorageProvider` using the `path_provider` package.
+2. Handle OS-specific path separators and mobile sandboxing (ApplicationDocumentsDirectory).
+
+/assign @jayjaybillings_bg
+/label ~Feature ~""Restricted AI""",,
+"Binary Storage Integration Tests","Create end-to-end tests for storing, retrieving, and serializing binary assets via the global provider.
+1. Write unit tests for `LocalFileStorageProvider`.
+2. Create integration tests verifying that `StagerSystem.storage` correctly redirects asset retrieval.
+
+/assign @jayjaybillings_bg
+/label ~Testing ~""Full AI""",,

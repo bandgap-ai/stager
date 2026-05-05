@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/editors/standard_widgets.dart';
 
+import '../mapping/location_editor.dart';
+
 /// A dialog for adding a new site.
 ///
 /// This dialog prompts the user to enter a name for a new site. When the "Add"
@@ -21,12 +23,16 @@ class AddSiteDialog extends StatefulWidget {
 class _AddSiteDialogState extends State<AddSiteDialog> {
   /// The controller for the text field.
   final _nameFieldController = TextEditingController();
+
   /// The controller for the latitude field.
   final _latitudeController = TextEditingController();
+
   /// The controller for the longitude field.
   final _longitudeController = TextEditingController();
+
   /// The initial value for the coordinate configuration button.
-  final LatLng _initialPoint = LatLng(38.989693,-77.968797);
+  final LatLng _initialPoint = LatLng(38.989693, -77.968797);
+
   /// Sets the initial value for the coordinate configuration button.
   bool _pickFromMap = false;
 
@@ -62,28 +68,30 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
   Widget _buildAddSiteDialog(BuildContext context) {
     String info = 'Please configure the site information.';
     // Be a content creator!
-    Widget content = Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        buildInfoLabel(context,info),
-        buildTextFieldEditor(context, _nameFieldController,
-            'Site Name:', 'Enter site name...'),
-        const SizedBox(height: 8),
-        buildPositionMethodWidget(context,_pickFromMap,(value){
-          setState(() {
-            _pickFromMap = value;
-          });}),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: _pickFromMap ? MediaQuery.of(context).size.width*0.8 : null,
-          height: _pickFromMap ? MediaQuery.of(context).size.height*0.5 : null,
-          child: _pickFromMap ? buildSinglePointMapEditor(context,_initialPoint,_onPointChanged) :
-            buildGeoCoordEditor(context,
-                _latitudeController,
-                _longitudeController),
-        )
-      ],
+    Widget content = SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          buildInfoLabel(context, info),
+          buildTextFieldEditor(
+            context,
+            _nameFieldController,
+            'Site Name:',
+            'Enter site name...',
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: LocationEditor(
+              onLocationChanged: (LatLng location) {
+                _onPointChanged(location);
+              },
+            ),
+          ),
+        ],
+      ),
     );
 
     return content;
@@ -106,9 +114,9 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
             Map<String, Object> nodeInfo = {};
             // Must at least have the name
             if (_nameFieldController.text.isNotEmpty) {
-                nodeInfo['name'] = _nameFieldController.text;
-                nodeInfo['latitude'] = _latitudeController.text;
-                nodeInfo['longitude'] = _longitudeController.text;
+              nodeInfo['name'] = _nameFieldController.text;
+              nodeInfo['latitude'] = _latitudeController.text;
+              nodeInfo['longitude'] = _longitudeController.text;
             }
             widget.onAdd(nodeInfo);
             Navigator.of(context).pop();
@@ -118,5 +126,4 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
       ],
     );
   }
-
 }

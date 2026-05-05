@@ -1,5 +1,6 @@
 import 'package:flutter_map/flutter_map.dart';
 import 'package:stager_platform/stager.dart';
+import 'package:stager_platform/tree/node_observer.dart';
 import '../site_state.dart';
 import '../tree/iterators.dart';
 import 'adapters/stager_map_options.dart';
@@ -29,7 +30,7 @@ List<Type> _polygonTypes = [KMLPolygonNode];
 ///
 /// In a more advanced implementation, this state would be populated by
 /// `LayerAdapter`s that transform Stager `TreeNode`s into these flattened forms.
-class MapState {
+class MapState implements NodeObserver<Object> {
   /// The tile layer configuration.
   TileLayer tileLayer = TileLayer();
 
@@ -89,6 +90,8 @@ class MapState {
     // FIXME! We need to add rich attribution layers for all active tile layers.
     // I need to think this through.
 
+    _siteState.attach(this);
+
     _rebuild();
   }
 
@@ -104,8 +107,8 @@ class MapState {
           MapEntry(type, nodeTypeMap[type]!)
     ];
 
-    print(nodeTypeMap);
-    print("Marker entries: $markerEntries");
+    //print(nodeTypeMap);
+    //print("Marker entries: $markerEntries");
 
     return MarkerLayerAdapter(markerEntries, onMarkerTap);
   }
@@ -118,4 +121,9 @@ class MapState {
     return PolygonLayerAdapter(polygonEntries, onMarkerTap);
   }
   StagerMapOptions get mapOptions => _stagerMapOptions;
+
+  @override
+  void update(Object node) {
+    _rebuild();
+  }
 }

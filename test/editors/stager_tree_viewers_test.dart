@@ -45,7 +45,10 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: NodePropertiesView(state: node),
+            body: SizedBox(height: 800,
+            width: 400,
+            child: NodePropertiesView(state: node),
+            )
           ),
         ),
       );

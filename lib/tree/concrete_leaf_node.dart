@@ -3,6 +3,8 @@
 /// This class represents a basic node in the tree that does not have children.
 library;
 
+import 'package:stager_platform/tree/data_properties.dart';
+import 'package:stager_platform/tree/data_node.dart';
 import 'package:uuid/uuid.dart';
 
 import '../system/stager_context.dart';
@@ -47,6 +49,11 @@ class ConcreteLeafNode implements LeafNode {
   /// This getter provides access to the data payload of the node.
   final NodeProperties _properties;
 
+  /// The [DataProperties] associated with this leaf node.
+  ///
+  /// This getter provides access to the data nodes of the node.
+  final DataProperties _dataNodes;
+
   /// The parent of this node, or 'this' if no parent has been set.
   late LeafNode _parent = this;
   /// The next sibling of this node, or 'this' if it has no next sibling.
@@ -68,7 +75,8 @@ class ConcreteLeafNode implements LeafNode {
   }) : _name = name,
         _id = Uuid().v7obj(),
         _point = LeafNode.defaultPosition,
-        _properties = ConcreteNodeProperties(initialProperties);
+        _properties = ConcreteNodeProperties(initialProperties),
+        _dataNodes = DataProperties();
 
   @override
   String get name => _name;
@@ -119,6 +127,12 @@ class ConcreteLeafNode implements LeafNode {
   NodeProperties get properties => _properties;
 
   @override
+  DataProperties get dataNodes => _dataNodes;
+
+  @override
+  bool get hasData => _dataNodes.isNotEmpty;
+
+  @override
   Map<String, Object> toMap() {
 
     // Add the name and id to the map as well as the node properties
@@ -128,6 +142,7 @@ class ConcreteLeafNode implements LeafNode {
       'position' : position.toMap(),
       // Add a type marker so clients know the type of the node
       'type' : runtimeType.toString(),
+      'dataNodes' : _dataNodes.toMap(),
       ..._properties.map
     };
 
@@ -163,6 +178,17 @@ class ConcreteLeafNode implements LeafNode {
       map.remove('type');
     }
 
+    // Load the data nodes directly to avoid generic rehydration issues.
+    if (map.containsKey('dataNodes')) {
+      final dataMap = map['dataNodes'] as Map<String, Object>;
+      for (final entry in dataMap.entries) {
+        if (entry.value is Map<String, Object>) {
+          _dataNodes.set(entry.key, DataNode.fromMap(entry.value as Map<String, Object>));
+        }
+      }
+      map.remove('dataNodes');
+    }
+
     // Load all the generic properties from what remains in the map.
     // We map every entry to a rehydrated TypedValue by passing the raw map 
     // data to the centralized buildTypedValue factory.
@@ -173,7 +199,7 @@ class ConcreteLeafNode implements LeafNode {
       } else {
         throw NodePropertyException('Property "$key" with type '
             '${value.runtimeType} is not a TypedValue tuple (List<Object>) but '
-            'must be since it is a generic property. If this property was '
+            'must be since it is a generic node property. If this property was '
             'created programmatically, ensure that TypedValue.toTuple() was '
             'called.');
       }
@@ -275,4 +301,5 @@ class ConcreteLeafNode implements LeafNode {
   void accept(NodeVisitor visitor) {
     visitor.visit(this);
   }
+
 }

@@ -34,13 +34,19 @@ class AddNodeController extends Controller<CompositeNode> {
 
   @override
   void process(Map<String,Object> input) {
-    // Create the node. The build will handle linking it to the parent (state)
-    // and notifying the observers.
-    String name = input['name'] as String;
-    if (input['isGroup'] as bool) {
-      nodeBuilder.buildCompositeNode(name, state);
-    } else {
-      nodeBuilder.buildLeafNode(name, state);
+    // The AddNodeDialog will emit a map with the key "canceled" and value true
+    // if the user canceled, so let's check for that.
+    if (!input.containsKey('canceled')) {
+      // Create the node. The build will handle linking it to the parent (state)
+      // and notifying the observers. Technically we should do more than a basic
+      // null check here, but the AddNodeDialog will only emit the event if a
+      // name is set.
+      String name = input['name']! as String;
+      if (input['isGroup']! as bool) {
+        nodeBuilder.buildCompositeNode(name, state);
+      } else {
+        nodeBuilder.buildLeafNode(name, state);
+      }
     }
   }
 }

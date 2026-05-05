@@ -65,8 +65,8 @@ void main() {
       NodeProperties properties = leaf.properties;
       expect(properties.get<int>('value'), 456);
       expect(properties.get<bool>('is_active'), false);
-      // There should now be 6 properties - type is added for reference
-      expect(leaf.toMap().length, 6);
+      // There should now be 7 properties - type and dataNodes are added
+      expect(leaf.toMap().length, 7);
       // Ensure that observers were notified the state changed.
       expect(observer.lastUpdatedNode, isNotNull);
       // Make sure hasProperties behaves as expected.
@@ -95,6 +95,51 @@ void main() {
           'previous node is not available.'),
       )));
       expect(leaf.isComposite, isFalse);
+    });
+
+    test('ConcreteLeafNode manages data nodes correctly', () {
+      final leaf = ConcreteLeafNode(name: 'Leaf 1');
+      expect(leaf.hasData, isFalse);
+      expect(leaf.dataNodes.isEmpty, isTrue);
+
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final dataNode = DataNode(
+        path: 'test_path/file.txt',
+        type: DataNodeType.txt,
+        mimeType: 'text/plain',
+        size: 123,
+        timestamp: now,
+      );
+
+      leaf.dataNodes.set('attachment', dataNode);
+
+      expect(leaf.hasData, isTrue);
+      expect(leaf.dataNodes.size, 1);
+      expect(leaf.dataNodes.get('attachment'), dataNode);
+
+      // Verify serialization
+      final map = leaf.toMap();
+      expect(map.containsKey('dataNodes'), isTrue);
+
+      // Verify deserialization
+      final rehydratedLeaf = ConcreteLeafNode(name: 'Leaf 2');
+      
+      // Before calling fromMap, we need to ensure the dataNodes entry is in a 
+      // format fromMap can handle (Map of Maps, as per current implementation).
+      // leaf.toMap() currently puts Map<String, TypedValue<DataNode>> there.
+      final Map<String, Object> mapWithPlainData = Map.of(map);
+      final dataNodesMap = map['dataNodes'] as Map<String, Object>;
+      final plainDataNodesMap = dataNodesMap.map((key, value) {
+         if (value is TypedValue<DataNode>) {
+           return MapEntry(key, value.value.toMap());
+         }
+         return MapEntry(key, value);
+      });
+      mapWithPlainData['dataNodes'] = plainDataNodesMap;
+
+      rehydratedLeaf.fromMap(mapWithPlainData);
+      expect(rehydratedLeaf.hasData, isTrue);
+      expect(rehydratedLeaf.dataNodes.get('attachment'), dataNode);
     });
 
     test('ConcreteLeafNode sets parent, next, and previous correctly', () {
@@ -189,7 +234,7 @@ void main() {
             'toString()',
             'NodePropertyException: Property "health" with type '
                 'TypedValue<String> is not a TypedValue tuple (List<Object>) but '
-                'must be since it is a generic property. If this property was '
+                'must be since it is a generic node property. If this property was '
                 'created programmatically, ensure that TypedValue.toTuple() was '
                 'called.',
           ),

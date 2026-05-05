@@ -27,6 +27,7 @@ dependencies:
   xml: ^6.5.0
   http: ^1.6.0
   collection: ^1.19.1
+  path: ^1.9.1
 
   # Location and mapping
   flutter_map: ^8.2.1
@@ -67,6 +68,7 @@ flutter:
   # Grab the assets directory to include all the files Stager needs.
   assets:
     - assets/schemas/kml/2.2.0/
+    - assets/test_images/test.png
 
   uses-material-design: true
   # To add assets to your package, add an assets section, like this:

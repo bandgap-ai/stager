@@ -6,6 +6,7 @@ import 'package:stager_platform/system/selection_service.dart';
 import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';
 import 'package:stager_platform/editors/properties_widget.dart';
+import 'package:stager_platform/tree/data_node.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 
 /// Widget tests for the `PropertiesWidget`.
@@ -79,4 +80,45 @@ void main() {
       },
     );
   });
+
+  group('PropertiesWidget updates images when added', () {
+    late Selection<LeafNode> selectedNode;
+    SelectionService selectionService = SelectionService();
+
+    setUp(() {
+      selectedNode = Selection<LeafNode>(ConcreteLeafNode(name: 'Test Node'));
+      selectionService.selection = selectedNode;
+    });
+
+    testWidgets('UI updates when an image is added to dataNodes', (WidgetTester tester) async {
+      // Arrange: Pump the PropertiesWidget
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PropertiesWidget(selectionService: selectionService),
+          ),
+        ),
+      );
+
+      // Switch to the 'images' tab
+      await tester.tap(find.byIcon(Icons.image_outlined));
+      await tester.pumpAndSettle();
+
+      // Verify that "No Images" is initially shown
+      expect(find.text('No Images'), findsOneWidget);
+
+      // Act: Manually add an image to the node's dataNodes
+      final node = selectionService.selection.value;
+      final data = DataNode(path: 'assets/test_images/test.png', timestamp: 123);
+      node.dataNodes.set('test_image', data);
+
+      // Pump to trigger rebuilds if any listeners are active
+      await tester.pump();
+
+      // Assert: "No Images" should be gone and the image should be visible
+      // (PropertiesWidget uses Image.asset for the paths in dataNodes)
+      expect(find.text('No Images'), findsNothing, reason: 'PropertiesWidget did not update after adding an image');
+    });
+  });
+
 }

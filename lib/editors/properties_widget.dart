@@ -3,11 +3,33 @@ import 'package:image_picker/image_picker.dart';
 import 'package:stager_platform/system/selection_observer.dart';
 import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/editors/stager_tree_viewers.dart';
+import 'package:stager_platform/tree/data_properties.dart';
 import 'package:stager_platform/tree/tree_node.dart';
 import 'package:stager_platform/tree/leaf_node.dart';
 import 'package:stager_platform/editors/node_properties_view.dart';
 
 import '../system/selection_service.dart';
+import '../tree/data_node.dart';
+import '../tree/data_properties_observer.dart';
+
+/// This is a simple wrapper class to delegate processing the update to a
+/// callback function for the PropertiesWidget. Since the properties widget
+/// already implements NodeObserver with NodeObserver and DataPropertiesObserver
+/// both requiring update() implementations, this gets around the compilation
+/// issue.
+class PropertiesWidgetDataObserver implements DataPropertiesObserver {
+
+  /// Callback function
+  void Function(DataProperties) callback;
+
+  PropertiesWidgetDataObserver(this.callback);
+
+  @override
+  void update(DataProperties data) {
+   callback(data);
+  }
+
+}
 
 /// A widget that displays the properties of the currently selected node in a
 /// bottom sheet.
@@ -45,6 +67,19 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   /// Current selected view in the segmented button
   String _selectedView = 'properties';
 
+  /// Data properties for the selected node
+  DataProperties _dataProps = DataProperties();
+
+  /// Data properties observer for the selected node
+  late PropertiesWidgetDataObserver _dataObserver;
+
+  /// Callback for observing data properties changes.
+  void _dataObserverCallback(DataProperties data) {
+    setState(() {
+      // No need to do anything - just get a redraw.
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -55,10 +90,14 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     widget.selectionService.attach(this);
     // Configure the pin used to pin the window
     _pin = widget.pin;
+    // Initialize the data properties observer
+    _dataObserver = PropertiesWidgetDataObserver(_dataObserverCallback);
   }
 
   @override
   void dispose() {
+    // Detach against the data properties before they are reset
+    _dataProps.detach(_dataObserver);
     // Detach as an observer of the selection
     widget.selectionService.detach(this);
     // Dispose the animation controller
@@ -82,18 +121,12 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
       // FIXME! Pretty sure this will break. The view needs to use visitation to
       // get this value.
       LeafNode node = widget.selectionService.selection.value;
-      // Get the current image paths if they exist, and otherwise start with an
-      // empty list.
-      List<String> currentImagePaths = [];
-      throw UnimplementedError();
-      // if (node.properties.contains('imagePaths')) {
-      //   currentImagePaths = node.properties.get<List<String>>('imagePaths');
-      // }
-      // Merge the new image path with the existing list
-      // node.properties.set<List<String>>('imagePaths', [
-      //   ...currentImagePaths,
-      //   pickedFile.path,
-      // ]);
+      // Add the new data node
+      final date = DateTime.now();
+      final data = DataNode(path: pickedFile.path,
+          timestamp: date.millisecondsSinceEpoch);
+      final fileKey = 'attachment_$date';
+      node.dataNodes.set(fileKey, data);
     }
   }
 
@@ -157,10 +190,8 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
 
   /// Builds the images view
   Widget _buildImagesView(LeafNode node) {
-    final imagePaths = [];
-    // FIXME!
-    //  node.properties.contains('imagePaths') ?
-        //(node.properties.get<List<String>>('imagePaths')) : [];
+    // Get the image paths
+    final imagePaths = (node.hasData) ? node.dataNodes.allPaths : [];
 
     return Column(
       children: [
@@ -271,6 +302,13 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     } else {
       // FIXME! - This should be set by visitation.
       var selectedNode = widget.selectionService.selection;
+
+      // Register against the data properties to catch changes to the node's
+      // data set.
+      _dataProps = selectedNode.value!.dataNodes;
+      _dataProps.attach(_dataObserver);
+
+      // Create the properties widget
       propWidget = Container(
         padding: const EdgeInsets.all(16.0),
         height: 400, // Fixed height for better testing and UX

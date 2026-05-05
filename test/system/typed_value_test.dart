@@ -493,6 +493,7 @@ void main() {
 
       // Rehydration: Reconstruct the property map using buildTypedValue.
       final reifiedMap = <String, Object>{};
+      final entriesToSkip = ['id', 'position', 'name', 'dataNodes'];
       for (final entry in entryMap.entries) {
         // Create a StagerContext from the dehydrated map entry.
         // For tuples, we wrap it in a Map with the 'value' key to match
@@ -501,7 +502,7 @@ void main() {
 
         // Rehydrate the TypedValue using the centralized builder function.
         // We only test the rehydration of TypedValue supported types here.
-        if (entry.key != 'id' && entry.key != 'position' && entry.key != 'name') {
+        if (!entriesToSkip.contains(entry.key)) {
           final reifiedTypedValue = buildTypedValue(context);
           reifiedMap[entry.key] = reifiedTypedValue;
         } else {

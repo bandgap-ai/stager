@@ -3,6 +3,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/editors/single_point_map_editor.dart';
 import 'package:flutter_map/flutter_map.dart';
 
+import '../mapping/location_editor.dart';
+
 /// Builds a function that can be used as a callback to post a notification.
 ///
 /// [context] is the context for the notification.
@@ -243,16 +245,8 @@ Widget buildSinglePointMapEditor(
     BuildContext context, LatLng initialPoint, void Function(LatLng) onPointChanged,
     {List<TileLayer>? tileLayers}) {
   // Create the map editor widget
-  Widget mapSelector = SinglePointMapEditor(
-    initialPoint: initialPoint,
-    centerPosition: initialPoint, // Initial map center
-    onPointChanged: (LatLng? newPoint) {
-      onPointChanged(newPoint!);
-    },
-    tileLayers: tileLayers,
-  );
 
-  return mapSelector;
+  return LocationEditor();
 }
 
 /// Builds the coordinate editor for the dialog. Controller values are updated in

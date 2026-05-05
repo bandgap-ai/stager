@@ -135,26 +135,50 @@ class _MapEditorState extends State<MapEditor> {
     );
   }
 
+  /// Opens a dialog to set the map location.
+  ///
+  /// This follows the "Apply" pattern where coordinates can be edited
+  /// reactively, but the actual map movement and dialog closure only
+  /// happen when the user clicks "Set".
   void _showLocationDialog(BuildContext context, MapState state) {
+    // Capture the current center as the starting point for editing.
+    LatLng currentEditingLocation = widget.state.mapController.camera.center;
+
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return buildCustomDialog(
-          context,
+          dialogContext,
           "Set Location",
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: LocationEditor(
+              initialLocation: currentEditingLocation,
               onLocationChanged: (location) {
-                selectionService.setSelectionForView(
-                  Selection<LatLng>(location),
-                  MapEditor.viewId,
-                );
-                // Close the sub-menu
-                Navigator.pop(context);
+                // Update the pending location as the user interacts with the
+                // editor (auto-locate, address lookup, or manual typing).
+                currentEditingLocation = location;
               },
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                // Only now do we broadcast the change to the selection service
+                // and close the dialog.
+                selectionService.setSelectionForView(
+                  Selection<LatLng>(currentEditingLocation),
+                  MapEditor.viewId,
+                );
+                Navigator.pop(dialogContext);
+              },
+              child: const Text("Set"),
+            ),
+          ],
         );
       },
     );

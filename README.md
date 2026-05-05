@@ -56,6 +56,14 @@ the project to its initial state. However, there are situations where a deeper
 clean is required, and there are notes in [AGENT_NOTES.md](AGENT_NOTES.md) from
 20260405 describing that process.
 
+### Debugging Stager Apps
+
+Applications built on Stager can be debugged by executing them in debug mode
+and attaching the debugger, just like any other process. Within the UI, the
+most effective way to do this appears to be by creating a Dart Remote Debugging
+session within Android Studio and attaching to the remove process, which can be
+launched from another instance of Android Studio.
+
 ## Running the Demonstration
 
 A fully functional demonstration of the platform's capabilities is provided in
