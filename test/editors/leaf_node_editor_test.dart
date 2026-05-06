@@ -1,23 +1,23 @@
+import 'package:build_test/build_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/leaf_node_editor.dart';
-import 'package:stager_platform/editors/single_point_map_editor.dart';
-import 'package:stager_platform/tree/concrete_leaf_node.dart';
+import 'package:stager_platform/mapping/single_point_map_editor.dart';
+import 'package:stager_platform/mapping/location_editor.dart';
+import 'package:stager_platform/system/typed_value.dart';
+import 'package:stager_platform/system/point.dart';
 import 'package:stager_platform/tree/tree.dart';
 
 void main() {
   late ConcreteLeafNode node;
-  late NodeProperties testProperties;
 
   setUp(() {
-    node = ConcreteLeafNode(id: 'test_id', name: 'Test Node');
-    testProperties = node.properties;
+    node = ConcreteLeafNode(name: 'Test Node');
   });
 
   group('LeafNodeEditor Tests', () {
     testWidgets('LeafNodeEditor displays title and content', (WidgetTester tester) async {
-      testProperties.setProperty('name', 'Test Node');
-      testProperties.setProperty('description', 'Some description');
+      node.properties.set<String>('description', 'Some description');
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
           body: LeafNodeEditor(state:node),
@@ -31,8 +31,7 @@ void main() {
     });
 
     testWidgets('LeafNodeEditor displays latitude and longitude', (WidgetTester tester) async {
-      testProperties.setProperty('latitude', 10.0);
-      testProperties.setProperty('longitude', 20.0);
+      node.position = Point(coords: [20.0, 10.0]);
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
           body: LeafNodeEditor(state: node),
@@ -40,16 +39,20 @@ void main() {
       ));
 
       expect(find.text('Latitude:'), findsOneWidget);
+      final latField = tester.widget<TextField>(
+          find.ancestor(
+              of: find.text('Latitude:'), matching: find.byType(TextField))
+      );
+      expect(latField.controller?.text, '10.0');
       expect(find.text('Longitude:'), findsOneWidget);
-      expect(find.widgetWithText(TextField, '10.0'), findsOneWidget);
-      expect(find.widgetWithText(TextField, '20.0'), findsOneWidget);
+      expect(find.text('10.0'), findsOneWidget);
+      expect(find.text('20.0'), findsOneWidget);
     });
 
     testWidgets('LeafNodeEditor returns updated properties on Save', (WidgetTester tester) async {
-      testProperties.setProperty('name', 'Old Name');
-      testProperties.setProperty('description', 'Old Description');
-      testProperties.setProperty('latitude', 1.0);
-      testProperties.setProperty('longitude', 2.0);
+      node.name = 'Old Name';
+      node.properties.set<String>('description', 'Old Description');
+      node.position = Point(coords: [2.0, 1.0]);
 
       Map<String, dynamic>? result;
 
@@ -58,7 +61,7 @@ void main() {
           body: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                result = await showDialog<Map<String, dynamic>>(
+                result = await showDialog<Map<String, Object>>(
                   context: context,
                   builder: (BuildContext context) {
                     return LeafNodeEditor(state: node);
@@ -85,13 +88,12 @@ void main() {
       expect(result, isNotNull);
       expect(result!['name'], 'Old Name'); // Name is not editable in this dialog
       expect(result!['description'], 'New Description');
-      expect(result!['latitude'], 100.0);
-      expect(result!['longitude'], 200.0);
+      expect(result!['latitude'], '100.0');
+      expect(result!['longitude'], '200.0');
     });
 
     testWidgets('LeafNodeEditor displays position method widget and switches editors', (WidgetTester tester) async {
-      testProperties.setProperty('latitude', 10.0);
-      testProperties.setProperty('longitude', 20.0);
+      node.position = Point(coords: [20.0, 10.0]);
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
@@ -99,39 +101,21 @@ void main() {
         ),
       ));
 
-      // Verify SegmentedButton is displayed
-      Finder segmentedButton = find.byType(SegmentedButton<bool>);
-      expect(segmentedButton, findsOneWidget);
+      expect(find.byType(LocationEditor), findsOneWidget);
 
-      Finder keyboardIcon = find.byIcon(Icons.keyboard);
-      expect(keyboardIcon, findsOneWidget);
-      Finder iconFinder = find.byIcon(Icons.pin_drop);
-      expect(iconFinder, findsOneWidget);
+      Finder locationIcon = find.byIcon(Icons.my_location);
+      expect(locationIcon, findsOneWidget);
+      Finder pinDropIcon = find.byIcon(Icons.pin_drop);
+      expect(pinDropIcon, findsOneWidget);
+      Finder editLocationIcon = find.byIcon(Icons.edit_location);
+      expect(editLocationIcon, findsOneWidget);
 
       // Initially, coordinate editor should be visible
       expect(find.text('Latitude:'), findsOneWidget);
       expect(find.text('Longitude:'), findsOneWidget);
-      expect(find.widgetWithText(TextField, '10.0'), findsOneWidget);
-      expect(find.widgetWithText(TextField, '20.0'), findsOneWidget);
-      expect(find.byType(SinglePointMapEditor), findsNothing);
 
-      // Tap "Select on Map"
-      await tester.tap(iconFinder);
-      await tester.pump();
-
-      // Map editor should be visible, coordinate editor should be gone
-      expect(find.byType(SinglePointMapEditor), findsOneWidget);
-      expect(find.text('Latitude:'), findsNothing);
-      expect(find.text('Longitude:'), findsNothing);
-
-      // Tap "Input Coordinates"
-      await tester.tap(keyboardIcon);
-      await tester.pump();
-
-      // Coordinate editor should be visible again
-      expect(find.text('Latitude:'), findsOneWidget);
-      expect(find.text('Longitude:'), findsOneWidget);
-      expect(find.byType(SinglePointMapEditor), findsNothing);
+      // If those icons are present, then the LocationEditor is working and we
+      // don't need to test further since it has its own tests.
     });
   });
 }

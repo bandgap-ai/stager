@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:stager_platform/editors/site_controls.dart';
-import 'package:stager_platform/editors/stager_pin.dart';
-import 'package:stager_platform/editors/standard_widgets.dart';
-import 'package:stager_platform/site_state.dart';
-import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/editors/add_site_dialog.dart';
-import 'package:stager_platform/editors/file_handler.dart';
-import 'package:stager_platform/editors/import_export_menu.dart';
-import 'package:stager_platform/editors/basic_site_controls.dart';
+import 'site_controls.dart';
+import 'stager_pin.dart';
+import 'standard_widgets.dart';
+import '../site_state.dart';
+import '../tree/tree.dart';
+import 'add_site_dialog.dart';
+import 'file_handler.dart';
+import 'import_export_menu.dart';
+import 'basic_site_controls.dart';
+import '../system/point.dart';
 
 /// The header for the [SiteEditor].
 ///
@@ -53,9 +54,10 @@ class StagerNavigatorHeader extends StatelessWidget {
   /// [nodeInfo] is a map of node information and equivalent to the NodeProperties.
   void _addSite(Map<String, Object> nodeInfo) {
     TreeNode site = siteState.addSite(nodeInfo['name'] as String);
-    NodeProperties properties = site.properties;
-    properties.setProperty('latitude', double.parse(nodeInfo['latitude'] as String));
-    properties.setProperty('longitude', double.parse(nodeInfo['longitude'] as String));
+    site.position = Point(coords:
+      [double.parse(nodeInfo['longitude'] as String),
+      double.parse(nodeInfo['latitude'] as String)]
+    );
   }
 
   @override

@@ -4,13 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/editors/node_properties_view.dart';
 import 'package:stager_platform/editors/properties_widget.dart';
-import 'package:stager_platform/editors/selection.dart';
+import 'package:stager_platform/mapping/location_editor.dart';
+import 'package:stager_platform/system/selection.dart';
 import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/editors/standard_widgets.dart';
-import 'package:stager_platform/editors/single_point_map_editor.dart';
+import 'package:stager_platform/mapping/single_point_map_editor.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:stager_platform/system/selection_service.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';
-import 'package:stager_platform/tree/leaf_node.dart';
 
 class MockTileProvider extends TileProvider {
   @override
@@ -103,7 +104,7 @@ void main() {
       ));
 
       // This is a basic test. A more thorough test would require a mock map implementation.
-      expect(find.byType(SinglePointMapEditor), findsOneWidget);
+      expect(find.byType(LocationEditor), findsOneWidget);
     });
 
     testWidgets('buildGeoCoordEditor builds a coordinate editor', (WidgetTester tester) async {
@@ -377,6 +378,40 @@ void main() {
           });
     });
 
+    group('buildCustomDialog', () {
+      testWidgets('builds an AlertDialog with correct title and custom content',
+              (WidgetTester tester) async {
+            const String dialogTitle = 'Custom Title';
+            const Widget customContent = Text('Custom Content Widget');
+
+            await pumpBaseWidget(tester, child: Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    showDialog<void>(
+                      context: context,
+                      builder: (BuildContext buildContext) {
+                        return buildCustomDialog(
+                            buildContext, dialogTitle, customContent);
+                      },
+                    );
+                  },
+                  child: const Text('Show Custom Dialog'),
+                );
+              },
+            ));
+
+            // Tap the button to show the dialog
+            await tester.tap(find.byType(ElevatedButton));
+            await tester.pumpAndSettle();
+
+            // Verify dialog is shown
+            expect(find.byType(AlertDialog), findsOneWidget);
+            expect(find.text(dialogTitle), findsOneWidget);
+            expect(find.text('Custom Content Widget'), findsOneWidget);
+          });
+    });
+
     group('buildMessageDialog', () {
       testWidgets('builds an AlertDialog with correct title, content, and OK button',
               (WidgetTester tester) async {
@@ -468,9 +503,7 @@ void main() {
 
     group('buildBottomSheet', () {
 
-      Selection<LeafNode> selectedNode = Selection<LeafNode>();
-
-      WidgetBuilder _getPropertiesWidgetBuilder(PropertiesWidget widget) {
+      WidgetBuilder getPropertiesWidgetBuilder(PropertiesWidget widget) {
         return (BuildContext context) {
           return widget;
         };
@@ -485,11 +518,11 @@ void main() {
                   builder: (BuildContext context) {
                     // Create the widget for the test
                     PropertiesWidget propertiesWidget = PropertiesWidget(
-                      selectedNode: selectedNode,
+                      selectionService: SelectionService(),
                       pin: pin,
                     );
                     // Build the bottom sheet that will actually be tested
-                    return buildBottomSheet(context, _getPropertiesWidgetBuilder(propertiesWidget), null);
+                    return buildBottomSheet(context, getPropertiesWidgetBuilder(propertiesWidget), null);
                   },
               ),
             ),
@@ -505,7 +538,8 @@ void main() {
         // the PropertiesWidget directly returned a bottom sheet.
 
         // Arrange: Select a node
-        selectedNode.value = ConcreteLeafNode(id: '1', name: 'Test Node');
+        SelectionService selectionService = SelectionService();
+        selectionService.selection = Selection<ConcreteLeafNode>(ConcreteLeafNode(name: 'Test Node'));
 
         // Act
         await pumpPropertiesWidget(tester);

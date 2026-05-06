@@ -1,12 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:stager_platform/editors/selection.dart';
-import 'package:stager_platform/editors/selection_observer.dart';
-import 'package:stager_platform/editors/stager_pin.dart';
-import 'package:stager_platform/editors/stager_tree_viewers.dart';
-import 'package:stager_platform/tree/tree_node.dart';
-import 'package:stager_platform/tree/leaf_node.dart';
-import 'package:stager_platform/editors/node_properties_view.dart';
+import 'package:path/path.dart' as path;
+import '../system/selection_observer.dart';
+import 'stager_pin.dart';
+import 'stager_tree_viewers.dart';
+import '../tree/data_properties.dart';
+import '../tree/tree_node.dart';
+import '../tree/leaf_node.dart';
+import '../editors/node_properties_view.dart';
+import '../system/stager_system.dart';
+import '../system/selection_service.dart';
+import '../tree/data_node.dart';
+import '../tree/data_properties_observer.dart';
+
+/// This is a simple wrapper class to delegate processing the update to a
+/// callback function for the PropertiesWidget. Since the properties widget
+/// already implements NodeObserver with NodeObserver and DataPropertiesObserver
+/// both requiring update() implementations, this gets around the compilation
+/// issue.
+class PropertiesWidgetDataObserver implements DataPropertiesObserver {
+
+  /// Callback function
+  void Function(DataProperties) callback;
+
+  PropertiesWidgetDataObserver(this.callback);
+
+  @override
+  void update(DataProperties data) {
+   callback(data);
+  }
+
+}
 
 /// A widget that displays the properties of the currently selected node in a
 /// bottom sheet.
@@ -15,8 +39,8 @@ import 'package:stager_platform/editors/node_properties_view.dart';
 /// [siteState.selectedNode]. It provides functionality to view node properties
 /// and to add images to the node.
 class PropertiesWidget extends StatefulWidget {
-  /// The state manager for the site data.
-  final Selection<LeafNode> selectedNode;
+  /// The selection service that manages global selections
+  final SelectionService selectionService;
 
   /// An optional StagerPin widget to pin the navigator.
   final StagerPin? pin;
@@ -25,7 +49,7 @@ class PropertiesWidget extends StatefulWidget {
   ///
   /// [selectedNode]: The currently selected node.
   /// [pin]: An optional StagerPin widget to pin the properties view.
-  const PropertiesWidget({super.key, required this.selectedNode, this.pin});
+  const PropertiesWidget({super.key, required this.selectionService, this.pin});
 
   @override
   State<StatefulWidget> createState() => _PropertiesWidgetState();
@@ -36,7 +60,6 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     implements SelectionObserver<LeafNode> {
   // TickerProviderStateMixin is used to create an animation controller.
 
-  late Selection<LeafNode> selectedNode;
   StagerPin? _pin;
 
   /// Animation controller for the bottom sheet
@@ -45,30 +68,48 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   /// Current selected view in the segmented button
   String _selectedView = 'properties';
 
+  /// Data properties for the selected node
+  DataProperties _dataProps = DataProperties();
+
+  /// Data properties observer for the selected node
+  late PropertiesWidgetDataObserver _dataObserver;
+
+  /// Callback for observing data properties changes.
+  void _dataObserverCallback(DataProperties data) {
+    setState(() {
+      // No need to do anything - just get a redraw.
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _bottomSheetAnimationController = BottomSheet.createAnimationController(
       this,
     );
-    // Configure the selection and observe it.
-    selectedNode = widget.selectedNode;
-    selectedNode.attach(this);
+    // Observer the selection service for changes to the global selection
+    widget.selectionService.attach(this);
     // Configure the pin used to pin the window
     _pin = widget.pin;
+    // Initialize the data properties observer
+    _dataObserver = PropertiesWidgetDataObserver(_dataObserverCallback);
+    // Set the reference to the data properties
+    _dataProps = DataProperties();
   }
 
   @override
   void dispose() {
+    // Detach against the data properties before they are reset
+    _dataProps.detach(_dataObserver);
     // Detach as an observer of the selection
-    selectedNode.detach(this);
+    widget.selectionService.detach(this);
     // Dispose the animation controller
     _bottomSheetAnimationController?.dispose();
     super.dispose();
   }
 
   @override
-  void update(selection) {
+  void update() {
     // Redraw the widget when the selection changes
     setState(() {});
   }
@@ -80,15 +121,14 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      if (selectedNode.value != null) {
-        LeafNode node = selectedNode.value!;
-        final currentImagePaths =
-            (node.properties.getProperty('imagePaths') as List<String>?) ?? [];
-        node.properties.setProperty('imagePaths', [
-          ...currentImagePaths,
-          pickedFile.path,
-        ]);
-      }
+      // Add the new data node to the selected node's data properties.
+      // The storage provider handles path management based on category.
+      await _dataProps.addAsset(
+        await pickedFile.readAsBytes(),
+        category: "images",
+        fileName: pickedFile.name,
+        type: DataNodeType.image,
+      );
     }
   }
 
@@ -152,8 +192,8 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
 
   /// Builds the images view
   Widget _buildImagesView(LeafNode node) {
-    final imagePaths =
-        (node.properties.getProperty('imagePaths') as List<String>?) ?? [];
+    // Get the image paths
+    final imagePaths = (node.hasData) ? node.dataNodes.allPaths : [];
 
     return Column(
       children: [
@@ -218,6 +258,9 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
   Stack _buildButtonHeader(BuildContext context) {
     bool pinnable = _pin != null;
 
+    // FIXME - This should be retrieved via visitation.
+    LeafNode selectedNode = widget.selectionService.selection.value;
+
     return Stack(
       children: [
         Center(
@@ -252,24 +295,37 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
 
   @override
   Widget build(BuildContext context) {
-    // If no node is selected, show nothing.
-    if (selectedNode.value == null) {
-      return const SizedBox.shrink();
-    }
 
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      height: 400, // Fixed height for better testing and UX
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildButtonHeader(context),
-          const SizedBox(height: 16.0),
-          // Content area based on selected view
-          Expanded(child: _buildSelectedView(selectedNode.value!)),
-        ],
-      ),
-    );
+    Widget propWidget;
+    // If no node is selected, show nothing.
+
+    if (!widget.selectionService.isSet()) {
+      propWidget = SizedBox.shrink();
+    } else {
+      // FIXME! - This should be set by visitation.
+      var selectedNode = widget.selectionService.selection;
+
+      // Register against the data properties to catch changes to the node's
+      // data set.
+      _dataProps = selectedNode.value!.dataNodes;
+      _dataProps.attach(_dataObserver);
+
+      // Create the properties widget
+      propWidget = Container(
+        padding: const EdgeInsets.all(16.0),
+        height: 400, // Fixed height for better testing and UX
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildButtonHeader(context),
+            const SizedBox(height: 16.0),
+            // Content area based on selected view
+            Expanded(child: _buildSelectedView(selectedNode.value!)),
+          ],
+        ),
+      );
+    }
+    return propWidget;
   }
 }

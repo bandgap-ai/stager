@@ -4,6 +4,7 @@ import 'package:stager_platform/editors/edit_node_controller.dart';
 import 'package:stager_platform/editors/controller.dart';
 import 'package:stager_platform/editors/editor_factory.dart';
 import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/tree/composite_node.dart';
 import 'package:stager_platform/tree/concrete_composite_node.dart';
 import 'mock_composite_node_observer.dart';
@@ -19,7 +20,7 @@ void main() {
   setUp(() {
     SiteState state = SiteState();
 
-    parent = ConcreteCompositeNode(id: "1", name: "Parent");
+    parent = ConcreteCompositeNode(name: "Parent");
     parent.attach(observer = MockCompositeNodeObserver());
     editorFactory = MockEditorFactory(state);
     controller = EditNodeController(parent, editorFactory);
@@ -70,22 +71,36 @@ void main() {
       // Make sure the observer has not been updated without being reset.
       expect(observer.updated, isFalse);
 
+      // Add some properties to the parent
+      parent.properties.set<int>('value',456);
+      parent.properties.set<bool>('is_active',false);
+
       // Make some new property values
-      Map<String, dynamic> results = {
-        'name': 'Updated Name',
-        'value': 456,
-        'is_active': false,
+      Map<String, Object> results = {
+        'name': "Pearl Jam",
+        'latitude': "4.0",
+        'longitude': "-5.0",
+        'value': "1112",
+        'is_active': "true",
+        'song_name': 'No Way'
       };
 
       // Update them
       controller.process(results);
 
-      // Get and check the properties.
-      expect(parent.properties.getProperty('name'), 'Updated Name');
-      expect(parent.properties.getProperty('value'), 456);
-      expect(parent.properties.getProperty('is_active'), false);
-      // There should now be 4 properties
-      expect(parent.properties.map.length, 4);
+      // Get and check the properties that were already there, but with
+      // udpated values.
+      expect(parent.name, "Pearl Jam");
+      expect(parent.position.y, 4.0);
+      expect(parent.position.x, -5.0);
+      expect(parent.properties.get<int>('value'), 1112);
+      expect(parent.properties.get<bool>('is_active'), isTrue);
+      // Check the new property, which should be a string since it was added by
+      // the UI.
+      expect(parent.properties.get<String>('song_name'), 'No Way');
+      print(parent.toMap());
+      // There should now be 3 generic properties
+      expect(parent.properties.map.length, 3);
       // Ensure that observers were notified the state changed.
       expect(observer.updated, isTrue);
       observer.reset();

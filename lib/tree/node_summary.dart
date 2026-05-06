@@ -1,4 +1,4 @@
-import 'package:latlong2/latlong.dart';
+import '../system/point.dart';
 
 /// A comprehensive summary of a node and its subtree containing node counts,
 /// geographic bounds, and statistical information.
@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 /// This class provides a snapshot of node data useful for analysis,
 /// reporting, and visualization purposes in forestry applications.
 /// Can be used to summarize any node and all its children.
+@Deprecated("This class violates several Stager policies and is deprecated.")
 class NodeSummary {
   /// Total number of nodes in the tree.
   final int totalNodes;
@@ -16,11 +17,11 @@ class NodeSummary {
 
   /// Polygon representing the convex hull of all node positions.
   /// Empty list if no valid coordinates are found.
-  final List<LatLng> boundingPolygon;
+  final List<Point> boundingPolygon;
 
   /// Geographic center point (centroid) of all node positions.
   /// Null if no valid coordinates are found.
-  final LatLng? centerPoint;
+  final Point? centerPoint;
 
   /// Total area covered by Level 1 outline polygons in square meters.
   /// Null if no outline areas are defined.
@@ -56,14 +57,14 @@ class NodeSummary {
       'nodeCountsByLevel': nodeCountsByLevel,
       'boundingPolygon': boundingPolygon
           .map((point) => {
-                'latitude': point.latitude,
-                'longitude': point.longitude,
+                'latitude': point.coords[1],
+                'longitude': point.coords[0],
               })
           .toList(),
       'centerPoint': centerPoint != null
           ? {
-              'latitude': centerPoint!.latitude,
-              'longitude': centerPoint!.longitude,
+              'latitude': centerPoint!.coords[1],
+              'longitude': centerPoint!.coords[0],
             }
           : null,
       'totalOutlineArea': totalOutlineArea,
@@ -77,16 +78,13 @@ class NodeSummary {
       totalNodes: json['totalNodes'] as int,
       nodeCountsByLevel: Map<int, int>.from(json['nodeCountsByLevel'] as Map),
       boundingPolygon: (json['boundingPolygon'] as List)
-          .map((point) => LatLng(
-                point['latitude'] as double,
-                point['longitude'] as double,
-              ))
+          .map((point) => Point(coords: [point['longitude'] as double, point['latitude'] as double]))
           .toList(),
       centerPoint: json['centerPoint'] != null
-          ? LatLng(
-              json['centerPoint']['latitude'] as double,
+          ? Point(coords: [
               json['centerPoint']['longitude'] as double,
-            )
+              json['centerPoint']['latitude'] as double,
+            ])
           : null,
       totalOutlineArea: json['totalOutlineArea'] as double?,
       additionalStats: Map<String, dynamic>.from(

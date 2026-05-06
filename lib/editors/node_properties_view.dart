@@ -4,6 +4,8 @@ import 'package:stager_platform/editors/leaf_node_editor.dart';
 import 'package:stager_platform/editors/add_property_dialog.dart';
 import 'package:stager_platform/editors/stager_editor.dart';
 
+import '../system/typed_value.dart';
+
 /// A stateful widget that displays the properties of a [NodeProperties] object
 /// and automatically updates itself when the properties change.
 class NodePropertiesView extends StagerEditor<LeafNode> {
@@ -106,10 +108,10 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
   /// [properties]: The [NodeProperties] object containing the properties to display.
   Widget _createTableWidget(BuildContext context, NodeProperties properties) {
 
-    final Iterable<MapEntry<String, Object?>> props = properties.map.entries.where((entry) =>
+    final Iterable<MapEntry<String, TypedValue<Object>>> props = properties.map.entries.where((entry) =>
     entry.key != 'id' &&
         entry.key != 'name' &&
-        entry.key != 'imagePaths').toList();
+        entry.key != 'dataNodes').toList();
 
     Widget tableWidget =  Table(
       border: TableBorder.all( // Adds borders to cells for clarity
@@ -137,7 +139,8 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                entry.value?.toString() ?? 'N/A', // Handle potential null values
+                // Yes, it really is .value.value for now.
+                entry.value.value.toString() ?? 'N/A', // Handle potential null values
               ),
             ),
           ],
@@ -158,7 +161,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
         IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () async {
-            final updatedProperties = await showDialog<Map<String, dynamic>>(
+            final updatedProperties = await showDialog<Map<String, Object>>(
               context: context,
               builder: (BuildContext context) {
                 return LeafNodeEditor(state: widget.state);
@@ -168,7 +171,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
             if (updatedProperties != null) {
               // Update the properties of the current node
               updatedProperties.forEach((key, value) {
-                properties.setProperty(key, value);
+                properties.set<String>(key, value.toString());
               });
             }
           },
@@ -176,7 +179,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
         IconButton(
           icon: const Icon(Icons.add),
           onPressed: () async {
-            final newProperty = await showDialog<Map<String, dynamic>>(
+            final newProperty = await showDialog<Map<String, Object>>(
               context: context,
               builder: (BuildContext context) {
                 return const AddPropertyDialog();
@@ -186,10 +189,11 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
             if (newProperty != null && newProperty.keys.isNotEmpty) {
               final key = newProperty.keys.first;
               final value = newProperty[key];
-              properties.setProperty(key, value);
+              properties.set<String>(key, value.toString());
             }
           },
         ),
+        // No delete for now
       ],
     );
   }
@@ -201,7 +205,7 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          properties.getProperty('name') as String? ?? 'Unknown',
+          widget.state.name,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),

@@ -25,7 +25,7 @@ void main() {
           home: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                final result = await showDialog<Map<String, dynamic>?>(
+                final result = await showDialog<Map<String, Object>>(
                   context: context,
                   builder: (context) => AddNodeDialog(state: root),
                 );
@@ -75,7 +75,7 @@ void main() {
           home: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                final result = await showDialog<Map<String, dynamic>?>(
+                final result = await showDialog<Map<String, Object>>(
                   context: context,
                   builder: (context) => AddNodeDialog(state: root),
                 );
@@ -120,7 +120,7 @@ void main() {
       return;
     });
 
-    testWidgets('should return null when Cancel is tapped', (WidgetTester tester) async {
+    testWidgets('should do nothing when Cancel is tapped', (WidgetTester tester) async {
 
       // Site State needs to be configured with a composite for this test.
       final SiteState state = SiteState();
@@ -132,7 +132,7 @@ void main() {
           home: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () {
-                showDialog<String>(
+                showDialog<Map<String,Object>>(
                   context: context,
                   builder: (context) => AddNodeDialog(state: root),
                 );

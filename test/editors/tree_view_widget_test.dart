@@ -3,17 +3,16 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/editors/tree_view.dart';
 
 void main() {
   group('TreeView Widget Tests', () {
     // Create a mock list of sites for testing.
-    final site1 = ConcreteTreeNode(id: 'site1', name: 'Site 1');
-    final leaf1 = ConcreteLeafNode(id: 'leaf1', name: 'Leaf 1');
-    final comp1 = ConcreteCompositeNode(id: 'comp1', name: 'Composite 1');
-    final leaf2 = ConcreteLeafNode(id: 'leaf2', name: 'Leaf 2');
+    final site1 = ConcreteTreeNode(name: 'Site 1');
+    final leaf1 = ConcreteLeafNode(name: 'Leaf 1');
+    final comp1 = ConcreteCompositeNode(name: 'Composite 1');
+    final leaf2 = ConcreteLeafNode(name: 'Leaf 2');
     comp1.addChild(leaf2);
     site1.addChild(leaf1);
     site1.addChild(comp1);
@@ -44,7 +43,7 @@ void main() {
     });
 
     testWidgets('should trigger onNodeTap when a node is tapped', (WidgetTester tester) async {
-      LeafNode? tappedNode;
+      late LeafNode tappedNode;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -69,7 +68,7 @@ void main() {
 
       // Verify that the callback was triggered with the correct node.
       expect(tappedNode, isNotNull);
-      expect(tappedNode?.properties.getProperty('name'), 'Leaf 1');
+      expect(tappedNode.name, 'Leaf 1');
     });
 
     testWidgets('should highlight the selected node', (WidgetTester tester) async {

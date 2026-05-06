@@ -1,6 +1,5 @@
 // test/stager/site_state_test.dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/site_state.dart';
 import 'package:stager_platform/site_state_observer.dart';
 import 'package:stager_platform/tree/tree.dart';
@@ -44,7 +43,7 @@ void main() {
       // Arrange
       final siteState = SiteState();
       final observer = MockSiteStateObserver();
-      final testNode = ConcreteTreeNode(id: '1', name: 'Test');
+      final testNode = ConcreteTreeNode(name: 'Test');
       siteState.attach(observer);
 
       // Act
@@ -60,7 +59,7 @@ void main() {
       // Arrange
       final siteState = SiteState();
       final observer = MockSiteStateObserver();
-      final testNode = ConcreteTreeNode(id: '1', name: 'Test');
+      final testNode = ConcreteTreeNode(name: 'Test');
       siteState.selectedNode = testNode; // Initial selection
       siteState.attach(observer);
 
@@ -114,7 +113,7 @@ void main() {
 
       // Assert
       expect(siteState.treeData.length, initialTreeCount + 1);
-      expect(siteState.treeData.last.properties.getProperty("name"), 'New Site');
+      expect(siteState.treeData.last.name, 'New Site');
       expect(observer.wasUpdated, isTrue);
     });
   });

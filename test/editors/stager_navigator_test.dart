@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager_platform/editors/selection.dart';
+import 'package:stager_platform/system/selection.dart';
 import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/site_state.dart';
 import 'package:stager_platform/editors/stager_navigator.dart';
 import 'package:stager_platform/editors/tree_view.dart';
-import 'package:stager_platform/tree/concrete_tree.dart';
+import 'package:stager_platform/system/selection_service.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'mock_file_handler.dart';
-import 'mock_selection_observer.dart';
+import '../system/mock_selection_observer.dart';
 import 'mock_site_controls.dart';
 
 void main() {
@@ -16,11 +16,10 @@ void main() {
     late SiteState siteState;
     late MockFileHandler mockFileHandler;
     late MockSiteControls mockSiteControls;
-    late Selection<LeafNode> selection;
+    final SelectionService selectionService = SelectionService();
 
     setUp(() {
       siteState = SiteState();
-      selection = Selection<LeafNode>();
       mockFileHandler = MockFileHandler();
       mockSiteControls = MockSiteControls();
     });
@@ -33,7 +32,6 @@ void main() {
             // Pass the state object directly to the constructor
             body: StagerNavigator(
               siteState: siteState,
-              selection: selection,
               fileHandler: mockFileHandler,
               siteControls: mockSiteControls,
               pin: pin,
@@ -44,6 +42,7 @@ void main() {
     }
 
     testWidgets('should display the label from SiteState', (WidgetTester tester) async {
+      selectionService.selection = Selection<LeafNode>(ConcreteLeafNode(name: 'Test Node'));
       await pumpWidget(tester);
       expect(find.text('Sites'), findsOneWidget);
     });
@@ -57,7 +56,7 @@ void main() {
     testWidgets('should display editor button when a node is selected', (WidgetTester tester) async {
 
       // Add a node
-      final node = ConcreteLeafNode(id: '1', name: 'Test Node');
+      final node = ConcreteLeafNode(name: 'Test Node');
       siteState.selectedNode = node;
       final TreeNode parent = siteState.addSite("Test Site");
       parent.addChild(node);
@@ -65,7 +64,7 @@ void main() {
       // Register an observer on the selection so we can check it
       MockSelectionObserver<LeafNode> selectionObserver
           = MockSelectionObserver<LeafNode>();
-      selection.attach(selectionObserver);
+      selectionService.attach(selectionObserver);
 
       // Act
       await pumpWidget(tester);
@@ -103,13 +102,13 @@ void main() {
 
       // Assert the selection was updated
       expect(selectionObserver.updated, isTrue);
-      expect(selection.value == parent, isTrue);
+      expect(selectionService.selection.value == parent, isTrue);
 
     });
 
-    testWidgets('should not display editor buttons when no node is selected', (WidgetTester tester) async {
+    testWidgets('should not display editor buttons when a node is not selected', (WidgetTester tester) async {
       // Arrange: Ensure no node is selected
-      siteState.selectedNode = null;
+      selectionService.clear();
 
       // Act
       await pumpWidget(tester);
@@ -121,6 +120,7 @@ void main() {
 
     testWidgets('should display pin when provided and call onPinChanged on tap', (WidgetTester tester) async {
       // Arrange
+
       bool callbackCalled = false;
       final StagerPin pin = StagerPin(
         initialPinState: false,
@@ -157,7 +157,7 @@ void main() {
       final treeFinder = find.byType(TreeView);
       final nodeViewFinder = find.descendant(
         of: treeFinder,
-        matching: find.text(nodeToDelete.properties.getProperty('name') as String),
+        matching: find.text(nodeToDelete.name),
       );
       expect(nodeViewFinder, findsOneWidget);
       await tester.tap(nodeViewFinder);
@@ -209,7 +209,7 @@ void main() {
 
       // Find the parent in the TreeView
       final parentFinder = find.descendant( of: treeFinder,
-          matching: find.text(parent.properties.getProperty('name') as String));
+          matching: find.text(parent.name));
       // Tap the parent to expand the list of children
       await tester.ensureVisible(parentFinder);
       await tester.tap(parentFinder);
@@ -222,7 +222,7 @@ void main() {
       // items in the list view are children of the TreeView.
       final nodeFinder = find.descendant(
           of: treeFinder,
-          matching: find.text(nodeToDelete.properties.getProperty('name') as String));
+          matching: find.text(nodeToDelete.name));
       await tester.ensureVisible(nodeFinder);
       await tester.tap(nodeFinder);
       await tester.pumpAndSettle();
@@ -252,7 +252,7 @@ void main() {
       final treeFinder = find.byType(TreeView);
       final nodeViewFinder = find.descendant(
         of: treeFinder,
-        matching: find.text(nodeToTest.properties.getProperty('name') as String),
+        matching: find.text(nodeToTest.name),
       );
       expect(nodeViewFinder, findsOneWidget);
       await tester.tap(nodeViewFinder);
@@ -285,7 +285,7 @@ void main() {
 
     testWidgets('tapping import button calls import on FileHandler and adds nodes', (WidgetTester tester) async {
       // Arrange
-      final nodesToImport = [ConcreteTreeNode(id: 'imported', name: 'Imported Node')];
+      final nodesToImport = [ConcreteTreeNode(name: 'Imported Node')];
       mockFileHandler.nodesToImport = nodesToImport;
       final initialSiteCount = siteState.treeData.length;
       await pumpWidget(tester);

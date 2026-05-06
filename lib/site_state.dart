@@ -1,5 +1,4 @@
 // lib/stager/site_state.dart
-import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/data/basic_sample_data.dart';
 import 'package:stager_platform/site_state_observer.dart';
 import 'package:stager_platform/tree/node_observer.dart';
@@ -50,8 +49,8 @@ class SiteState implements ObservableSubject {
   /// If the deleted node was the currently selected one, the selection is cleared.
   /// After deletion, it notifies all observers.
   void deleteNode(LeafNode node) {
-    if (node.parent != null && node.parent!.isComposite) {
-      (node.parent! as CompositeNode).removeChild(node);
+    if (node.hasParent() && node.parent.isComposite) {
+      (node.parent as CompositeNode).removeChild(node);
     } else {
       // Handle deletion of a top-level site node.
       _treeData.remove(node);
@@ -72,7 +71,6 @@ class SiteState implements ObservableSubject {
   /// [treeData]. All observers are then notified of the change.
   TreeNode addSite(String name) {
     final newSite = ConcreteTreeNode(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,
     );
     _treeData.add(newSite);

@@ -35,7 +35,7 @@ class MockController extends Controller {
   }
 
   @override
-  void process(Object input) {
+  void process(Map<String,Object> input) {
     _processed = true;
   }
 

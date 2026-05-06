@@ -13,7 +13,7 @@ void main() {
   late BasicEditorFactory factory;
 
   setUp(() {
-    parent = ConcreteCompositeNode(id: "id", name: "name");
+    parent = ConcreteCompositeNode(name: "name");
     factory = BasicEditorFactory();
   });
 

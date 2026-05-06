@@ -16,7 +16,7 @@ class DialogControlButton extends StatelessWidget {
   /// Handles the results from the editor and must be implemented by subclasses.
   ///
   /// [results] is the results from the editor.
-  void processResults(dynamic results) {
+  void processResults(Map<String,Object> results) {
     controller.process(results);
   }
 
@@ -27,11 +27,13 @@ class DialogControlButton extends StatelessWidget {
 
     // This awaits the completion of the modal dialog and forwards the result to
     // the controller for processing.
-    final results = await showDialog(
+    final results = await showDialog<Map<String,Object>>(
       context: context,
       builder: (context) => controller.editor(context),
     );
-    processResults(results);
+    // showDialog can technically return null, so we need to provide a safe
+    // default in case it does.
+    processResults(results ?? {});
   }
 
   @override

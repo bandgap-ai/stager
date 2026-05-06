@@ -5,7 +5,14 @@ import 'package:stager_platform/tree/leaf_node.dart';
 /// This class extends [LeafNode] and adds the capability to manage child nodes,
 /// thereby implementing the Composite design pattern. A composite node can
 /// contain both leaf nodes and other composite nodes.
+///
+/// CompositeNodes follow the same no-null policy as LeafNodes. This means that
+/// removing a child will result in the child pointing to itself for its parents
+/// and siblings (i.e., it is orphaned).
 abstract class CompositeNode extends LeafNode {
+
+  const CompositeNode();
+
   /// Retrieves the list of child [LeafNode]s directly associated with this composite node.
   ///
   /// This getter provides access to the immediate children of this node.

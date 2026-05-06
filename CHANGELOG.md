@@ -1,6 +1,18 @@
-## 0.0.3
+## 0.0.5
+
+* Added TypedValue, Point, BasicBuilder, StagerContext, and other core classes.
+* Overhauled nodes with many updates to follow the no-null policy and create a much better dev 
+experience.
+
+## 0.0.4
 
 * Added a generic Selection class and observer to manage UI selection state.
+
+## 0.0.3
+* Added dynamic type factory for persistence.
+* Added a new map editor with partial KML support.
+* Added new Agent management constructs.
+* Added new HLDs in doc/.
 
 ## 0.0.2
 

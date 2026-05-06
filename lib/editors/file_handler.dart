@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:stager_platform/persistence/json_codec.dart';
+import 'package:stager_platform/persistence/json_io_util.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'dart:convert';
@@ -47,13 +47,13 @@ abstract class FileHandler {
 /// A basic implementation of [FileHandler] that uses the `file_picker` package
 /// and a `JsonCodec` to handle file operations.
 class BasicFileHandler implements FileHandler {
-  final JsonCodec _codec = const JsonCodec();
+  final JsonIOUtil _jsonIOUtil = const JsonIOUtil();
 
   const BasicFileHandler();
 
   @override
   Future<void> writeToFile(String path, List<LeafNode> nodes) async {
-    final jsonString = _codec.serialize(nodes);
+    final jsonString = _jsonIOUtil.serialize(nodes);
     final file = File(path);
     await file.writeAsString(jsonString);
   }
@@ -76,7 +76,7 @@ class BasicFileHandler implements FileHandler {
       String filename = suggestedFileName ?? "tracee_export.json";
       final filePath = await FlutterFileDialog.saveFileToDirectory(
         directory: pickedDirectory,
-        data: utf8.encode(_codec.serialize(nodes)),
+        data: utf8.encode(_jsonIOUtil.serialize(nodes)),
         mimeType: "application/json",
         fileName: filename,
         replace: true,
@@ -178,7 +178,7 @@ class BasicFileHandler implements FileHandler {
     final file = File(path);
     if (await file.exists()) {
       final jsonString = await file.readAsString();
-      return _codec.deserialize(jsonString);
+      return _jsonIOUtil.deserialize(jsonString);
     }
     return null;
   }

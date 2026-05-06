@@ -1,8 +1,9 @@
-import 'package:stager_platform/tree/composite_node.dart';
-import 'package:stager_platform/tree/leaf_node.dart';
-import 'package:stager_platform/tree/node_builder.dart';
-import 'package:stager_platform/tree/concrete_composite_node.dart';
-import 'package:stager_platform/tree/concrete_leaf_node.dart';
+import 'composite_node.dart';
+import 'leaf_node.dart';
+import 'node_builder.dart';
+import 'concrete_composite_node.dart';
+import 'concrete_leaf_node.dart';
+import 'null_nodes.dart';
 
 /// This is an implementation of [NodeBuilder] that provides a default
 /// implementation using [ConcreteLeafNode] and [ConcreteCompositeNode].
@@ -10,6 +11,8 @@ import 'package:stager_platform/tree/concrete_leaf_node.dart';
 /// Subclasses and alternatives should be especially mindful of the linkage
 /// logic for parents and children.
 class BasicNodeBuilder extends NodeBuilder {
+
+  static const NullComposite _nullParent = NullComposite();
 
   /// Const constructor for the BasicNodeBuilder class.
   const BasicNodeBuilder();
@@ -19,8 +22,8 @@ class BasicNodeBuilder extends NodeBuilder {
   ///
   /// [node]: The node to be linked.
   /// [parent]: The parent of the node.
-  void linkParent(LeafNode node, CompositeNode? parent) {
-    if (parent != null) {
+  void _linkParent(LeafNode node, CompositeNode parent) {
+    if (parent != _nullParent) {
       // Link the new node to the parent as a child
       parent.addChild(node);
       // Let the watchers know
@@ -29,16 +32,16 @@ class BasicNodeBuilder extends NodeBuilder {
   }
 
   @override
-  CompositeNode buildCompositeNode(String id, String name, [CompositeNode? parent]) {
-    ConcreteCompositeNode node = ConcreteCompositeNode(id: id, name: name);
-    linkParent(node, parent);
+  CompositeNode buildCompositeNode(String name, [CompositeNode parent = _nullParent]) {
+    ConcreteCompositeNode node = ConcreteCompositeNode(name: name);
+    _linkParent(node, parent);
     return node;
   }
 
   @override
-  LeafNode buildLeafNode(String id, String name, [CompositeNode? parent]) {
-    ConcreteLeafNode node = ConcreteLeafNode(id: id, name: name);
-    linkParent(node, parent);
+  LeafNode buildLeafNode(String name, [CompositeNode parent = _nullParent]) {
+    ConcreteLeafNode node = ConcreteLeafNode(name: name);
+    _linkParent(node, parent);
     return node;
   }
 

@@ -59,12 +59,12 @@ class _LeafNodeViewState extends State<LeafNodeView> implements LeafNodeObserver
   @override
   Widget build(BuildContext context) {
     IconData iconData = widget.iconProvider.getIconForLevel(widget.level);
-    final bool isSelected = widget.selectedNode?.properties.getProperty('id') ==
-        widget.node.properties.getProperty('id');
+    final bool isSelected = widget.selectedNode?.id ==
+        widget.node.id;
 
     return ListTile(
       contentPadding: EdgeInsets.only(left: 16.0 + widget.level * 20.0),
-      title: Text(widget.node.properties.getProperty('name') as String),
+      title: Text(widget.node.name),
       leading: Icon(iconData),
       selected: isSelected,
       onTap: () => widget.onNodeTap(widget.node),
@@ -132,12 +132,12 @@ class _CompositeNodeViewState extends State<CompositeNodeView>
   @override
   Widget build(BuildContext context) {
     IconData iconData = widget.iconProvider.getIconForLevel(widget.level);
-    final bool isSelected = widget.selectedNode?.properties.getProperty('id') ==
-        widget.node.properties.getProperty('id');
+    final bool isSelected = widget.selectedNode?.id ==
+        widget.node.id;
 
     return ExpansionTile(
       tilePadding: EdgeInsets.only(left: 16.0 + widget.level * 20.0),
-      title: Text(widget.node.properties.getProperty('name') as String),
+      title: Text(widget.node.name),
       leading: Icon(iconData),
       initiallyExpanded: isSelected,
       backgroundColor:
@@ -220,7 +220,7 @@ class NodeSummaryView extends StatelessWidget {
       rows.add(_buildTableRow(
         context,
         'Center',
-        '${summary.centerPoint!.latitude.toStringAsFixed(4)}, ${summary.centerPoint!.longitude.toStringAsFixed(4)}',
+        '${summary.centerPoint!.y.toStringAsFixed(4)}, ${summary.centerPoint!.x.toStringAsFixed(4)}',
       ));
     }
 

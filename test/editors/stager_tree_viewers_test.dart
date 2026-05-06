@@ -8,8 +8,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/node_properties_view.dart';
-import 'package:stager_platform/tree/concrete_tree.dart';
 import 'package:stager_platform/tree/tree.dart';
+import 'package:stager_platform/system/point.dart';
 import 'package:stager_platform/editors/stager_tree_viewers.dart';
 import 'package:stager_platform/editors/tree_icon_provider.dart';
 
@@ -19,12 +19,8 @@ void main() {
     late NodeProperties testProperties;
 
     setUp(() {
-      node = ConcreteLeafNode(id: 'test_id', name: 'Test Node');
-      testProperties = node.properties;
-      testProperties.setProperty('id', 'test_id');
-      testProperties.setProperty('name', 'Test Node');
-      testProperties.setProperty('latitude', 36.73444);
-      testProperties.setProperty('longitude', -81.86052);
+      node = ConcreteLeafNode(name: 'Test Node');
+      node.properties.set<int>('temperature', 10);
     });
 
     testWidgets('should display node properties correctly', (WidgetTester tester) async {
@@ -39,20 +35,20 @@ void main() {
       // Verify properties are displayed correctly
       // The name should be displayed as bold text
       expect(find.text('Test Node'), findsOneWidget);
-      // Other properties should be displayed as key-value pairs
-      expect(find.text('Latitude'), findsOneWidget);
-      expect(find.text('36.73444'), findsOneWidget);
-      expect(find.text('Longitude'), findsOneWidget);
-      expect(find.text('-81.86052'), findsOneWidget);
-      // id should NOT be displayed (it's filtered out)
-      expect(find.text('test_id'), findsNothing);
+      // Other properties should be displayed as key-value pairs. The text is
+      // "cleaned up," so look for that capital "T" on the screen.
+      expect(find.text('Temperature'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
     });
 
     testWidgets('should display edit icon and open NodeEditor on tap', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: NodePropertiesView(state: node),
+            body: SizedBox(height: 800,
+            width: 400,
+            child: NodePropertiesView(state: node),
+            )
           ),
         ),
       );
@@ -83,7 +79,9 @@ void main() {
       expect(find.text('Test Node'), findsOneWidget);
 
       // Update property
-      testProperties.setProperty('name', 'Updated Node');
+      node.name = 'Updated Node';
+      // Manually notify since the name is not part of the properties.
+      node.properties.notify();
       await tester.pump();
 
       // Verify update
@@ -111,7 +109,7 @@ void main() {
     late TreeIconProvider iconProvider;
 
     setUp(() {
-      testLeafNode = ConcreteLeafNode(id: 'leaf1', name: 'Test Leaf');
+      testLeafNode = ConcreteLeafNode(name: 'Test Leaf');
       iconProvider = TreeIconProvider();
     });
 
@@ -188,9 +186,9 @@ void main() {
     late TreeIconProvider iconProvider;
 
     setUp(() {
-      testCompositeNode = ConcreteCompositeNode(id: 'comp1', name: 'Test Composite');
-      final child1 = ConcreteLeafNode(id: 'leaf1', name: 'Child 1');
-      final child2 = ConcreteLeafNode(id: 'leaf2', name: 'Child 2');
+      testCompositeNode = ConcreteCompositeNode(name: 'Test Composite');
+      final child1 = ConcreteLeafNode(name: 'Child 1');
+      final child2 = ConcreteLeafNode(name: 'Child 2');
       testCompositeNode.addChild(child1);
       testCompositeNode.addChild(child2);
       iconProvider = TreeIconProvider();

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stager_platform/editors/selection.dart';
+import 'package:stager_platform/system/selection.dart';
 import 'package:stager_platform/editors/stager_navigator_header.dart';
 import 'package:stager_platform/editors/tree_view.dart';
 import 'package:stager_platform/site_state.dart';
+import 'package:stager_platform/system/selection_service.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/editors/add_site_dialog.dart';
 import 'package:stager_platform/editors/stager_navigator.dart';
@@ -11,7 +12,13 @@ import 'package:stager_platform/editors/stager_navigator.dart';
 void main() {
   group('Site Editor functions', () {
 
-    final Selection<LeafNode> selection = Selection<LeafNode>();
+    SelectionService selectionService = SelectionService();
+
+    final Selection<LeafNode> selection = Selection<LeafNode>(ConcreteLeafNode(name: 'name'));
+
+    setUp(() {
+      selectionService.selection = selection;
+    });
 
     // Test for the "Add Site" button functionality.
     testWidgets('should display the add site button and open a dialog on tap', (WidgetTester tester) async {
@@ -19,7 +26,7 @@ void main() {
       final siteState = SiteState();
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: StagerNavigator(siteState: siteState, selection: selection),
+          body: StagerNavigator(siteState: siteState),
         ),
       ));
 
@@ -41,7 +48,7 @@ void main() {
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: StagerNavigator(siteState: siteState, selection: selection),
+          body: StagerNavigator(siteState: siteState),
         ),
       ));
 
@@ -60,7 +67,7 @@ void main() {
 
       // Assert
       expect(siteState.treeData.length, initialSiteCount + 1);
-      expect(siteState.treeData.last.properties.getProperty('name'), 'New Test Site');
+      expect(siteState.treeData.last.name, 'New Test Site');
     });
 
     // Test that the "Create New Folder" button is visible when a composite node is selected.
@@ -71,7 +78,7 @@ void main() {
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: StagerNavigator(siteState: siteState, selection: selection),
+          body: StagerNavigator(siteState: siteState),
         ),
       ));
 
@@ -79,7 +86,7 @@ void main() {
       final treeFinder = find.byType(TreeView);
       final nodeViewFinder = find.descendant(
         of: treeFinder,
-        matching: find.text(nodeToTest.properties.getProperty('name') as String),
+        matching: find.text(nodeToTest.name),
       );
       expect(nodeViewFinder, findsOneWidget);
       await tester.tap(nodeViewFinder);
@@ -99,7 +106,7 @@ void main() {
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          body: StagerNavigator(siteState: siteState, selection: selection),
+          body: StagerNavigator(siteState: siteState),
         ),
       ));
 
@@ -107,7 +114,7 @@ void main() {
       final treeFinder = find.byType(TreeView);
       final nodeViewFinder = find.descendant(
         of: treeFinder,
-        matching: find.text(parentNode.properties.getProperty('name') as String),
+        matching: find.text(parentNode.name),
       );
       expect(nodeViewFinder, findsOneWidget);
       await tester.tap(nodeViewFinder);
@@ -129,7 +136,7 @@ void main() {
       // Assert
       expect(parentNode.children.length, initialChildCount + 1);
       final newNode = parentNode.children.last;
-      expect(newNode.properties.getProperty('name'), 'New Folder');
+      expect(newNode.name, 'New Folder');
       expect(newNode.isComposite, isTrue);
     });
   });

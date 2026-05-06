@@ -15,7 +15,7 @@ void main() {
 
   setUp(() {
     SiteState state = SiteState();
-    node = ConcreteCompositeNode(id: "1", name: "Test Node");
+    node = ConcreteCompositeNode(name: "Test Node");
     editorFactory = MockEditorFactory(state);
     siteControls = BasicSiteControls(editorFactory);
   });

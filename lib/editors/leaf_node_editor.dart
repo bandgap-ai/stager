@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:stager_platform/editors/stager_editor.dart';
-import 'package:stager_platform/tree/tree.dart';
-import 'package:stager_platform/editors/standard_widgets.dart';
-import 'package:stager_platform/editors/basic_widget_factory.dart';
+import '../mapping/location_editor.dart';
+import 'stager_editor.dart';
+import '../tree/tree.dart';
+import 'standard_widgets.dart';
+import 'basic_widget_factory.dart';
+import '../system/point.dart';
+
+import '../system/typed_value.dart';
 
 /// A dialog for editing node properties.
 ///
@@ -30,7 +34,7 @@ class _NodeEditorState extends State<LeafNodeEditor> {
   late NodeProperties properties;
 
   /// A map to store [TextEditingController]s for string-based properties.
-  final Map<String, TextEditingController> _controllers = {};
+  final Map<String, TextEditingController> _textControllers = {};
 
   /// The current selection for the position input method (map or coordinates).
   late bool _pickFromMap;
@@ -40,29 +44,42 @@ class _NodeEditorState extends State<LeafNodeEditor> {
     super.initState();
     properties = widget.state.properties;
     // Initialize controllers for each property based on their type.
-    properties.map.forEach((key, value) {
+
+    // FIXME! This is where the name, id, latitude and longitude would normally
+    // be created if they were still part of the the properties map.
+
+    // Create text controllers for the name, id, and position
+    _textControllers['name'] = TextEditingController(text: widget.state.name);
+    _textControllers['id'] = TextEditingController(text: widget.state.id.toString());
+    final longitude = widget.state.position.coords[0];
+    final latitude = widget.state.position.coords[1];
+    _textControllers['latitude'] = TextEditingController(text: latitude.toString());
+    _textControllers['longitude'] = TextEditingController(text: longitude.toString());
+
+    // Create text controllers for each generic property in the node properties.
+    properties.map.forEach((key, typedValue) {
       // For all properties, create a TextEditingController.
-      _controllers[key] = TextEditingController(text: value?.toString() ?? '');
+      _textControllers[key] = TextEditingController(text: typedValue.value.toString() ?? '');
     });
 
     // Initialize _pickFromMap based on whether latitude/longitude exist
-    _pickFromMap = !(properties.map.containsKey('latitude') ||
-        properties.map.containsKey('longitude'));
+    _pickFromMap = !(widget.state.position != Point() ||
+    widget.state.position != LeafNode.defaultPosition);
   }
 
   // Call back for point picking on the map
   void _onPointChanged(LatLng newPoint) {
     setState(() {
       // Update the point in the text controllers
-      _controllers['latitude']!.text = newPoint.latitude.toString();
-      _controllers['longitude']!.text = newPoint.longitude.toString();
+      _textControllers['latitude']!.text = newPoint.latitude.toString();
+      _textControllers['longitude']!.text = newPoint.longitude.toString();
     });
   }
 
   @override
   void dispose() {
     // Dispose all created TextEditingController to prevent memory leaks.
-    _controllers.forEach((key, controller) => controller.dispose());
+    _textControllers.forEach((key, controller) => controller.dispose());
     super.dispose();
   }
 
@@ -79,64 +96,42 @@ class _NodeEditorState extends State<LeafNodeEditor> {
             // Display an informational label at the top of the dialog.
             buildInfoLabel(context,info),
             // Dynamically build text field editors for all properties
-            // except 'id' (because it is private), and lat/long because
-            // they are edited with a different widget.
-            ...properties.map.entries.where((entry) => entry.key != 'id' && entry.key != 'latitude' && entry.key != 'longitude').map((entry) {
+            // except 'id' (because it is private)
+            ...properties.map.entries.where((entry) => entry.key != 'id' ).map((entry) {
               return buildTextFieldEditor(
                 context,
-                _controllers[entry.key]!, // Use the pre-initialized controller
+                _textControllers[entry.key]!, // Use the pre-initialized controller
                 '${_spruceUpKey(entry.key)}:', // Spruce up the key for display
                 'Enter ${entry.key}', // Hint text
               );
             }),
-            // If latitude or longitude properties exist, build a geographic coordinate editor.
-            if (properties.map.containsKey('latitude') || properties.map.containsKey('longitude'))
-              buildPositionMethodWidget(context, _pickFromMap, (value) {
-                setState(() {
-                  _pickFromMap = value;
-                });
-              }),
             SizedBox(height: 8),
-            if (properties.map.containsKey('latitude') || properties.map.containsKey('longitude'))
-              SizedBox(
-                width: _pickFromMap ? MediaQuery.of(context).size.width * 0.8 : null,
-                height: _pickFromMap ? MediaQuery.of(context).size.height * 0.5 : null,
-                child: _pickFromMap
-                    ? buildSinglePointMapEditor(
-                        context,
-                        LatLng(
-                          double.tryParse(_controllers['latitude']!.text) ?? 0.0,
-                          double.tryParse(_controllers['longitude']!.text) ?? 0.0,
-                        ),
-                        _onPointChanged,
-                      )
-                    : buildGeoCoordEditor(
-                        context,
-                        _controllers['latitude']!,
-                        _controllers['longitude']!,
-                      ),
+            SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.height * 0.5,
+                child: LocationEditor(
+                    initialLocation: widget.state.position.toLatLng(),
+                    onLocationChanged: (LatLng location) {
+                      _onPointChanged(location);
+                    }),
               ),
           ],
         ),
       ),
       actions: [
-        // Cancel button: Pops the dialog and returns null.
+        // Cancel button: Pops the dialog and returns an empty map.
         TextButton(
-          onPressed: () => Navigator.of(context).pop(null),
+          onPressed: () => Navigator.of(context).pop<Map<String, Object>>({}),
           child: const Text('Cancel'),
         ),
         // Save button: Collects updated values and pops the dialog with the result.
         TextButton(
           onPressed: () {
-            // Create a mutable copy of the properties map.
-            final updatedProperties = Map<String, dynamic>.from(properties.map);
-            _controllers.forEach((key, controller) {
-              if (key == 'latitude' || key == 'longitude') {
-                updatedProperties[key] = double.tryParse(controller.text);
-              } else {
-                updatedProperties[key] = controller.text;
-              }
-            });
+            // Map the text controller properties straight to Map<String,Object>
+            // and pop it like its hoooooooottt.
+            final updatedProperties = Map<String,Object>.from(_textControllers.map((key,value) {
+              return MapEntry(key,value.text);
+            }));
             Navigator.of(context).pop(updatedProperties);
           },
           child: const Text('Save'),
