@@ -31,7 +31,7 @@ abstract class StorageProvider {
   Future<String> store(Uint8List data, {
     required String category, 
     required String fileName,
-    String? mimeType,
+    String mimeType,
   });
 
   /// Retrieves the raw bytes for the given [identifier].

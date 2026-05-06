@@ -100,6 +100,8 @@ class DataNode {
     return result;
   }
 
+  String toString() => toMap().toString();
+
   /// Converts the DataNode to an encodable object for JSON serialization.
   Object toJson() => toMap();
 
@@ -109,6 +111,24 @@ class DataNode {
   /// Opens a stream for reading the data object from the active storage
   /// provider.
   Future<Stream<List<int>>> openStream() => StagerSystem.storage.getStream(path);
+
+  /// Writes the provided [data] to the data object's path in the active storage
+  /// provider.
+  ///
+  /// This operation overwrites the existing content at the current [path].
+  /// [category] is used by the storage provider to organize the data.
+  /// [fileName] is the suggested name for the file.
+  Future<void> write(Uint8List data, {
+    required String category,
+    required String fileName,
+  }) async {
+    await StagerSystem.storage.store(
+      data,
+      category: category,
+      fileName: fileName,
+      mimeType: mimeType,
+    );
+  }
 
   /// Removes the data object from the active storage provider if [confirmed] is
   /// true.

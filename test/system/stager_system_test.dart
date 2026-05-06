@@ -5,25 +5,79 @@ import 'dart:typed_data';
 // Flutter
 import 'package:flutter_test/flutter_test.dart';
 
+// External packages
+import 'package:mockito/mockito.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
 // Project files
 import 'package:stager_platform/persistence/local_storage_provider.dart';
 import 'package:stager_platform/system/selection_service.dart';
 import 'package:stager_platform/system/stager_system.dart';
 
+/// A manual fake for the PathProvider platform interface.
+///
+/// This avoids the need for build_runner during diagnostic system tests while
+/// adhering to the Single Return Principle and no-null policy.
+class FakePathProviderPlatform extends PathProviderPlatform
+    with MockPlatformInterfaceMixin {
+  String? _mockPath;
+
+  /// Sets the path to be returned by [getApplicationDocumentsPath].
+  void setMockPath(String path) {
+    _mockPath = path;
+  }
+
+  @override
+  Future<String?> getApplicationDocumentsPath() async {
+    return _mockPath;
+  }
+}
+
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('System diagnostic tests', () {
+    late FakePathProviderPlatform fakePlatform;
+
+    setUp(() {
+      // Initialize and register the fake platform.
+      fakePlatform = FakePathProviderPlatform();
+      PathProviderPlatform.instance = fakePlatform;
+    });
+
     test('Can retrieve the temporary directory', () {
       // Retrieve the temporary directory from the system.
       final tempDir = StagerSystem.temporaryDirectory;
 
       // Verify that the directory exists on the filesystem.
-      // Note: StagerSystem doesn't create it, but LocalStorageProvider.store
-      // will create its category subdirectories under this path.
       expect(tempDir, isNotNull);
 
       // Log the path for diagnostic purposes.
       final os = Platform.operatingSystem;
       print("Stager Temporary for $os OS: ${tempDir.path}");
+    });
+
+    test('Can retrieve the documents directory', () async {
+      // Arrange: Setup the mock path for the base documents directory.
+      const baseMockPath = '/mock/documents';
+      fakePlatform.setMockPath(baseMockPath);
+
+      // Act: Retrieve the documents directory from the system.
+      final docsDir = await StagerSystem.documentsDirectory;
+
+      // Assert: Verify that the path is correct based on the platform logic.
+      late final bool isCorrect;
+      if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+        final expectedPath =
+            path.join(baseMockPath, StagerSystem.tmpDirectoryRoot);
+        isCorrect = docsDir.path == expectedPath;
+      } else {
+        isCorrect = docsDir.path == baseMockPath;
+      }
+
+      expect(isCorrect, isTrue);
     });
   });
 

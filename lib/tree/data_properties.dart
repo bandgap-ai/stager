@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import '../system/typed_value.dart';
+import '../system/stager_system.dart';
 import 'concrete_node_properties.dart';
 import 'data_node.dart';
 import 'node_observer.dart';
@@ -56,8 +58,56 @@ class DataProperties implements ObservableSubject {
     notify();
   }
 
+  /// Stores data in the [StorageProvider] and creates a [DataNode] in this
+  /// container atomically.
+  ///
+  /// [data]: The raw bytes to store.
+  /// [category]: A logical grouping for the storage provider.
+  /// [fileName]: The suggested name for the file.
+  /// [mimeType]: The MIME type hint for the storage backend.
+  /// [type]: The [DataNodeType] for the new node.
+  ///
+  /// Returns the newly created [DataNode].
+  Future<DataNode> addAsset(
+    Uint8List data, {
+    required String category,
+    required String fileName,
+    String mimeType = 'application/octet-stream',
+    DataNodeType type = DataNodeType.other,
+  }) async {
+    // Store the data and get the unique identifier (path).
+    final String identifier = await StagerSystem.storage.store(
+      data,
+      category: category,
+      fileName: fileName,
+      mimeType: mimeType,
+    );
+
+    // Create the DataNode.
+    final DataNode node = DataNode(
+      path: identifier,
+      type: type,
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+      mimeType: mimeType,
+      size: data.length,
+    );
+
+    // Add it to our properties map.
+    final String key = 'attachment_${node.timestamp}';
+    set(key, node);
+
+    return node;
+  }
+
+  /// Like node properties, data properties can be retrieved as a full map of
+  /// typed values, if necessary.
+  Map<String,TypedValue<Object>> get map => _properties.map;
+
   /// Converts this container to a map.
-  Map<String, Object> toMap() => _properties.map;
+  Map<String, Object> toMap() => _properties.toMap();
+
+  /// Magic json function
+  Object toJson() => toMap();
 
   @override
   void attach(NodeObserver observer) {

@@ -18,6 +18,7 @@ class NodePropertyException implements Exception {
 /// This class serves as a base for concrete implementations that will store
 /// and manage key-value pairs representing node-specific data.
 abstract class NodeProperties implements ObservableSubject {
+
   /// Retrieves the value of a property given its [key].
   ///
   /// [key]: The string identifier for the property.
@@ -82,4 +83,12 @@ abstract class NodeProperties implements ObservableSubject {
   /// stored value. Per Stager's no-null policy, the map will not include null
   /// values.
   Map<String, TypedValue<Object>> get map;
+
+  /// toMap() is an alternative to the getter map and it produces a pure
+  /// Map<String,Object>. Where map() has its uses in programmatic situations,
+  /// toMap() is more convenient for I/O.
+  Map<String,Object> toMap();
+
+  /// Magic json function
+  Object toJson();
 }

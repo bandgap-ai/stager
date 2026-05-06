@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:stager_platform/system/selection_observer.dart';
-import 'package:stager_platform/editors/stager_pin.dart';
-import 'package:stager_platform/editors/stager_tree_viewers.dart';
-import 'package:stager_platform/tree/data_properties.dart';
-import 'package:stager_platform/tree/tree_node.dart';
-import 'package:stager_platform/tree/leaf_node.dart';
-import 'package:stager_platform/editors/node_properties_view.dart';
-
+import 'package:path/path.dart' as path;
+import '../system/selection_observer.dart';
+import 'stager_pin.dart';
+import 'stager_tree_viewers.dart';
+import '../tree/data_properties.dart';
+import '../tree/tree_node.dart';
+import '../tree/leaf_node.dart';
+import '../editors/node_properties_view.dart';
+import '../system/stager_system.dart';
 import '../system/selection_service.dart';
 import '../tree/data_node.dart';
 import '../tree/data_properties_observer.dart';
@@ -92,6 +93,8 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     _pin = widget.pin;
     // Initialize the data properties observer
     _dataObserver = PropertiesWidgetDataObserver(_dataObserverCallback);
+    // Set the reference to the data properties
+    _dataProps = DataProperties();
   }
 
   @override
@@ -118,15 +121,14 @@ class _PropertiesWidgetState extends State<PropertiesWidget>
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      // FIXME! Pretty sure this will break. The view needs to use visitation to
-      // get this value.
-      LeafNode node = widget.selectionService.selection.value;
-      // Add the new data node
-      final date = DateTime.now();
-      final data = DataNode(path: pickedFile.path,
-          timestamp: date.millisecondsSinceEpoch);
-      final fileKey = 'attachment_$date';
-      node.dataNodes.set(fileKey, data);
+      // Add the new data node to the selected node's data properties.
+      // The storage provider handles path management based on category.
+      await _dataProps.addAsset(
+        await pickedFile.readAsBytes(),
+        category: "images",
+        fileName: pickedFile.name,
+        type: DataNodeType.image,
+      );
     }
   }
 

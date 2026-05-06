@@ -2,7 +2,7 @@ import 'package:build_test/build_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stager_platform/editors/leaf_node_editor.dart';
-import 'package:stager_platform/editors/single_point_map_editor.dart';
+import 'package:stager_platform/mapping/single_point_map_editor.dart';
 import 'package:stager_platform/mapping/location_editor.dart';
 import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/system/point.dart';

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:stager_platform/mapping/location_editor.dart';
 import 'package:stager_platform/mapping/map_editor.dart';
 import 'package:stager_platform/mapping/map_state.dart';
+import 'package:stager_platform/mapping/single_point_map_editor.dart';
 import 'package:stager_platform/site_state.dart';
+import 'package:latlong2/latlong.dart';
 
 /// This is a class for manually testing widgets in Stager. It is not used
 /// by clients or in any final products. Its sole purpose is to enable local
@@ -48,7 +50,7 @@ class _StagerPlatformExampleHomePageState extends
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _mapState = MapState(SiteState());
   }
 
@@ -74,6 +76,7 @@ class _StagerPlatformExampleHomePageState extends
             Tab(icon: Icon(Icons.map_rounded), text: 'Location Editor Widget'),
             Tab(icon: Icon(Icons.map_outlined), text: 'Stager Map Editor'),
             Tab(icon: Icon(Icons.brightness_5_sharp), text: 'Tab 3'),
+            Tab(icon: Icon(Icons.brightness_5_sharp), text: 'Single Point Map Editor'),
           ],
         )
       ),
@@ -119,6 +122,7 @@ class _StagerPlatformExampleHomePageState extends
                 ],
               ),
             ),
+            Center(child: SinglePointMapEditor(centerPosition: LatLng(0.0,0.0), onPointChanged: (LatLng p1) {  },)),
           ],
         ),
       ),

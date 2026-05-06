@@ -143,7 +143,7 @@ class ConcreteLeafNode implements LeafNode {
       // Add a type marker so clients know the type of the node
       'type' : runtimeType.toString(),
       'dataNodes' : _dataNodes.toMap(),
-      ..._properties.map
+      ..._properties.toMap(),
     };
 
   }
@@ -180,10 +180,21 @@ class ConcreteLeafNode implements LeafNode {
 
     // Load the data nodes directly to avoid generic rehydration issues.
     if (map.containsKey('dataNodes')) {
+      // Outer map for data nodes
       final dataMap = map['dataNodes'] as Map<String, Object>;
+      // MapEntry for the identifier for the data node and the TypedValue tuple
+      // representing the data node
       for (final entry in dataMap.entries) {
-        if (entry.value is Map<String, Object>) {
-          _dataNodes.set(entry.key, DataNode.fromMap(entry.value as Map<String, Object>));
+        // TypedValue tuple for the data node
+        if (entry.value is List<Object>) {
+          // See if the tuple has been complete serialized previously
+          final node = (entry.value as List<Object>)[1];
+          if (node is Map<String,Object>) {
+            _dataNodes.set(entry.key, DataNode.fromMap(node));
+          } else if (node is DataNode) {
+            // Or only partially serialized
+            _dataNodes.set(entry.key, node);
+          }
         }
       }
       map.remove('dataNodes');

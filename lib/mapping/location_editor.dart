@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/providers/geolocator_location_provider.dart';
 import 'package:stager_platform/providers/location_provider.dart';
 import 'package:logger/logger.dart';
+import 'single_point_map_editor.dart';
 
 /// An editor widget for selecting a location.
 ///
@@ -251,15 +252,31 @@ class _LocationEditorState extends State<LocationEditor> {
 
     switch (_selectedMethod) {
       case LocationPickerMethod.auto:
-        result = _buildAutoLocatorPanel(context);
+        result = SingleChildScrollView(child: _buildAutoLocatorPanel(context));
       case LocationPickerMethod.map:
-        // Placeholder for map picker functionality
-        result = const Center(child: Text('Map picker not implemented.'));
+        // Extract current coordinates from the controllers to initialize the
+        // map.
+        final double lat = double.tryParse(latitudeController.text) ??
+            widget.initialLocation.latitude;
+        final double lng = double.tryParse(longitudeController.text) ??
+            widget.initialLocation.longitude;
+        final LatLng currentLoc = LatLng(lat, lng);
+
+        result = SinglePointMapEditor(
+          initialPoint: currentLoc,
+          centerPosition: currentLoc,
+          onPointChanged: (LatLng point) {
+            // Update the controllers with the new coordinates from the map.
+            // This triggers _onControllerChanged which notifies the parent.
+            latitudeController.text = point.latitude.toString();
+            longitudeController.text = point.longitude.toString();
+          },
+        );
       case LocationPickerMethod.address:
-        result = _buildAddressPanel(context);
+        result = SingleChildScrollView(child: _buildAddressPanel(context));
     }
 
-    return SingleChildScrollView(child: result);
+    return result;
   }
 
   @override

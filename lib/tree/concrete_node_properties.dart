@@ -35,6 +35,18 @@ class ConcreteNodeProperties implements NodeProperties {
   @override
   Map<String, TypedValue<Object>> get map => _properties;
 
+  /// toMap() is an alternative to the getter map and it produces a pure
+  /// Map<String,Object>. Where map() has its uses in programmatic situations,
+  /// toMap() is more convenient for I/O.
+  @override
+  Map<String,Object> toMap() => _properties.map((key, value) {
+    return MapEntry(key,value.toTuple());
+  });
+
+  /// Magic json function
+  @override
+  Object toJson() => toMap();
+
   @override
   T get<T>(String key) {
     late final T result;

@@ -3,7 +3,10 @@
 /// in `lib/stager/concrete_tree.dart`.
 library;
 
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stager_platform/persistence/json_io_util.dart';
 import 'package:stager_platform/system/stager_context.dart';
 import 'package:stager_platform/system/typed_value.dart';
 import 'package:stager_platform/tree/tree.dart';
@@ -97,6 +100,32 @@ void main() {
       expect(leaf.isComposite, isFalse);
     });
 
+    test('ConcreteLeafNode can be fully serialized and deserialized with DataNodes', () {
+      final leaf = ConcreteLeafNode(name: 'Leaf with Data');
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final dataNode = DataNode(
+        path: 'assets/test.png',
+        type: DataNodeType.image,
+        mimeType: 'image/png',
+        size: 1024,
+        timestamp: now,
+      );
+      leaf.dataNodes.set('main_image', dataNode);
+      leaf.properties.set<int>('version', 1);
+
+      // Full serialization to JSON string
+      JsonIOUtil jsonUtil = JsonIOUtil();
+      final jsonString = jsonUtil.serialize([leaf]);
+
+      // Deserialization back to map
+      final LeafNode decodedLeaf = jsonUtil.deserialize(jsonString)[0];
+
+      expect(decodedLeaf.name, 'Leaf with Data');
+      expect(decodedLeaf.dataNodes.size, 1);
+      expect(decodedLeaf.dataNodes.get('main_image'), dataNode);
+      expect(decodedLeaf.properties.get<int>('version'), 1);
+    });
+
     test('ConcreteLeafNode manages data nodes correctly', () {
       final leaf = ConcreteLeafNode(name: 'Leaf 1');
       expect(leaf.hasData, isFalse);
@@ -112,6 +141,7 @@ void main() {
       );
 
       leaf.dataNodes.set('attachment', dataNode);
+      leaf.properties.set<int>('version', 1);
 
       expect(leaf.hasData, isTrue);
       expect(leaf.dataNodes.size, 1);
@@ -120,24 +150,13 @@ void main() {
       // Verify serialization
       final map = leaf.toMap();
       expect(map.containsKey('dataNodes'), isTrue);
+      print("Dehydrated: $map");
 
       // Verify deserialization
       final rehydratedLeaf = ConcreteLeafNode(name: 'Leaf 2');
-      
-      // Before calling fromMap, we need to ensure the dataNodes entry is in a 
-      // format fromMap can handle (Map of Maps, as per current implementation).
-      // leaf.toMap() currently puts Map<String, TypedValue<DataNode>> there.
-      final Map<String, Object> mapWithPlainData = Map.of(map);
-      final dataNodesMap = map['dataNodes'] as Map<String, Object>;
-      final plainDataNodesMap = dataNodesMap.map((key, value) {
-         if (value is TypedValue<DataNode>) {
-           return MapEntry(key, value.value.toMap());
-         }
-         return MapEntry(key, value);
-      });
-      mapWithPlainData['dataNodes'] = plainDataNodesMap;
 
-      rehydratedLeaf.fromMap(mapWithPlainData);
+      rehydratedLeaf.fromMap(map);
+      print("Rehydrated: ${rehydratedLeaf.toMap()}");
       expect(rehydratedLeaf.hasData, isTrue);
       expect(rehydratedLeaf.dataNodes.get('attachment'), dataNode);
     });

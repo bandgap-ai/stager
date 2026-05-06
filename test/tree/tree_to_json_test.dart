@@ -4,6 +4,8 @@ import 'package:stager_platform/data/basic_sample_data.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/tree/iterators.dart';
 
+import 'json_reviver.dart';
+
 
 class TestLeafNode extends ConcreteLeafNode {
   TestLeafNode({required super.name});
@@ -21,22 +23,6 @@ class TestLeafNode extends ConcreteLeafNode {
 
 /// A bunch of diagnostic tests for json manipulation.
 void main() {
-  /// A reviver function for [jsonDecode] that ensures the resulting object 
-  /// graph is strictly typed and adheres to the platform's No-Null Policy.
-  Object _jsonReviver(Object? key, Object? value) {
-    // Satisfy No-Null policy by converting nulls to empty strings.
-    Object result = value ?? '';
-
-    if (value is Map) {
-      // Reify dynamic maps into strictly typed Map<String, Object>.
-      result = Map<String, Object>.from(value);
-    } else if (value is List) {
-      // Reify dynamic lists into strictly typed List<Object>.
-      result = List<Object>.from(value);
-    }
-
-    return result;
-  }
 
   test('Output sample data to console hierarchically', () {
     // Iterate through each root site using DepthFirstIterator to visit 
@@ -73,7 +59,7 @@ void main() {
     final String jsonString = jsonEncode(originalMap);
 
     // Decode the JSON string back into a map using the reviver for reification.
-    final dynamic decodedMap = jsonDecode(jsonString, reviver: _jsonReviver);
+    final dynamic decodedMap = jsonDecode(jsonString, reviver: jsonReviver);
 
     // Verify that the reified decoded map is equal to the original map.
     expect(decodedMap, equals(originalMap));
@@ -83,7 +69,7 @@ void main() {
     final leaf = TestLeafNode(name: 'Test Leaf');
     final String leafJson = jsonEncode(leaf);
     print(leafJson);
-    final revivedLeafCastMap = jsonDecode(leafJson, reviver: _jsonReviver);
+    final revivedLeafCastMap = jsonDecode(leafJson, reviver: jsonReviver);
     print(revivedLeafCastMap);
     print(revivedLeafCastMap.runtimeType);
     final map = Map<String,Object>.from(revivedLeafCastMap);

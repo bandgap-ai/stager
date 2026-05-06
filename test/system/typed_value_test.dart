@@ -504,7 +504,7 @@ void main() {
         // We only test the rehydration of TypedValue supported types here.
         if (!entriesToSkip.contains(entry.key)) {
           final reifiedTypedValue = buildTypedValue(context);
-          reifiedMap[entry.key] = reifiedTypedValue;
+          reifiedMap[entry.key] = reifiedTypedValue.toTuple();
         } else {
           // Skip id, position and name as they are either raw or use custom
           // builders not yet registered in buildTypedValue's internal map.
@@ -515,7 +515,7 @@ void main() {
       print('Rehydrated Map: $reifiedMap');
 
       // Verify that the rehydration cycle is lossless and produces equal maps.
-      expect(leafPropMap, reifiedMap);
+      expect(reifiedMap, leafPropMap);
     });
 
     test("toString() and toJson()", () {

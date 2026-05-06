@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:stager_platform/editors/single_point_map_editor.dart';
+import 'package:stager_platform/mapping/single_point_map_editor.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 import '../mapping/location_editor.dart';

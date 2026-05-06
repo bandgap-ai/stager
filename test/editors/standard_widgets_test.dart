@@ -8,7 +8,7 @@ import 'package:stager_platform/mapping/location_editor.dart';
 import 'package:stager_platform/system/selection.dart';
 import 'package:stager_platform/editors/stager_pin.dart';
 import 'package:stager_platform/editors/standard_widgets.dart';
-import 'package:stager_platform/editors/single_point_map_editor.dart';
+import 'package:stager_platform/mapping/single_point_map_editor.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:stager_platform/system/selection_service.dart';
 import 'package:stager_platform/tree/concrete_leaf_node.dart';

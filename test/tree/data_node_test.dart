@@ -101,6 +101,26 @@ void main() {
       expect(result, equals(data));
     });
 
+    test("write should store data through the storage provider", () async {
+      // Create a DataNode with a target path.
+      final node = DataNode(
+        path: '${tempDir.path}/io_test/written.bin',
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      );
+      final data = Uint8List.fromList([70, 80, 90]);
+
+      // Act: Write data using the node.
+      await node.write(data, category: 'io_test', fileName: 'written.bin');
+
+      // Assert: Verify the file exists and has correct content.
+      expect(await StagerSystem.storage.exists(node.path), isTrue);
+      expect(await StagerSystem.storage.get(node.path), equals(data));
+
+      // Cleanup: Remove the file through the node.
+      await node.remove(true);
+      expect(await StagerSystem.storage.exists(node.path), isFalse);
+    });
+
     test("remove should delete from storage only when confirmed", () async {
       // Create and store dummy data.
       final data = Uint8List.fromList([1, 1, 1]);
