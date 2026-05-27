@@ -65,6 +65,8 @@ setup_dependencies_linux:
 # Run all tests on all operating systems with coverage
 test_all:
   stage: test
+  tags:
+    - bg-linux
   needs: ["test_linux", "test_macos", "test_windows"]
   script:
     - echo "Aggregating multi-platform test results."
@@ -103,6 +105,7 @@ test_macos:
   tags:
     - saas-macos-medium-m1
   image: macos-14-xcode-15
+  dependencies: [] # Skip downloading Linux artifacts
   script:
     - echo "Running natively on GitLab's SaaS Apple Silicon!"
     - sw_vers
@@ -111,6 +114,7 @@ test_windows:
   stage: test
   tags:
     - bg-win
+  dependencies: [] # Skip downloading Linux artifacts
   script:
     - echo "Executing on the Windows self-hosted runner!"
     - Write-Host (Get-CimInstance Win32_OperatingSystem).Caption
