@@ -114,6 +114,7 @@ test_windows:
   script:
     - echo "Executing on the Windows self-hosted runner!"
     - Write-Host (Get-CimInstance Win32_OperatingSystem).Caption
+    - flutter --version
 
 
 # Static analysis and code quality. Only performed on Linux.
