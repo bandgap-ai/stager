@@ -45,7 +45,7 @@ dart_test:
 	$(DART_EXE) test $(GENERATOR_TESTS)
 
 flutter_test:
-	$(FLUTTER_EXE) test
+	$(FLUTTER_EXE) test --coverage
 
 test: dart_test flutter_test
 

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:stager_platform/editors/basic_editor_factory.dart';
 import 'package:stager_platform/tree/tree.dart';
 import 'package:stager_platform/editors/leaf_node_editor.dart';
 import 'package:stager_platform/editors/add_property_dialog.dart';
 import 'package:stager_platform/editors/stager_editor.dart';
 
 import '../system/typed_value.dart';
+import 'controller.dart';
+import 'dialog_control_button.dart';
+import 'edit_node_controller.dart';
+import 'editor_factory.dart';
 
 /// A stateful widget that displays the properties of a [NodeProperties] object
 /// and automatically updates itself when the properties change.
@@ -155,27 +160,19 @@ class _NodePropertiesViewState extends State<NodePropertiesView>
   ///
   /// [context]: The context in which the widget is being built.
   Widget _buildEditButton(BuildContext context) {
+
+    // Wire the editor button the same way as the Stager Navigator.
+    // This needs to eventually be wired back to the default editor
+    // factory (which may not be BasicEditorFactory) configured by clients, but
+    // it is OK for now.
+    EditorFactory editorFactory = BasicEditorFactory();
+    Controller editController = EditNodeController(widget.state, editorFactory);
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () async {
-            final updatedProperties = await showDialog<Map<String, Object>>(
-              context: context,
-              builder: (BuildContext context) {
-                return LeafNodeEditor(state: widget.state);
-              },
-            );
-
-            if (updatedProperties != null) {
-              // Update the properties of the current node
-              updatedProperties.forEach((key, value) {
-                properties.set<String>(key, value.toString());
-              });
-            }
-          },
-        ),
+        // Add
+        DialogControlButton(controller: editController),
         IconButton(
           icon: const Icon(Icons.add),
           onPressed: () async {

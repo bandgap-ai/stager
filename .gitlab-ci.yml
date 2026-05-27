@@ -17,9 +17,6 @@ include:
 secret_detection:
   stage: secret-detection
 
-# Use the official Flutter Docker image with a stable version
-image: ghcr.io/cirruslabs/flutter:latest
-
 # Cache dependencies between pipeline runs to speed up builds
 cache:
   key: "${CI_COMMIT_REF_SLUG}"
@@ -31,10 +28,10 @@ cache:
 stages:
   - setup
   - get-binaries
-  - sonarcloud-check
   - secret-detection
   - analyze
   - test
+  - sonarcloud-check
   - build
 
 # Global variables for consistent configuration
@@ -48,8 +45,11 @@ variables:
   GIT_DEPTH: "0"
 
 # Setup dependencies stage
-setup_dependencies:
+setup_dependencies_linux:
   stage: setup
+  image: ghcr.io/cirruslabs/flutter:latest
+  tags:
+    - bg-linux
   script:
     - flutter --version
     - flutter doctor -v
@@ -57,24 +57,30 @@ setup_dependencies:
   artifacts:
     paths:
       - pubspec.lock
-      - lib/stager_registry.g.dart
+      - "lib/**/*.g.dart"
       - .pub-cache/
       - .dart_tool/
     expire_in: 2 hours
 
-# Run all tests with coverage
+# Run all tests on all operating systems with coverage
 test_all:
   stage: test
-  needs: ["setup_dependencies"]
+  needs: ["test_linux", "test_macos", "test_windows"]
+  script:
+    - echo "Aggregating multi-platform test results."
+
+test_linux:
+  stage: test
+  image: ghcr.io/cirruslabs/flutter:latest
+  tags:
+    - bg-linux
+  needs: ["setup_dependencies_linux"]
   before_script:
     # Install lcov for genhtml command and lcov_cobertura for format conversion
     - apt-get update -qq && apt-get install -y -qq lcov python3-pip
     - pip install --break-system-packages lcov_cobertura
   script:
-    # Run specialized generator tests
-    - make dart_test
-    # Run Flutter unit tests and generate coverage data
-    - flutter test --coverage
+    - make test
     # Generate HTML coverage report
     - genhtml coverage/lcov.info -o $CI_PROJECT_DIR/coverage/html
     # Convert lcov.info to Cobertura format for GitLab
@@ -92,17 +98,40 @@ test_all:
         coverage_format: cobertura
         path: coverage/cobertura-coverage.xml
 
-# Static analysis and code quality
+test_macos:
+  stage: test
+  tags:
+    - saas-macos-medium-m1
+  image: macos-14-xcode-15
+  script:
+    - echo "Running natively on GitLab's SaaS Apple Silicon!"
+    - sw_vers
+
+test_windows:
+  stage: test
+  tags:
+    - bg-win
+  script:
+    - echo "Executing on the Windows self-hosted runner!"
+    - Write-Host (Get-CimInstance Win32_OperatingSystem).Caption
+
+
+# Static analysis and code quality. Only performed on Linux.
 analyze:
   stage: analyze
-  needs: ["setup_dependencies"]
+  image: ghcr.io/cirruslabs/flutter:latest
+  tags:
+    - bg-linux
+  needs: ["setup_dependencies_linux"]
   script:
     - echo "Running static analysis..."
     - make analyze
 
-# Dry run of dart publish.
+# Dry run of dart publish. Only performed on Linux.
 dart-publish-dry-run:
   stage: build
+  tags:
+    - bg-linux
   needs: ["test_all", "analyze"]
   script:
     - echo "Running 'dart pub publish --dry-run'."
@@ -111,6 +140,9 @@ dart-publish-dry-run:
 # SonarQube binaries
 get-binaries:
   stage: get-binaries
+  image: ghcr.io/cirruslabs/flutter:latest
+  tags:
+    - bg-linux
   script:
     - curl -sSLo ./sonar-scanner.zip 'https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-8.0.1.6346-linux-x64.zip'
     - unzip -o sonar-scanner.zip
@@ -123,7 +155,11 @@ get-binaries:
 # Actual SonarQube check
 sonarcloud-check:
   stage: sonarcloud-check
+  image: ghcr.io/cirruslabs/flutter:latest
+  tags:
+    - bg-linux
   dependencies:
     - get-binaries
+    - test_linux
   script:
     - sonar-scanner/bin/sonar-scanner

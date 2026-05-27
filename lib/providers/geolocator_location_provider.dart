@@ -5,10 +5,37 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:stager_platform/providers/location_provider.dart';
 import 'geolocation_exception.dart';
+import 'package:flutter/foundation.dart';
+
+/// Set high
+LocationSettings getLocationSettings() {
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    return AndroidSettings(
+      accuracy: LocationAccuracy.bestForNavigation,
+      distanceFilter: 0,
+      // Bypass Google's Wi-Fi fused provider and forces the native Android
+      // hardware GPS manager.
+      forceLocationManager: true,
+      intervalDuration: const Duration(seconds: 1),
+    );
+  } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+    return AppleSettings(
+      accuracy: LocationAccuracy.bestForNavigation,
+      activityType: ActivityType.fitness, // Keeps the GPS chip awake continuously
+      distanceFilter: 0,
+    );
+  } else {
+    return const LocationSettings(
+      accuracy: LocationAccuracy.bestForNavigation,
+      distanceFilter: 0,
+    );
+  }
+}
 
 /// A concrete implementation of [LocationProvider] that uses the `geolocator`
 /// package to provide real location data.
 class GeolocatorLocationProvider implements LocationProvider {
+
   /// Creates a [GeolocatorLocationProvider].
   const GeolocatorLocationProvider();
 
@@ -33,7 +60,9 @@ class GeolocatorLocationProvider implements LocationProvider {
   @override
   Future<Position> getCurrentPosition() {
     // Forward the call directly to the geolocator package.
-    return Geolocator.getCurrentPosition();
+    return Geolocator.getCurrentPosition(
+      locationSettings: getLocationSettings()
+    );
   }
 
   @override
