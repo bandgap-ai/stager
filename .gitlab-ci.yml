@@ -50,6 +50,8 @@ setup_dependencies_linux:
   image: ghcr.io/cirruslabs/flutter:latest
   tags:
     - bg-linux
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq cmake
   script:
     - flutter --version
     - flutter doctor -v
