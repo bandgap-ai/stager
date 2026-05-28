@@ -62,6 +62,22 @@ setup_dependencies_linux:
       - .dart_tool/
     expire_in: 2 hours
 
+setup_dependencies_windows:
+  stage: setup
+  tags:
+    - bg-win
+  script:
+    - flutter --version
+    - flutter doctor -v
+    - nmake generate
+  artifacts:
+    paths:
+      - pubspec.lock
+      - "lib/**/*.g.dart"
+      - .pub-cache/
+      - .dart_tool/
+    expire_in: 2 hours
+
 # Run all tests on all operating systems with coverage
 test_all:
   stage: test
@@ -114,12 +130,9 @@ test_windows:
   stage: test
   tags:
     - bg-win
-  dependencies: [] # Skip downloading Linux artifacts
+  dependencies: ["setup_dependencies_windows"] # Skip downloading Linux artifacts
   script:
-    - echo "Executing on the Windows self-hosted runner!"
-    - Write-Host (Get-CimInstance Win32_OperatingSystem).Caption
-    - flutter --version
-    - nmake /help
+    - nmake test
 
 # Static analysis and code quality. Only performed on Linux.
 analyze:
