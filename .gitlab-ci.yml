@@ -53,7 +53,8 @@ setup_dependencies_linux:
   script:
     - flutter --version
     - flutter doctor -v
-    - make generate
+    - cmake -S . -B build
+    - cmake --build build --target generate
   artifacts:
     paths:
       - pubspec.lock
@@ -69,7 +70,8 @@ setup_dependencies_windows:
   script:
     - flutter --version
     - flutter doctor -v
-    - nmake generate
+    - cmake -S . -B build
+    - cmake --build build --target generate
   artifacts:
     paths:
       - pubspec.lock
@@ -98,7 +100,7 @@ test_linux:
     - apt-get update -qq && apt-get install -y -qq lcov python3-pip
     - pip install --break-system-packages lcov_cobertura
   script:
-    - make test
+    - cmake --build --target test
     # Generate HTML coverage report
     - genhtml coverage/lcov.info -o $CI_PROJECT_DIR/coverage/html
     # Convert lcov.info to Cobertura format for GitLab
@@ -132,7 +134,7 @@ test_windows:
     - bg-win
   dependencies: ["setup_dependencies_windows"] # Skip downloading Linux artifacts
   script:
-    - nmake test
+    - cmake --build build --target test
 
 # Static analysis and code quality. Only performed on Linux.
 analyze:
@@ -143,7 +145,7 @@ analyze:
   needs: ["setup_dependencies_linux"]
   script:
     - echo "Running static analysis..."
-    - make analyze
+    - cmake --build build --target analyze
 
 # Dry run of dart publish. Only performed on Linux.
 dart-publish-dry-run:
