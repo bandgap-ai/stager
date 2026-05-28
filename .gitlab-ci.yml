@@ -133,7 +133,7 @@ test_windows:
     - hostname
     - echo "--- DYNAMICALLY LOCATING NMAKE ---"
     - $nmakePath = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -find **\nmake.exe | Select-Object -First 1
-    - echo "nmake is located at: $nmakePath"
+    - echo "nmake is located at $nmakePath"
 
 
 # Static analysis and code quality. Only performed on Linux.
