@@ -97,7 +97,7 @@ test_linux:
   needs: ["setup_dependencies_linux"]
   before_script:
     # Install lcov for genhtml command and lcov_cobertura for format conversion
-    - apt-get update -qq && apt-get install -y -qq lcov python3-pip
+    - apt-get update -qq && apt-get install -y -qq lcov python3-pip cmake
     - pip install --break-system-packages lcov_cobertura
   script:
     - cmake --build --target test
