@@ -34,13 +34,14 @@ add_custom_target(stager_help
     COMMAND ${CMAKE_COMMAND} -E echo "Detected Platform: ${FLUTTER_OS}"
     COMMAND ${CMAKE_COMMAND} -E echo ""
     COMMAND ${CMAKE_COMMAND} -E echo "Targets:"
-    COMMAND ${CMAKE_COMMAND} -E echo "  generate - Run build_runner code generation"
-    COMMAND ${CMAKE_COMMAND} -E echo "  analyze  - Run static analysis"
-    COMMAND ${CMAKE_COMMAND} -E echo "  test     - Run all unit tests"
-    COMMAND ${CMAKE_COMMAND} -E echo "  build    - Build the example app for ${FLUTTER_OS}"
-    COMMAND ${CMAKE_COMMAND} -E echo "  run      - Run the example app on ${FLUTTER_OS}"
-    COMMAND ${CMAKE_COMMAND} -E echo "  all      - Run generate, build, and test"
-    COMMAND ${CMAKE_COMMAND} -E echo "  clean    - Clean flutter build artifacts"
+    COMMAND ${CMAKE_COMMAND} -E echo "  stager_help - Generates this help message"
+    COMMAND ${CMAKE_COMMAND} -E echo "  generate    - Run build_runner code generation"
+    COMMAND ${CMAKE_COMMAND} -E echo "  analyze     - Run static analysis"
+    COMMAND ${CMAKE_COMMAND} -E echo "  test        - Run all unit tests"
+    COMMAND ${CMAKE_COMMAND} -E echo "  build       - Build the example app for ${FLUTTER_OS}"
+    COMMAND ${CMAKE_COMMAND} -E echo "  run         - Run the example app on ${FLUTTER_OS}"
+    COMMAND ${CMAKE_COMMAND} -E echo "  stager_all  - Run generate, build, and test"
+    COMMAND ${CMAKE_COMMAND} -E echo "  clean       - Clean flutter build artifacts"
     VERBATIM
 )
 

@@ -19,10 +19,12 @@ Development on the Stager Platform is primarily driven through the included
 consistent, cross-platform interface. This ensures that essential tasks like
 dependency resolution, code generation, and testing are executed with the
 correct flags regardless of the host operating system. Developers can build the
-entire project and run all tests by executing
+entire project and run all tests by executing the following from the root directory:
 
 ```bash
-make all 
+# Configure the project for the current platform
+cmake -S . -B build
+cmake --build build --target stager_all
 ```
 
 Developers can see the available make targets by simply executing `make`
@@ -30,11 +32,17 @@ without any arguments.
 
 ### Specific Build Targets
 
-The `make all` target executes the `generate`, `build`, and `test` sub-targets.
-The `generate` target runs the Dart `build_runner` to process source
-annotations, generate the master `stager_registry.g.dart` file and produce other
-required artifacts. The `build` target only executes the normal Flutter build.
-The `analyze` target will run the Flutter analyzer.
+See `cmake --build build --target stager_help` for a full list of targets.
+
+Targets:
+* stager_help - Generates this help message
+* generate    - Run build_runner code generation
+* analyze     - Run static analysis
+* test        - Run all unit tests
+* build       - Build the example app for linux
+* run         - Run the example app on linux
+* stager_all  - Run generate, build, and test
+* clean       - Clean flutter build artifacts
 
 ### Executing Tests
 
