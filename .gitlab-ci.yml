@@ -119,6 +119,7 @@ test_windows:
     - echo "Executing on the Windows self-hosted runner!"
     - Write-Host (Get-CimInstance Win32_OperatingSystem).Caption
     - flutter --version
+    - nmake.exe /help
 
 
 # Static analysis and code quality. Only performed on Linux.
