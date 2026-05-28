@@ -127,13 +127,13 @@ test_windows:
     - Test-Path "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.50.35717\bin\Hostx64\x64\nmake.exe"
     - echo "--- Checking Architecture (Is Windows redirecting us?) ---"
     - "[Environment]::Is64BitProcess"
-    - echo "--- Checking Traversal (What folders CAN we see?) ---"
-    - Get-ChildItem "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC"
     - echo "--- WHICH MACHINE IS RUNNING THIS? ---"
     - hostname
     - echo "--- DYNAMICALLY LOCATING NMAKE ---"
     - $nmakePath = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -find **\nmake.exe | Select-Object -First 1
     - echo "nmake is located at $nmakePath"
+    - echo "--- Checking Traversal (What folders CAN we see?) ---"
+    - Get-ChildItem "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC"
 
 
 # Static analysis and code quality. Only performed on Linux.
