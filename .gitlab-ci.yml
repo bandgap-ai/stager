@@ -142,6 +142,8 @@ test_windows:
 analyze:
   stage: analyze
   image: ghcr.io/cirruslabs/flutter:latest
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq cmake
   tags:
     - bg-linux
   needs: ["setup_dependencies_linux"]
