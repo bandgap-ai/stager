@@ -125,6 +125,10 @@ test_windows:
     - echo $env:PATH
     - echo "--- Checking File Permissions ---"
     - Test-Path "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.50.35717\bin\Hostx64\x64\nmake.exe"
+    - echo "--- Checking Architecture (Is Windows redirecting us?) ---"
+    - "[Environment]::Is64BitProcess"
+    - echo "--- Checking Traversal (What folders CAN we see?) ---"
+    - Get-ChildItem "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC"
 
 
 # Static analysis and code quality. Only performed on Linux.
