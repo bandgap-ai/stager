@@ -102,6 +102,7 @@ test_linux:
     - apt-get update -qq && apt-get install -y -qq lcov python3-pip cmake
     - pip install --break-system-packages lcov_cobertura
   script:
+    - cmake -S . -B build
     - cmake --build --target test
     # Generate HTML coverage report
     - genhtml coverage/lcov.info -o $CI_PROJECT_DIR/coverage/html
@@ -136,6 +137,7 @@ test_windows:
     - bg-win
   dependencies: ["setup_dependencies_windows"] # Skip downloading Linux artifacts
   script:
+    - cmake -S . -B build
     - cmake --build build --target test
 
 # Static analysis and code quality. Only performed on Linux.
