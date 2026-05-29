@@ -103,8 +103,8 @@ test_linux:
     - pip install --break-system-packages lcov_cobertura
   script:
     - cmake -S . -B build
-    - cmake --build --target generate
-    - cmake --build --target test
+    - cmake --build build --target generate
+    - cmake --build build --target test
     # Generate HTML coverage report
     - genhtml coverage/lcov.info -o $CI_PROJECT_DIR/coverage/html
     # Convert lcov.info to Cobertura format for GitLab
@@ -139,7 +139,7 @@ test_windows:
   dependencies: ["setup_dependencies_windows"] # Skip downloading Linux artifacts
   script:
     - cmake -S . -B build
-    - cmake --build --target generate
+    - cmake --build build --target generate
     - cmake --build build --target test
 
 # Static analysis and code quality. Only performed on Linux.
@@ -154,7 +154,7 @@ analyze:
   script:
     - echo "Running static analysis..."
     - cmake -S . -B build
-    - cmake --build --target generate
+    - cmake --build build --target generate
     - cmake --build build --target analyze
 
 # Dry run of dart publish. Only performed on Linux.
