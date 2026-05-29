@@ -149,6 +149,7 @@ analyze:
   needs: ["setup_dependencies_linux"]
   script:
     - echo "Running static analysis..."
+    - cmake -S . -B build
     - cmake --build build --target analyze
 
 # Dry run of dart publish. Only performed on Linux.
