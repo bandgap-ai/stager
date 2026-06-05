@@ -126,11 +126,42 @@ test_macos:
   stage: test
   tags:
     - saas-macos-medium-m1
-  image: macos-14-xcode-15
+  image: macos-15-xcode-16
+  cache:
+    key: "mac-flutter-3.44.1"
+    paths:
+      - flutter/
+      - ~/.pub-cache/
+
+  before_script:
+    - echo "--- Installing CMake ---"
+    - brew install cmake
+
+    - echo "--- Setting up Flutter 3.44.1 ---"
+    # If the unzipped flutter folder doesn't exist in the cache, download and extract it
+    - |
+      if [ ! -d "flutter" ]; then
+        echo "Cache miss: Downloading Flutter archive..."
+        curl -O https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_arm64_3.44.1-stable.zip
+        unzip -q flutter_macos_arm64_3.44.1-stable.zip
+        rm flutter_macos_arm64_3.44.1-stable.zip
+      else
+        echo "Cache hit: Using restored Flutter SDK."
+      fi
+
+    # Export the path for this runner session
+    - export PATH="$PWD/flutter/bin:$PATH"
+
+    # Pre-download specific binaries to save build time
+    - flutter config --enable-macos-desktop
+    - flutter precache --macos --ios
+
   dependencies: [] # Skip downloading Linux artifacts
   script:
-    - echo "Running natively on GitLab's SaaS Apple Silicon!"
-    - sw_vers
+    - echo "Testing the app"
+    - cmake -S . -B build
+    - cmake --build build --target generate
+    - cmake --build build --target test
 
 test_windows:
   stage: test
