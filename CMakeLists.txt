@@ -22,6 +22,13 @@ message(STATUS "Configuring Stager for target platform: ${FLUTTER_OS}")
 find_program(FLUTTER_EXE flutter REQUIRED)
 find_program(DART_EXE dart REQUIRED)
 
+# Overwrite the variables on Windows to prevent batch file termination.
+# This prevents you from having to rewrite your COMMAND blocks below.
+if(WIN32)
+    set(FLUTTER_EXE cmd /c call ${FLUTTER_EXE})
+    set(DART_EXE cmd /c call ${DART_EXE})
+endif()
+
 # Variables
 set(GENERATOR_TESTS "generator_test")
 
@@ -48,7 +55,7 @@ add_custom_target(stager_help
 # Target: generate
 add_custom_target(generate
     COMMAND ${FLUTTER_EXE} pub get
-    COMMAND ${DART_EXE} run build_runner build --delete-conflicting-outputs
+    COMMAND ${DART_EXE} run build_runner build
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Running build_runner code generation"
     VERBATIM
